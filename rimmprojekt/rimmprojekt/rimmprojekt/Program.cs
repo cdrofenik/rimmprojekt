@@ -1,4 +1,5 @@
 ﻿using System;
+using Xen;
 
 namespace rimmprojekt
 {
@@ -17,5 +18,16 @@ namespace rimmprojekt
         }
     }
 #endif
+}
+
+public class DisplayNameAttribute : Attribute
+{
+    private string name;
+
+    public string Name
+    {
+        get { return name; }
+        set { name = value; }
+    }
 }
 

@@ -9,83 +9,82 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 
+using Xen;
+using Xen.Camera;
+using Xen.Graphics;
+using Xen.Ex.Geometry;
+using Xen.Ex.Material;
+
 namespace rimmprojekt
 {
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class Game1 : Microsoft.Xna.Framework.Game
+    [DisplayName(Name = "RIMM")]
+    public class Game1 : Application
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        //A DrawTarget is a class that performs all the logic needed to complete a draw operation to
+        //a surface (such as the screen or a texture).
+        //
+        //Drawing in xen is very explicit, the call to Draw() will perform the entire draw operation.
+        //
+        //A DrawTargetScreen is a draw target that draws items directly to the screen.
+        //
+        //In this tutorial all that will happen is the DrawTarget will clear itself to blue
+        //(Most applications will only have one DrawTargetScreen)
+        private DrawTargetScreen drawToScreen;
 
-        public Game1()
+
+        //This method gets called just before the window is shown, and the device is created
+        protected override void Initialise()
         {
-            graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
+            //draw targets usually need a camera.
+            //create a 3D camera with default parameters
+            Camera3D camera = new Camera3D();
+
+            //create the draw target.
+            drawToScreen = new DrawTargetScreen(camera);
+
+            //Set the screen clear colour to blue
+            //(Draw targets have a built in ClearBuffer object)
+            drawToScreen.ClearBuffer.ClearColour = Color.CornflowerBlue;
+            Window.Title = "RIMM";
+            Window.AllowUserResizing = true;
+            
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
-        protected override void Initialize()
+        //this is the default Update method.
+        //Update() is called 60 times per second, which is the same rate that player input
+        //is updated.
+        //Note: Player input and Updating is explained in more detail in Tutorial 13
+        protected override void Update(UpdateState state)
         {
-            // TODO: Add your initialization logic here
-
-            base.Initialize();
+            //quit when the back button is pressed (escape on the PC)
+            if (state.PlayerInput[PlayerIndex.One].InputState.Buttons.Back.OnPressed)
+                this.Shutdown();
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
-        protected override void LoadContent()
+        //This is the main application draw method. All drawing code should go in here.
+        //
+        //Any drawing should be done through, or using the DrawState object.
+        //Do not store a reference to a DrawState - if a method doesn't give access to it, you shouldn't be drawing in that method.
+        //The most useful GraphicsDevice functionality is covered by the DrawState or other objects in Xen/Xen.Ex
+        //The vast majority of applications shouldn't need to directly access the graphics device.
+        protected override void Frame(FrameState state)
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            //perform the draw to the screen.
+            drawToScreen.Draw(state);
 
-            // TODO: use this.Content to load your game content here
+            //at this point the screen has been drawn...
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// all content.
-        /// </summary>
-        protected override void UnloadContent()
+        protected override void SetupGraphicsDeviceManager(GraphicsDeviceManager graphics, ref RenderTargetUsage presentation)
         {
-            // TODO: Unload any non ContentManager content here
-        }
-
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Update(GameTime gameTime)
-        {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
-
-            // TODO: Add your update logic here
-
-            base.Update(gameTime);
-        }
-
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime)
-        {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
-
-            base.Draw(gameTime);
+            if (graphics != null) // graphics is null when starting within a WinForms host
+            {
+                graphics.PreferredBackBufferWidth = 800;
+                graphics.PreferredBackBufferHeight = 450;
+            }
         }
     }
 }
