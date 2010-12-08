@@ -105,6 +105,18 @@
     <Reference Include="System.Net">
       <Private>False</Private>
     </Reference>
+    <Reference Include="Xen">
+      <HintPath>xen\Xen.dll</HintPath>
+    </Reference>
+    <Reference Include="Xen.Ex">
+      <HintPath>xen\Xen.Ex.dll</HintPath>
+    </Reference>
+    <Reference Include="Xen.Ex.ModelImporter">
+      <HintPath>xen\Xen.Ex.ModelImporter.dll</HintPath>
+    </Reference>
+    <Reference Include="Xen.Graphics.ShaderSystem">
+      <HintPath>xen\Xen.Graphics.ShaderSystem.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
