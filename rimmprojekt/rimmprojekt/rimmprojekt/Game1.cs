@@ -41,16 +41,18 @@ namespace rimmprojekt
             //draw targets usually need a camera.
             //create a 3D camera with default parameters
             Camera3D camera = new Camera3D();
-
+            camera.LookAt(new Vector3(24.0f, -20.0f, 0.0f), new Vector3(24.0f, 20.0f, 60.0f), Vector3.UnitY);
             //create the draw target.
             drawToScreen = new DrawTargetScreen(camera);
-
+            
             //Set the screen clear colour to blue
             //(Draw targets have a built in ClearBuffer object)
             drawToScreen.ClearBuffer.ClearColour = Color.CornflowerBlue;
             Window.Title = "RIMM";
             Window.AllowUserResizing = true;
-            
+
+            Razredi.Mapa mapa = new Razredi.Mapa("../../../../rimmprojektContent/labirint1.txt");
+            drawToScreen.Add(mapa);
         }
 
         //this is the default Update method.
@@ -84,6 +86,7 @@ namespace rimmprojekt
             {
                 graphics.PreferredBackBufferWidth = 800;
                 graphics.PreferredBackBufferHeight = 450;
+                graphics.PreferMultiSampling = true;
             }
         }
     }
