@@ -14,6 +14,8 @@ using Xen.Camera;
 using Xen.Graphics;
 using Xen.Ex.Geometry;
 using Xen.Ex.Material;
+using Xen.Ex.Graphics2D;
+using Xen.Ex.Graphics.Content;
 
 namespace rimmprojekt
 {
@@ -23,26 +25,27 @@ namespace rimmprojekt
     [DisplayName(Name = "RIMM")]
     public class Game1 : Application
     {
-        //A DrawTarget is a class that performs all the logic needed to complete a draw operation to
-        //a surface (such as the screen or a texture).
-        //
-        //Drawing in xen is very explicit, the call to Draw() will perform the entire draw operation.
-        //
-        //A DrawTargetScreen is a draw target that draws items directly to the screen.
-        //
-        //In this tutorial all that will happen is the DrawTarget will clear itself to blue
-        //(Most applications will only have one DrawTargetScreen)
+        private Camera3D camera;
         private DrawTargetScreen drawToScreen;
+        private Xen.Ex.Graphics2D.Statistics.DrawStatisticsDisplay statisticsOverlay;
 
 
         //This method gets called just before the window is shown, and the device is created
         protected override void Initialise()
         {
-            //draw targets usually need a camera.
-            //create a 3D camera with default parameters
-            Camera3D camera = new Camera3D();
-            camera.LookAt(new Vector3(24.0f, -20.0f, 0.0f), new Vector3(24.0f, 20.0f, 60.0f), Vector3.UnitY);
             //create the draw target.
+            Xen.Camera.FirstPersonControlledCamera3D camera = null;
+
+            //it uses player input, so the UpdateManager must be passed in
+            camera = new Xen.Camera.FirstPersonControlledCamera3D(this.UpdateManager);
+
+            //in this case, we want the z-axis to be the up/down axis (otherwise it's the Y-axis)
+            //camera.ZAxisUp = true;
+            //also it's default is a bit too fast moving
+            camera.MovementSensitivity *= 0.01f;
+            camera.LookAt(new Vector3(24.0f, -20.0f, 0.0f), new Vector3(24.0f, 20.0f, 60.0f), Vector3.UnitY);
+
+            this.camera = camera;
             drawToScreen = new DrawTargetScreen(camera);
             
             //Set the screen clear colour to blue
@@ -53,6 +56,9 @@ namespace rimmprojekt
 
             Razredi.Mapa mapa = new Razredi.Mapa("../../../../rimmprojektContent/labirint1.txt");
             drawToScreen.Add(mapa);
+
+            statisticsOverlay = new Xen.Ex.Graphics2D.Statistics.DrawStatisticsDisplay(this.UpdateManager);
+            drawToScreen.Add(statisticsOverlay);
         }
 
         //this is the default Update method.
@@ -88,6 +94,24 @@ namespace rimmprojekt
                 graphics.PreferredBackBufferHeight = 450;
                 graphics.PreferMultiSampling = true;
             }
+        }
+
+        protected override void InitialisePlayerInput(Xen.Input.PlayerInputCollection playerInput)
+        {
+            //if using keyboard/mouse, then centre the mouse each frame
+            if (playerInput[PlayerIndex.One].ControlInput == Xen.Input.ControlInput.KeyboardMouse)
+            {
+                playerInput[PlayerIndex.One].InputMapper.CentreMouseToWindow = true;
+            }
+        }
+
+        protected override void LoadContent(ContentState state)
+        {
+            //Load a normal XNA sprite font
+            SpriteFont xnaSpriteFont = state.Load<SpriteFont>("Arial");
+
+            //the statistics overlay requires the font is set
+            this.statisticsOverlay.Font = xnaSpriteFont;
         }
     }
 }
