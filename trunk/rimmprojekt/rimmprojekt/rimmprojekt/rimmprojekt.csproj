@@ -124,6 +124,7 @@
     <Compile Include="Game1.cs" />
     <Compile Include="Razredi\Kocka.cs" />
     <Compile Include="Razredi\Mapa.cs" />
+    <Compile Include="Razredi\Tezej.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

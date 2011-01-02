@@ -28,24 +28,16 @@ namespace rimmprojekt
         private Camera3D camera;
         private DrawTargetScreen drawToScreen;
         private Xen.Ex.Graphics2D.Statistics.DrawStatisticsDisplay statisticsOverlay;
-
+        Razredi.Tezej tezej;
 
         //This method gets called just before the window is shown, and the device is created
         protected override void Initialise()
         {
             //create the draw target.
-            Xen.Camera.FirstPersonControlledCamera3D camera = null;
+            camera = new Camera3D();
 
-            //it uses player input, so the UpdateManager must be passed in
-            camera = new Xen.Camera.FirstPersonControlledCamera3D(this.UpdateManager);
+            camera.LookAt(new Vector3(240.0f, -200.0f, 0.0f), new Vector3(240.0f, 200.0f, 600.0f), Vector3.UnitY);
 
-            //in this case, we want the z-axis to be the up/down axis (otherwise it's the Y-axis)
-            //camera.ZAxisUp = true;
-            //also it's default is a bit too fast moving
-            camera.MovementSensitivity *= 0.01f;
-            camera.LookAt(new Vector3(24.0f, -20.0f, 0.0f), new Vector3(24.0f, 20.0f, 60.0f), Vector3.UnitY);
-
-            this.camera = camera;
             drawToScreen = new DrawTargetScreen(camera);
             
             //Set the screen clear colour to blue
@@ -56,6 +48,9 @@ namespace rimmprojekt
 
             Razredi.Mapa mapa = new Razredi.Mapa("../../../../rimmprojektContent/labirint1.txt");
             drawToScreen.Add(mapa);
+
+            tezej = new Razredi.Tezej(30.0f, 0.0f, 20.0f, UpdateManager);
+            drawToScreen.Add(tezej);
 
             statisticsOverlay = new Xen.Ex.Graphics2D.Statistics.DrawStatisticsDisplay(this.UpdateManager);
             drawToScreen.Add(statisticsOverlay);
@@ -70,6 +65,9 @@ namespace rimmprojekt
             //quit when the back button is pressed (escape on the PC)
             if (state.PlayerInput[PlayerIndex.One].InputState.Buttons.Back.OnPressed)
                 this.Shutdown();
+            Vector3 target = new Vector3(tezej.polozaj.X, tezej.polozaj.Y - 35.0f, tezej.polozaj.Z - 35.0f);
+            Vector3 position = new Vector3(tezej.polozaj.X, tezej.polozaj.Y + 35.0f, tezej.polozaj.Z + 35.0f);
+            camera.LookAt(target, position, Vector3.UnitY);
         }
 
         //This is the main application draw method. All drawing code should go in here.
@@ -99,10 +97,10 @@ namespace rimmprojekt
         protected override void InitialisePlayerInput(Xen.Input.PlayerInputCollection playerInput)
         {
             //if using keyboard/mouse, then centre the mouse each frame
-            if (playerInput[PlayerIndex.One].ControlInput == Xen.Input.ControlInput.KeyboardMouse)
-            {
-                playerInput[PlayerIndex.One].InputMapper.CentreMouseToWindow = true;
-            }
+            //if (playerInput[PlayerIndex.One].ControlInput == Xen.Input.ControlInput.KeyboardMouse)
+            //{
+            //    playerInput[PlayerIndex.One].InputMapper.CentreMouseToWindow = true;
+            //}
         }
 
         protected override void LoadContent(ContentState state)

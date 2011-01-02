@@ -27,16 +27,16 @@ namespace rimmprojekt.Razredi
             using (StreamReader sr = new StreamReader(pot))
             {
                 Vector2 topLeft = new Vector2(0.0f, 0.0f);
-                Vector2 topRight = new Vector2(1.0f, 0.0f);
-                Vector2 bottomLeft = new Vector2(0.0f, 1.0f);
-                Vector2 bottomRight = new Vector2(1.0f, 1.0f);
+                Vector2 topRight = new Vector2(10.0f, 0.0f);
+                Vector2 bottomLeft = new Vector2(0.0f, 10.0f);
+                Vector2 bottomRight = new Vector2(10.0f, 10.0f);
                 velikost.X = Int32.Parse(sr.ReadLine());
                 velikost.Y = Int32.Parse(sr.ReadLine());
                 VertexPositionNormalTexture[]  tempTla = new VertexPositionNormalTexture[]{
-                    new VertexPositionNormalTexture(new Vector3(-1.0f, -1.0f, (float)velikost.X*2.0f- 1.0f), Vector3.Up, topLeft),
-                    new VertexPositionNormalTexture(new Vector3(-1.0f, -1.0f, -1.0f), Vector3.Up, bottomLeft),
-                    new VertexPositionNormalTexture(new Vector3((float)velikost.Y*2.0f -1.0f, -1.0f, (float)velikost.X*2.0f - 1.0f), Vector3.Up, topRight),
-                    new VertexPositionNormalTexture(new Vector3((float)velikost.Y*2.0f - 1.0f, -1.0f, -1.0f), Vector3.Up, bottomRight)
+                    new VertexPositionNormalTexture(new Vector3(-10.0f, -10.0f, (float)velikost.X*20.0f- 10.0f), Vector3.Up, topLeft),
+                    new VertexPositionNormalTexture(new Vector3(-10.0f, -10.0f, -10.0f), Vector3.Up, bottomLeft),
+                    new VertexPositionNormalTexture(new Vector3((float)velikost.Y*20.0f -10.0f, -10.0f, (float)velikost.X*20.0f - 10.0f), Vector3.Up, topRight),
+                    new VertexPositionNormalTexture(new Vector3((float)velikost.Y*20.0f - 10.0f, -10.0f, -10.0f), Vector3.Up, bottomRight)
                 };
                 tla = new Vertices<VertexPositionNormalTexture>(tempTla);
                 tempTla = null;
@@ -56,7 +56,7 @@ namespace rimmprojekt.Razredi
                     {
                         if (sr.Read() - 48 == 0)
                         {
-                            zidovi[stevec] = new Kocka((float)j * 2.0f, 0.0f, (float)i * 2.0f);
+                            zidovi[stevec] = new Kocka((float)j * 20.0f, 0.0f, (float)i * 20.0f);
                             stevec++;
                         }
                     }
