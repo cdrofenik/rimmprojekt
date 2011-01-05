@@ -77,7 +77,7 @@ namespace rimmprojekt.Razredi
             material.LightCollection = lights;
 
             material.Textures = new MaterialTextures();
-            material.Textures.TextureMapSampler = TextureSamplerState.AnisotropicHighFiltering;
+            material.Textures.TextureMapSampler = TextureSamplerState.PointFiltering;
 
             content.Add(this);
         }
