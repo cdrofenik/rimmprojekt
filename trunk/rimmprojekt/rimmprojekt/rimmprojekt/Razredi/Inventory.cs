@@ -41,7 +41,7 @@ namespace rimmprojekt.Razredi
                 {
                     if (isVisable)
                     {
-                        element.Position = new Vector2(state.Application.WindowWidth-380, state.Application.WindowHeight-340);
+                        element.Position = new Vector2(state.Application.WindowWidth - 380, state.Application.WindowHeight - 340);
                         element.Draw(state);
                     }
                 }
@@ -55,7 +55,7 @@ namespace rimmprojekt.Razredi
 
         public UpdateFrequency Update(UpdateState state)
         {
-            if (state.KeyboardState.KeyState.I.IsDown)
+            if (state.KeyboardState.KeyState.I.OnReleased)
             {
                 if (isVisable)
                 {
@@ -67,7 +67,7 @@ namespace rimmprojekt.Razredi
                 }
             }
             element = new TexturedElement(inventoryTexture, sizeOfElement);
-            return UpdateFrequency.PartialUpdate15hz;
+            return UpdateFrequency.FullUpdate60hz;
         }
 
         public void LoadContent(ContentState state)
