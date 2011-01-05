@@ -103,7 +103,7 @@ namespace rimmprojekt.Razredi
 
         void IContentOwner.LoadContent(ContentState state)
         {
-            material.Textures.TextureMap = state.Load<Texture2D>(@"Textures/tla");
+            material.Textures.TextureMap = state.Load<Texture2D>(@"Textures/tla2");
         }
     }
 }
