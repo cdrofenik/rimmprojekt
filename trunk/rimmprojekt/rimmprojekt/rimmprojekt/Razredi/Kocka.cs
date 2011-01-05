@@ -13,15 +13,15 @@ using Xen.Ex.Material;
 
 namespace rimmprojekt.Razredi
 {
-    class Kocka : IDraw
+    class Kocka : IDraw, IContentOwner
     {
         protected Matrix matrix;
         //public Vector3 polozaj;
         protected readonly IVertices vertices;
         protected readonly IIndices indices;
-        protected IShader shader;
+        protected MaterialShader material;
 
-        public Kocka(float x, float y, float z)
+        public Kocka(float x, float y, float z, ContentRegister content)
         {
             matrix = Matrix.CreateTranslation(new Vector3(x, y, z));
 
@@ -85,18 +85,21 @@ namespace rimmprojekt.Razredi
             ploskve = null;
             boxIndices = null;
 
-            //MaterialShader material = new MaterialShader();
-            //material.SpecularColour = Color.LightYellow.ToVector3();//with a nice sheen
+            material = new MaterialShader();
+            material.SpecularColour = Color.LightYellow.ToVector3();//with a nice sheen
 
-            //Vector3 lightDirection = new Vector3(0.5f, 1, -0.5f); //a less dramatic direction
+            Vector3 lightDirection = new Vector3(0.5f, 1, -0.5f); //a less dramatic direction
 
-            //MaterialLightCollection lights = new MaterialLightCollection();
-            //lights.AmbientLightColour = Color.White.ToVector3() * 0.5f;
-            //lights.CreateDirectionalLight(lightDirection, Color.White);
+            MaterialLightCollection lights = new MaterialLightCollection();
+            lights.AmbientLightColour = Color.White.ToVector3() * 0.5f;
+            lights.CreateDirectionalLight(lightDirection, Color.White);
 
-            //material.LightCollection = lights;
+            material.LightCollection = lights;
 
-            //shader = material;
+            material.Textures = new MaterialTextures();
+            material.Textures.TextureMapSampler = TextureSamplerState.BilinearFiltering;
+
+            content.Add(this);
         }
 
         virtual public void Draw(DrawState state)
@@ -108,11 +111,11 @@ namespace rimmprojekt.Razredi
                 if (CullTest(state))
                 {
                     //bind the shader
-                    //using (state.Shader.Push(shader))
-                    //{
+                    using (state.Shader.Push(material))
+                    {
                         //draw the custom geometry
                         this.vertices.Draw(state, this.indices, PrimitiveType.TriangleList);
-                    //}
+                    }
                 }
             }
         }
@@ -127,6 +130,11 @@ namespace rimmprojekt.Razredi
             //would return false, and it would not be drawn.
             //return culler.TestBox(new Vector3(-1, -1, 0), new Vector3(1, 1, 0));
             return true;
+        }
+
+        void IContentOwner.LoadContent(ContentState state)
+        {
+            material.Textures.TextureMap = state.Load<Texture2D>(@"Textures/zid2");
         }
     }
 }

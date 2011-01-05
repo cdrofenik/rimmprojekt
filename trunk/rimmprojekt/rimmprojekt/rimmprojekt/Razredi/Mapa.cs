@@ -14,15 +14,15 @@ using Xen.Ex.Material;
 
 namespace rimmprojekt.Razredi
 {
-    class Mapa : IDraw
+    class Mapa : IDraw, IContentOwner
     {
         private Kocka[] zidovi;
         private IVertices tla;
         private IIndices indices;
         private Point velikost;
-        private IShader shader;
+        private MaterialShader material;
 
-        public Mapa(string pot)
+        public Mapa(string pot, ContentRegister content)
         {
             using (StreamReader sr = new StreamReader(pot))
             {
@@ -32,7 +32,7 @@ namespace rimmprojekt.Razredi
                 Vector2 bottomRight = new Vector2(10.0f, 10.0f);
                 velikost.X = Int32.Parse(sr.ReadLine());
                 velikost.Y = Int32.Parse(sr.ReadLine());
-                VertexPositionNormalTexture[]  tempTla = new VertexPositionNormalTexture[]{
+                VertexPositionNormalTexture[] tempTla = new VertexPositionNormalTexture[]{
                     new VertexPositionNormalTexture(new Vector3(-10.0f, -10.0f, (float)velikost.X*20.0f- 10.0f), Vector3.Up, topLeft),
                     new VertexPositionNormalTexture(new Vector3(-10.0f, -10.0f, -10.0f), Vector3.Up, bottomLeft),
                     new VertexPositionNormalTexture(new Vector3((float)velikost.Y*20.0f -10.0f, -10.0f, (float)velikost.X*20.0f - 10.0f), Vector3.Up, topRight),
@@ -56,7 +56,7 @@ namespace rimmprojekt.Razredi
                     {
                         if (sr.Read() - 48 == 0)
                         {
-                            zidovi[stevec] = new Kocka((float)j * 20.0f, 0.0f, (float)i * 20.0f);
+                            zidovi[stevec] = new Kocka((float)j * 20.0f, 0.0f, (float)i * 20.0f, content);
                             stevec++;
                         }
                     }
@@ -65,7 +65,7 @@ namespace rimmprojekt.Razredi
                 }
             }
 
-            MaterialShader material = new MaterialShader();
+            material = new MaterialShader();
             material.SpecularColour = Color.LightYellow.ToVector3();//with a nice sheen
 
             Vector3 lightDirection = new Vector3(0.5f, 1, -0.5f); //a less dramatic direction
@@ -76,12 +76,15 @@ namespace rimmprojekt.Razredi
 
             material.LightCollection = lights;
 
-            shader = material;
+            material.Textures = new MaterialTextures();
+            material.Textures.TextureMapSampler = TextureSamplerState.AnisotropicHighFiltering;
+
+            content.Add(this);
         }
 
         public void Draw(DrawState state)
         {
-            using (state.Shader.Push(shader))
+            using (state.Shader.Push(material))
             {
                 tla.Draw(state, indices, PrimitiveType.TriangleList);
                 int stevec = 0;
@@ -96,6 +99,11 @@ namespace rimmprojekt.Razredi
         public bool CullTest(ICuller culler)
         {
             return true;
+        }
+
+        void IContentOwner.LoadContent(ContentState state)
+        {
+            material.Textures.TextureMap = state.Load<Texture2D>(@"Textures/tla");
         }
     }
 }
