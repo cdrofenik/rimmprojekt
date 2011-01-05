@@ -25,20 +25,14 @@ namespace rimmprojekt
     [DisplayName(Name = "RIMM")]
     public class Game1 : Application
     {
-        private Camera3D camera;
         private DrawTargetScreen drawToScreen;
         private Xen.Ex.Graphics2D.Statistics.DrawStatisticsDisplay statisticsOverlay;
-        Razredi.Tezej tezej;
 
         //This method gets called just before the window is shown, and the device is created
         protected override void Initialise()
         {
             //create the draw target.
-            camera = new Camera3D();
-
-            camera.LookAt(new Vector3(240.0f, -200.0f, 0.0f), new Vector3(240.0f, 200.0f, 600.0f), Vector3.UnitY);
-
-            drawToScreen = new DrawTargetScreen(camera);
+            drawToScreen = new DrawTargetScreen(new Camera3D());
             
             //Set the screen clear colour to blue
             //(Draw targets have a built in ClearBuffer object)
@@ -46,11 +40,9 @@ namespace rimmprojekt
             Window.Title = "RIMM";
             Window.AllowUserResizing = true;
 
-            Razredi.Mapa mapa = new Razredi.Mapa("../../../../rimmprojektContent/labirint1.txt");
-            drawToScreen.Add(mapa);
-
-            tezej = new Razredi.Tezej(30.0f, 0.0f, 20.0f, UpdateManager, this.Content);
-            drawToScreen.Add(tezej);
+            States.GameStateManager manager = new States.GameStateManager(this);
+            this.drawToScreen.Add(manager);
+            this.UpdateManager.Add(manager);
 
             statisticsOverlay = new Xen.Ex.Graphics2D.Statistics.DrawStatisticsDisplay(this.UpdateManager);
             drawToScreen.Add(statisticsOverlay);
@@ -62,12 +54,7 @@ namespace rimmprojekt
         //Note: Player input and Updating is explained in more detail in Tutorial 13
         protected override void Update(UpdateState state)
         {
-            //quit when the back button is pressed (escape on the PC)
-            if (state.PlayerInput[PlayerIndex.One].InputState.Buttons.Back.OnPressed)
-                this.Shutdown();
-            Vector3 target = new Vector3(tezej.polozaj.X, tezej.polozaj.Y - 35.0f, tezej.polozaj.Z - 35.0f);
-            Vector3 position = new Vector3(tezej.polozaj.X, tezej.polozaj.Y + 35.0f, tezej.polozaj.Z + 35.0f);
-            camera.LookAt(target, position, Vector3.UnitY);
+            
         }
 
         //This is the main application draw method. All drawing code should go in here.
