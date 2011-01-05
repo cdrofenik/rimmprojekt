@@ -20,6 +20,10 @@ namespace rimmprojekt.Razredi
 {
     class Tezej : IDraw, IContentOwner, IUpdate
     {
+        private Texture2D tezejTexture;
+        private TexturedElement sideElement;
+        private Vector2 sizeOfSideElement;
+
         public Vector3 polozaj;
         private Matrix matrix;
         private IShader shader;
@@ -30,6 +34,12 @@ namespace rimmprojekt.Razredi
             manager.Add(this);
             model = new ModelInstance();
             content.Add(this);
+
+            //inicializacija stranskega elementa
+            sizeOfSideElement = new Vector2(649, 160);
+            sideElement = new TexturedElement(tezejTexture, sizeOfSideElement);
+            sideElement.AlphaBlendState = Xen.Graphics.AlphaBlendState.Alpha;
+
 
             polozaj = new Vector3(x, y, z);
             matrix = Matrix.CreateTranslation(polozaj);
@@ -50,6 +60,16 @@ namespace rimmprojekt.Razredi
         public void Draw(DrawState state)
         {
             //draw the vertices as a triangle list, with the indices
+
+            using (state.Shader.Push())
+            {
+                if (CullTest(state))
+                {
+                        sideElement.Draw(state);
+                }
+            }
+
+
             using (state.WorldMatrix.PushMultiply(ref matrix))
             {
                 //cull test the custom geometry
@@ -60,6 +80,7 @@ namespace rimmprojekt.Razredi
                     {
                     //draw the custom geometry
                         model.Draw(state);
+                        sideElement.Draw(state);
                     }
                 }
             }
@@ -74,6 +95,7 @@ namespace rimmprojekt.Razredi
         {
             //load the model data into the model instance
             model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"tiny_4anim");
+            tezejTexture = state.Load<Texture2D>(@"tezejus");
         }
 
         public UpdateFrequency Update(UpdateState state)

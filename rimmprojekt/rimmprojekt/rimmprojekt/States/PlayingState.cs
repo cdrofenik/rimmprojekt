@@ -23,6 +23,7 @@ namespace rimmprojekt.States
         private IGameStateManager stateManager;
         private Razredi.Tezej tezej;
         private Razredi.Mapa mapa;
+        private Razredi.Inventory inventory;
 
         public PlayingState(Application application)
         {
@@ -34,6 +35,7 @@ namespace rimmprojekt.States
             this.stateManager = stateManager;
             mapa = new Razredi.Mapa("../../../../rimmprojektContent/labirint1.txt", stateManager.Application.Content);
             tezej = new Razredi.Tezej(30.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content);
+            inventory = new Razredi.Inventory(stateManager.Application.UpdateManager, stateManager.Application.Content);
         }
 
         //simplified IDraw/IUpdate
@@ -46,8 +48,10 @@ namespace rimmprojekt.States
             Camera3D camera = new Camera3D();
             camera.LookAt(target, position, Vector3.UnitY);
             state.Camera.SetCamera(camera);
+            
             mapa.Draw(state);
             tezej.Draw(state);
+            inventory.Draw(state);
         }
 
         public void Update(UpdateState state)
