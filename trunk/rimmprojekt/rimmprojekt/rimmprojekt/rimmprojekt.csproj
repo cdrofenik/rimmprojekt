@@ -119,8 +119,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="Razredi\Inventory.cs" />
     <Compile Include="Razredi\Kocka.cs" />
     <Compile Include="Razredi\Mapa.cs" />
+    <Compile Include="Razredi\Oprema.cs" />
     <Compile Include="Razredi\Tezej.cs" />
     <Compile Include="States\GameStateManager.cs" />
     <Compile Include="States\Interfaces.cs" />
