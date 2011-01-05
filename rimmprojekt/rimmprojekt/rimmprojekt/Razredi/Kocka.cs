@@ -26,9 +26,9 @@ namespace rimmprojekt.Razredi
             matrix = Matrix.CreateTranslation(new Vector3(x, y, z));
 
             Vector2 topLeft = new Vector2(0.0f, 0.0f);
-            Vector2 topRight = new Vector2(10.0f, 0.0f);
-            Vector2 bottomLeft = new Vector2(0.0f, 10.0f);
-            Vector2 bottomRight = new Vector2(10.0f, 10.0f);
+            Vector2 topRight = new Vector2(1.0f, 0.0f);
+            Vector2 bottomLeft = new Vector2(0.0f, 1.0f);
+            Vector2 bottomRight = new Vector2(1.0f, 1.0f);
 
             VertexPositionNormalTexture[] ploskve = new VertexPositionNormalTexture[]
             {
@@ -97,7 +97,7 @@ namespace rimmprojekt.Razredi
             material.LightCollection = lights;
 
             material.Textures = new MaterialTextures();
-            material.Textures.TextureMapSampler = TextureSamplerState.BilinearFiltering;
+            material.Textures.TextureMapSampler = TextureSamplerState.PointFiltering;
 
             content.Add(this);
         }
@@ -134,7 +134,7 @@ namespace rimmprojekt.Razredi
 
         void IContentOwner.LoadContent(ContentState state)
         {
-            material.Textures.TextureMap = state.Load<Texture2D>(@"Textures/zid2");
+            material.Textures.TextureMap = state.Load<Texture2D>(@"Textures/zid");
         }
     }
 }
