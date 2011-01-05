@@ -49,7 +49,7 @@ namespace rimmprojekt
             Razredi.Mapa mapa = new Razredi.Mapa("../../../../rimmprojektContent/labirint1.txt");
             drawToScreen.Add(mapa);
 
-            tezej = new Razredi.Tezej(30.0f, 0.0f, 20.0f, UpdateManager);
+            tezej = new Razredi.Tezej(30.0f, 0.0f, 20.0f, UpdateManager, this.Content);
             drawToScreen.Add(tezej);
 
             statisticsOverlay = new Xen.Ex.Graphics2D.Statistics.DrawStatisticsDisplay(this.UpdateManager);
@@ -88,8 +88,8 @@ namespace rimmprojekt
         {
             if (graphics != null) // graphics is null when starting within a WinForms host
             {
-                graphics.PreferredBackBufferWidth = 800;
-                graphics.PreferredBackBufferHeight = 450;
+                graphics.PreferredBackBufferWidth = 1280;
+                graphics.PreferredBackBufferHeight = 720;
                 graphics.PreferMultiSampling = true;
             }
         }

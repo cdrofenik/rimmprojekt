@@ -111,9 +111,6 @@
     <Reference Include="Xen.Ex">
       <HintPath>xen\Xen.Ex.dll</HintPath>
     </Reference>
-    <Reference Include="Xen.Ex.ModelImporter">
-      <HintPath>xen\Xen.Ex.ModelImporter.dll</HintPath>
-    </Reference>
     <Reference Include="Xen.Graphics.ShaderSystem">
       <HintPath>xen\Xen.Graphics.ShaderSystem.dll</HintPath>
     </Reference>
