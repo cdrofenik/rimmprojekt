@@ -21,6 +21,7 @@ namespace rimmprojekt.Razredi
         private Texture2D inventoryTexture;
         private TexturedElement element;
         private Vector2 sizeOfElement;
+
         private List<Oprema> inventoryList = new List<Oprema>();
         private Boolean isVisable = false;
 
