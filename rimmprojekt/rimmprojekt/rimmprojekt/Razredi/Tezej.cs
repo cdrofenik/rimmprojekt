@@ -14,6 +14,11 @@ using Xen.Ex.Geometry;
 using Xen.Ex.Graphics.Content;
 using Xen.Ex.Material;
 
+using JigLibX.Math;
+using JigLibX.Physics;
+using JigLibX.Geometry;
+using JigLibX.Collision;
+
 using Microsoft.Xna.Framework.Content;
 
 namespace rimmprojekt.Razredi
@@ -28,6 +33,9 @@ namespace rimmprojekt.Razredi
         private Matrix matrix;
         private IShader shader;
         private ModelInstance model;
+
+        private Body body;
+        private CollisionSkin skin;
 
         public Tezej(float x, float y, float z, UpdateManager manager, ContentRegister content)
         {
@@ -51,16 +59,28 @@ namespace rimmprojekt.Razredi
             MaterialLightCollection lights = new MaterialLightCollection();
             lights.AmbientLightColour = Color.White.ToVector3() * 0.5f;
             //lights.CreateDirectionalLight(lightDirection, Color.Red);
-
             material.LightCollection = lights;
-
             shader = material;
+
+            body = new Body();
+            skin = new CollisionSkin(body);
+            body.CollisionSkin = skin;
+
+            Box box = new Box(new Vector3(5f, 5f, 5f), Matrix.Identity, new Vector3(5.0f, 5.0f, 5.0f));
+            skin.AddPrimitive(box, new MaterialProperties(0.0f, 1.0f, 1.0f));
+
+            Vector3 com = SetMass(1f);
+
+            body.MoveTo(polozaj, Matrix.Identity);
+            skin.ApplyLocalTransform(new JigLibX.Math.Transform(-com, Matrix.Identity));
+            body.EnableBody();
+
+            content.Add(this);
         }
 
         public void Draw(DrawState state)
         {
             //draw the vertices as a triangle list, with the indices
-
             using (state.Shader.Push())
             {
                 if (CullTest(state))
@@ -77,11 +97,7 @@ namespace rimmprojekt.Razredi
                 {
                     //bind the shader
                     using (state.Shader.Push(shader))
-                    {
-                    //draw the custom geometry
                         model.Draw(state);
-                        sideElement.Draw(state);
-                    }
                 }
             }
         }
@@ -100,6 +116,7 @@ namespace rimmprojekt.Razredi
 
         public UpdateFrequency Update(UpdateState state)
         {
+            polozaj = body.Position;
             if (state.KeyboardState.KeyState.S.IsDown)
                 polozaj.Z += 1.0f;
             if (state.KeyboardState.KeyState.W.IsDown)
@@ -108,9 +125,33 @@ namespace rimmprojekt.Razredi
                 polozaj.X += 1.0f;
             if (state.KeyboardState.KeyState.A.IsDown)
                 polozaj.X -= 1.0f;
-            matrix = Matrix.CreateScale(0.04f, 0.04f, 0.04f) * Matrix.CreateRotationZ((float)Math.PI) *Matrix.CreateRotationX((float)Math.PI/2);
+            matrix = Matrix.CreateScale(0.03f, 0.03f, 0.03f) * Matrix.CreateRotationZ((float)Math.PI) * Matrix.CreateRotationX((float)Math.PI / 2);
             matrix *= Matrix.CreateTranslation(polozaj);
+            //matrix=Matrix.CreateScale(0.04f,0.04f,0.04f) *
+            //    skin.GetPrimitiveLocal(0).Transform.Orientation *
+            //    body.Orientation *
+            //    Matrix.CreateTranslation(body.Position);
+            body.Position = polozaj;
             return UpdateFrequency.FullUpdate60hz;
+        }
+
+        private Vector3 SetMass(float mass)
+        {
+            PrimitiveProperties primitiveProperties = new PrimitiveProperties(
+                PrimitiveProperties.MassDistributionEnum.Solid,
+                PrimitiveProperties.MassTypeEnum.Mass, mass);
+
+            float junk;
+            Vector3 com;
+            Matrix it;
+            Matrix itCoM;
+
+            skin.GetMassProperties(primitiveProperties, out junk, out com, out it, out itCoM);
+
+            body.BodyInertia = itCoM;
+            body.Mass = junk;
+
+            return com;
         }
     }
 }

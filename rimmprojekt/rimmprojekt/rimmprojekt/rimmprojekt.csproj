@@ -60,6 +60,9 @@
     <XnaCompressContent>true</XnaCompressContent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JigLibX">
+      <HintPath>jiglibx\JigLibX.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
       <Private>False</Private>
     </Reference>
@@ -124,6 +127,7 @@
     <Compile Include="Razredi\Mapa.cs" />
     <Compile Include="Razredi\Oprema.cs" />
     <Compile Include="Razredi\Tezej.cs" />
+    <Compile Include="Razredi\Tla.cs" />
     <Compile Include="States\GameStateManager.cs" />
     <Compile Include="States\Interfaces.cs" />
     <Compile Include="States\MenuState.cs" />
