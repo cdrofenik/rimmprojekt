@@ -1,0 +1,26 @@
+OPOZORILO:
+Orožij še raje ne namešèati v roke ker izgleda, da ima opisana metoa še neke pomankljivosti...
+
+index  animaion_name  start_frame/length/stretch
+0 ... walk ... 158/16/1
+1 ... idle ... 0/14/5
+2 ... jump ... 27/14/1
+3 ... angry ... 80/14/5
+4 ... attack1 ... 94/36/1
+5 ... land ... 45/11/1
+6 ... fly ... 41/4/1
+7 ... block ... 135/5/1
+8 ... blocking ... 140/5/1
+9 ... unblock ... 145/5/1
+10 ... takeDamage ... 150/5/211 ... die ... 60/13/2
+12 ... dead ... 73/5/1
+
+Modeli characterov imajo 2 pomembnejši kosti poimenovani helperR in helperL.
+Namešèeni sta na dlan characterea, na njiju je treba pritrditi orožja in šèite.
+Orožja in šèiti imajo eno kost, ki jo je treba poravnati s helperji na characterjevi dlani.
+
+Kar se tièe animacij... prvi stolpec so indeksi animacij v .x modelu, drugi stolpec so njihova imena, tretji stolpec je za mene :)
+
+Opomba: Tezej bo v zraku, ko se ne bo predvajala nobena animacija (model z iztegnjenimi rokami), ampak osnovnega modela z 
+iztegnjenimi rokami tako ali tako ne želimo imeti v igri, zato se mora vedno predvajati ena izmed animacij. 
+Ko model miruje se naj predvaja recimo animacija idle ali angry.
