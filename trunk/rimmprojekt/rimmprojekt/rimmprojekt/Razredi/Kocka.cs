@@ -11,19 +11,30 @@ using Xen.Graphics;
 using Xen.Ex.Geometry;
 using Xen.Ex.Material;
 
+using JigLibX.Math;
+using JigLibX.Physics;
+using JigLibX.Geometry;
+using JigLibX.Collision;
+
 namespace rimmprojekt.Razredi
 {
-    class Kocka : IDraw, IContentOwner
+    class Kocka : IDraw, IContentOwner, IUpdate
     {
         protected Matrix matrix;
-        //public Vector3 polozaj;
+        protected Vector3 polozaj;
         protected readonly IVertices vertices;
         protected readonly IIndices indices;
         protected MaterialShader material;
 
-        public Kocka(float x, float y, float z, ContentRegister content)
+        private Body body;
+        public CollisionSkin skin;
+
+        public Kocka(float x, float y, float z, ContentRegister content, UpdateManager manager)
         {
-            matrix = Matrix.CreateTranslation(new Vector3(x, y, z));
+            polozaj = new Vector3(x, y, z);
+            matrix = Matrix.CreateTranslation(polozaj);
+
+            manager.Add(this);
 
             Vector2 topLeft = new Vector2(0.0f, 0.0f);
             Vector2 topRight = new Vector2(1.0f, 0.0f);
@@ -99,6 +110,20 @@ namespace rimmprojekt.Razredi
             material.Textures = new MaterialTextures();
             material.Textures.TextureMapSampler = TextureSamplerState.PointFiltering;
 
+            body = new Body();
+            skin = new CollisionSkin(body);
+            body.CollisionSkin = skin;
+
+            Box box = new Box(new Vector3(10f, 10f, 10f), Matrix.Identity, new Vector3(20.0f, 20.0f, 20.0f));
+            skin.AddPrimitive(box, new MaterialProperties(0.0f, 1.0f, 1.0f));
+
+            Vector3 com = SetMass(1.0f);
+
+            body.MoveTo(polozaj+new Vector3(10f,10f,10f), Matrix.Identity);
+            skin.ApplyLocalTransform(new JigLibX.Math.Transform(-com, Matrix.Identity));
+            body.EnableBody();
+            body.Immovable = true;
+
             content.Add(this);
         }
 
@@ -114,7 +139,7 @@ namespace rimmprojekt.Razredi
                     using (state.Shader.Push(material))
                     {
                         //draw the custom geometry
-                        this.vertices.Draw(state, this.indices, PrimitiveType.TriangleList);
+                        this.vertices.Draw(state, this.indices, Microsoft.Xna.Framework.Graphics.PrimitiveType.TriangleList);
                     }
                 }
             }
@@ -135,6 +160,32 @@ namespace rimmprojekt.Razredi
         void IContentOwner.LoadContent(ContentState state)
         {
             material.Textures.TextureMap = state.Load<Texture2D>(@"Textures/zid");
+        }
+
+        public UpdateFrequency Update(UpdateState state)
+        {
+            polozaj = body.Position;
+            matrix = Matrix.CreateTranslation(polozaj);
+            return UpdateFrequency.FullUpdate60hz;
+        }
+
+        private Vector3 SetMass(float mass)
+        {
+            PrimitiveProperties primitiveProperties = new PrimitiveProperties(
+                PrimitiveProperties.MassDistributionEnum.Solid,
+                PrimitiveProperties.MassTypeEnum.Mass, mass);
+
+            float junk;
+            Vector3 com;
+            Matrix it;
+            Matrix itCoM;
+
+            skin.GetMassProperties(primitiveProperties, out junk, out com, out it, out itCoM);
+
+            body.BodyInertia = itCoM;
+            body.Mass = junk;
+
+            return com;
         }
     }
 }

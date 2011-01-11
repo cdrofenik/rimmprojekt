@@ -16,10 +16,17 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
+using JigLibX.Math;
+using JigLibX.Physics;
+using JigLibX.Geometry;
+using JigLibX.Collision;
+
 namespace rimmprojekt.States
 {
     class PlayingState : IGameState, IContentOwner
     {
+        private TextElementRect debugText;
+
         private IGameStateManager stateManager;
         private Razredi.Tezej tezej;
         private Razredi.Mapa mapa;
@@ -33,9 +40,25 @@ namespace rimmprojekt.States
         public void Initalise(IGameStateManager stateManager)
         {
             this.stateManager = stateManager;
-            mapa = new Razredi.Mapa("../../../../rimmprojektContent/labirint1.txt", stateManager.Application.Content);
-            tezej = new Razredi.Tezej(30.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content);
+            InitialisePhysics();
+            mapa = new Razredi.Mapa("../../../../rimmprojektContent/labirint1.txt", stateManager.Application.Content, stateManager.Application.UpdateManager);
+            tezej = new Razredi.Tezej(30.0f, 1.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content);
             inventory = new Razredi.Inventory(stateManager.Application.UpdateManager, stateManager.Application.Content);
+
+            this.debugText = new TextElementRect(new Vector2(400, 100));
+            this.debugText.Text.SetText("Pritisni [ENTER]");
+            this.debugText.VerticalAlignment = VerticalAlignment.Centre;
+            this.debugText.HorizontalAlignment = HorizontalAlignment.Centre;
+            this.debugText.TextHorizontalAlignment = TextHorizontalAlignment.Centre;
+
+            stateManager.Application.Content.Add(this);
+        }
+
+        private void InitialisePhysics()
+        {
+            PhysicsSystem world = new PhysicsSystem();
+            world.CollisionSystem = new CollisionSystemSAP();
+            world.Gravity = new Vector3(0.0f, -0.01f, 0.0f);
         }
 
         //simplified IDraw/IUpdate
@@ -45,6 +68,7 @@ namespace rimmprojekt.States
         {
             Vector3 target = new Vector3(tezej.polozaj.X, tezej.polozaj.Y - 35.0f, tezej.polozaj.Z - 35.0f);
             Vector3 position = new Vector3(tezej.polozaj.X, tezej.polozaj.Y + 35.0f, tezej.polozaj.Z + 35.0f);
+            Vector3 position2 = new Vector3(tezej.polozaj.X, 35.0f, 35.0f);
             Camera3D camera = new Camera3D();
             camera.LookAt(target, position, Vector3.UnitY);
             state.Camera.SetCamera(camera);
@@ -52,16 +76,23 @@ namespace rimmprojekt.States
             mapa.Draw(state);
             tezej.Draw(state);
             inventory.Draw(state);
+            this.debugText.Draw(state);
         }
 
         public void Update(UpdateState state)
         {
             if (state.KeyboardState.KeyState.Escape.OnReleased)
                 stateManager.SetState(new MenuState());
+
+            debugText.Text.SetText(tezej.polozaj.ToString());
+
+            float timeStep = (float)state.TotalTimeTicks / TimeSpan.TicksPerSecond;
+            PhysicsSystem.CurrentPhysicsSystem.Integrate(timeStep);
         }
 
         void IContentOwner.LoadContent(ContentState state)
         {
+            this.debugText.Font = state.Load<SpriteFont>("Arial");
         }
     }
 }
