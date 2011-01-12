@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 
 using Xen;
 using Xen.Camera;
@@ -25,6 +26,7 @@ namespace rimmprojekt.Razredi
 {
     class Tezej : IDraw, IContentOwner, IUpdate
     {
+        Boolean hasPlayed;
         //leveling up info
         private Int32 lvlUpMaxPoints = 5;
         private Int32 pointsCounter = 0;
@@ -60,6 +62,10 @@ namespace rimmprojekt.Razredi
         private Vector2 sizeOfSideElement;
         #endregion
 
+
+        //audio
+        SoundEffect levelUpSoundEffect;
+
         //displaying properties
 
         public Vector3 polozaj;
@@ -75,6 +81,8 @@ namespace rimmprojekt.Razredi
             manager.Add(this);
             model = new ModelInstance();
             content.Add(this);
+
+            hasPlayed = false;
 
             healthPoints = 361;
             manaPoints = 361;
@@ -191,6 +199,7 @@ namespace rimmprojekt.Razredi
             tezejExpTexture = state.Load<Texture2D>(@"Tezej/expbar");
             tezejLevelUpTexture = state.Load<Texture2D>(@"Tezej/LvlUpTexture");
             tezejLevelUpButtonTexture = state.Load<Texture2D>(@"Tezej/lvlUpButton");
+            levelUpSoundEffect = state.Load<SoundEffect>(@"Tezej/lvlupEffect");
             trueFont = state.Load<SpriteFont>("Arial");
         }
 
@@ -199,6 +208,12 @@ namespace rimmprojekt.Razredi
             
             if (hasLeveledUp)
             {
+                if (!hasPlayed)
+                {
+                    levelUpSoundEffect.Play();
+                    hasPlayed = true;
+                }
+                
                 if (state.KeyboardState.KeyState.B.OnPressed)
                 {
                     damage += 1;
@@ -225,6 +240,7 @@ namespace rimmprojekt.Razredi
             }
             else
             {
+                hasPlayed = false;
                 polozaj = body.Position;
                 if (state.KeyboardState.KeyState.S.IsDown)
                     polozaj.Z += 1.0f;
