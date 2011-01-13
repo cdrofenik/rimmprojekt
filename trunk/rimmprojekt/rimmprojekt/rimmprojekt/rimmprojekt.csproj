@@ -128,6 +128,7 @@
     <Compile Include="Razredi\Oprema.cs" />
     <Compile Include="Razredi\Tezej.cs" />
     <Compile Include="Razredi\Tla.cs" />
+    <Compile Include="States\Gallery.cs" />
     <Compile Include="States\GameStateManager.cs" />
     <Compile Include="States\Interfaces.cs" />
     <Compile Include="States\MenuState.cs" />
