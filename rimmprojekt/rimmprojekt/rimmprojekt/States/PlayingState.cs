@@ -87,7 +87,7 @@ namespace rimmprojekt.States
             if (!backgroundSongStart)
             {
                 MediaPlayer.Play(backgroundSong);
-                MediaPlayer.Volume = 1.0f;
+                MediaPlayer.Volume = 0.6f;
                 backgroundSongStart = true;
             }
 
