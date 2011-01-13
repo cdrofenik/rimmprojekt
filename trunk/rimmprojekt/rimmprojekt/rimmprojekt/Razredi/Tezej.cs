@@ -95,7 +95,7 @@ namespace rimmprojekt.Razredi
             #region leveling up elements
             //inicializacija leveling elementa
             lvlUpFirstButtonElement = new TexturedElement(tezejLevelUpButtonTexture, new Vector2(98, 37));
-            lvlUpFirstButtonElement.Position = new Vector2(280, 217);        // pozicija damage bara
+            lvlUpFirstButtonElement.Position = new Vector2(280, 214);        // pozicija damage bara
 
             lvlUpSecondButtonElement = new TexturedElement(tezejLevelUpButtonTexture, new Vector2(98, 37));
             lvlUpSecondButtonElement.Position = new Vector2(280, 167);        // pozicija durability bara
@@ -204,8 +204,7 @@ namespace rimmprojekt.Razredi
         }
 
         public UpdateFrequency Update(UpdateState state)
-        {
-            
+        {         
             if (hasLeveledUp)
             {
                 if (!hasPlayed)
@@ -309,10 +308,10 @@ namespace rimmprojekt.Razredi
 
         private void setCharacterStatusValuseOnLevelUp()
         {
-            damageBarText = new TextElementRect(new Vector2(25, 25));
-            damageBarText.Position = new Vector2(134, 28);
+            damageBarText = new TextElementRect(new Vector2(40, 40));
+            damageBarText.Position = new Vector2(134, 20);
             damageBarText.Font = trueFont;
-            damageBarText.Colour = Color.Black;
+            damageBarText.Colour = Color.DarkBlue;
             damageBarText.Text.AppendLine(damage.ToString());
             damageBarText.Text.AppendLine();
             damageBarText.Text.AppendLine();

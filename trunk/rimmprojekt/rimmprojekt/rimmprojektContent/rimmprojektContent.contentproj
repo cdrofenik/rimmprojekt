@@ -133,6 +133,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="backgroundSong.mp3">
+      <Name>backgroundSong</Name>
+      <Importer>Mp3Importer</Importer>
+      <Processor>SongProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Tezej\lvlupEffect.wav">
       <Name>lvlupEffect</Name>
       <Importer>WavImporter</Importer>
