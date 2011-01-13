@@ -20,7 +20,7 @@ namespace rimmprojekt.States
 {
     class MenuState : IGameState, IContentOwner
     {
-        private TextElementRect menuText;
+        private List<TextElementRect> menuText = new List<TextElementRect>();
         private IGameStateManager stateManager;
 
 
@@ -29,11 +29,17 @@ namespace rimmprojekt.States
             this.stateManager = stateManager;
 
             //display an incredibly complex line of text
-            this.menuText = new TextElementRect(new Vector2(400, 100));
-            this.menuText.Text.SetText("Pritisni [ENTER]");
-            this.menuText.VerticalAlignment = VerticalAlignment.Centre;
-            this.menuText.HorizontalAlignment = HorizontalAlignment.Centre;
-            this.menuText.TextHorizontalAlignment = TextHorizontalAlignment.Centre;
+            this.menuText.Add(new TextElementRect(new Vector2(400, 150)));
+            this.menuText[0].Text.SetText("Nova igra [ENTER]");
+            this.menuText[0].VerticalAlignment = VerticalAlignment.Bottom;
+            this.menuText[0].HorizontalAlignment = HorizontalAlignment.Left;
+            this.menuText[0].TextHorizontalAlignment = TextHorizontalAlignment.Left;
+
+            this.menuText.Add(new TextElementRect(new Vector2(400, 100)));
+            this.menuText[1].Text.SetText("Izhod [ESC]");
+            this.menuText[1].VerticalAlignment = VerticalAlignment.Bottom;
+            this.menuText[1].HorizontalAlignment = HorizontalAlignment.Left;
+            this.menuText[1].TextHorizontalAlignment = TextHorizontalAlignment.Left;
 
             //set the text font (using global content)
             stateManager.Application.Content.Add(this);
@@ -42,7 +48,8 @@ namespace rimmprojekt.States
         public void DrawScreen(DrawState state)
         {
             //display the 'menu' :-)
-            menuText.Draw(state);
+            menuText[0].Draw(state);
+            menuText[1].Draw(state);
         }
 
         public void Update(UpdateState state)
@@ -74,7 +81,8 @@ namespace rimmprojekt.States
         void IContentOwner.LoadContent(ContentState state)
         {
             //load the text font.
-            this.menuText.Font = state.Load<SpriteFont>("Arial");
+            this.menuText[0].Font = state.Load<SpriteFont>("MenuFont");
+            this.menuText[1].Font = state.Load<SpriteFont>("MenuFont");
         }
     }
 }
