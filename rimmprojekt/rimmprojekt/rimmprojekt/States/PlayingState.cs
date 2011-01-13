@@ -15,6 +15,7 @@ using Xen.Ex.Material;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 
 using JigLibX.Math;
 using JigLibX.Physics;
@@ -25,6 +26,8 @@ namespace rimmprojekt.States
 {
     class PlayingState : IGameState, IContentOwner
     {
+        Song backgroundSong;
+        Boolean backgroundSongStart = false;
         private TextElementRect debugText;
 
         private IGameStateManager stateManager;
@@ -81,8 +84,19 @@ namespace rimmprojekt.States
 
         public void Update(UpdateState state)
         {
+            if (!backgroundSongStart)
+            {
+                MediaPlayer.Play(backgroundSong);
+                MediaPlayer.Volume = 1.0f;
+                backgroundSongStart = true;
+            }
+
             if (state.KeyboardState.KeyState.Escape.OnReleased)
+            {
                 stateManager.SetState(new MenuState());
+                MediaPlayer.Stop();
+            }
+                
 
             debugText.Text.SetText(tezej.polozaj.ToString());
 
@@ -93,6 +107,8 @@ namespace rimmprojekt.States
         void IContentOwner.LoadContent(ContentState state)
         {
             this.debugText.Font = state.Load<SpriteFont>("Arial");
+            backgroundSong = state.Load<Song>(@"backgroundSong");
+            MediaPlayer.IsRepeating = true;
         }
     }
 }
