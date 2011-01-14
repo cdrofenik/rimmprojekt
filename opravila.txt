@@ -1,0 +1,13 @@
+Modeli in animacije
+Mapa
+Skini
+slika odzadja (game1.cs) ali posebj draw state
+
+Žiga:
+collision detection
+screenshots
+
+Toše:
+Meni ( shranjevanje, pauziranje, pregled slik(galerija), help)
+intro
+fullscreen mode!

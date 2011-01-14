@@ -30,6 +30,7 @@ namespace rimmprojekt.States
         Boolean backgroundSongStart = false;
         private TextElementRect debugText;
 
+        private DrawTargetScreen drawToScreen;
         private IGameStateManager stateManager;
         private Razredi.Tezej tezej;
         private Razredi.Mapa mapa;
@@ -37,7 +38,7 @@ namespace rimmprojekt.States
 
         public PlayingState(Application application)
         {
-            
+            drawToScreen = new DrawTargetScreen(new Camera3D());
         }
 
         public void Initalise(IGameStateManager stateManager)
@@ -75,7 +76,8 @@ namespace rimmprojekt.States
             Camera3D camera = new Camera3D();
             camera.LookAt(target, position, Vector3.UnitY);
             state.Camera.SetCamera(camera);
-            
+
+
             mapa.Draw(state);
             tezej.Draw(state);
             inventory.Draw(state);
