@@ -36,7 +36,7 @@ namespace rimmprojekt
             
             //Set the screen clear colour to blue
             //(Draw targets have a built in ClearBuffer object)
-            drawToScreen.ClearBuffer.ClearColour = Color.CornflowerBlue;
+            drawToScreen.ClearBuffer.ClearColour = Color.Black;
             Window.Title = "RIMM";
             Window.AllowUserResizing = true;
 

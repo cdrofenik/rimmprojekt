@@ -192,7 +192,7 @@ namespace rimmprojekt.Razredi
         public void LoadContent(ContentState state)
         {
             //load the model data into the model instance
-            model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"tiny_4anim");
+            model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/player");
             sideBarTexture = state.Load<Texture2D>(@"Tezej/tezejus");
             tezejHpTexture = state.Load<Texture2D>(@"Tezej/hpbar");
             tezejMpTexture = state.Load<Texture2D>(@"Tezej/manabar");
@@ -258,8 +258,8 @@ namespace rimmprojekt.Razredi
                 if ((expPoints == maxExp) || (expPoints > maxExp))
                     hasLeveledUp = true;
 
-                matrix = Matrix.CreateScale(0.03f, 0.03f, 0.03f) * Matrix.CreateRotationZ((float)Math.PI) * Matrix.CreateRotationX((float)Math.PI / 2);
-                matrix *= Matrix.CreateTranslation(polozaj);
+                //matrix =  Matrix.CreateRotationZ((float)Math.PI);
+                matrix = Matrix.CreateTranslation(polozaj);
                 body.Position = polozaj;
             }
             //matrix=Matrix.CreateScale(0.04f,0.04f,0.04f) *
