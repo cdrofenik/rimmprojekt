@@ -29,9 +29,6 @@ namespace rimmprojekt.Razredi
 
         private Vector3 polozaj;
 
-        private Body body;
-        public CollisionSkin skin;
-
         public Tla(Point v, ContentRegister content)
         {
             velikost = v;
@@ -44,10 +41,10 @@ namespace rimmprojekt.Razredi
             Vector2 bottomRight = new Vector2(10.0f, 10.0f);
 
             VertexPositionNormalTexture[] tempTla = new VertexPositionNormalTexture[]{
-                    new VertexPositionNormalTexture(new Vector3(0.0f, -10.0f, (float)velikost.X*20.0f), Vector3.Up, topLeft),
-                    new VertexPositionNormalTexture(new Vector3(0.0f, -10.0f, 0.0f), Vector3.Up, bottomLeft),
-                    new VertexPositionNormalTexture(new Vector3((float)velikost.Y*20.0f, -10.0f, (float)velikost.X*20.0f), Vector3.Up, topRight),
-                    new VertexPositionNormalTexture(new Vector3((float)velikost.Y*20.0f, -10.0f, 0.0f), Vector3.Up, bottomRight)
+                    new VertexPositionNormalTexture(new Vector3(-10.0f, -10.0f, (float)velikost.X*20.0f-10f), Vector3.Up, topLeft),
+                    new VertexPositionNormalTexture(new Vector3(-10.0f, -10.0f, 0.0f), Vector3.Up, bottomLeft),
+                    new VertexPositionNormalTexture(new Vector3((float)velikost.Y*20.0f-10f, -10.0f, (float)velikost.X*20.0f-10f), Vector3.Up, topRight),
+                    new VertexPositionNormalTexture(new Vector3((float)velikost.Y*20.0f-10f, -10.0f, 0.0f), Vector3.Up, bottomRight)
                 };
             tla = new Vertices<VertexPositionNormalTexture>(tempTla);
             tempTla = null;
@@ -72,20 +69,6 @@ namespace rimmprojekt.Razredi
 
             material.Textures = new MaterialTextures();
             material.Textures.TextureMapSampler = TextureSamplerState.PointFiltering;
-
-            body = new Body();
-            skin = new CollisionSkin(body);
-            body.CollisionSkin = skin;
-
-            JigLibX.Geometry.Plane plane = new JigLibX.Geometry.Plane(Vector3.UnitY, 0f);
-            skin.AddPrimitive(plane, new MaterialProperties(0.0f, 100.0f, 100.0f));
-
-            Vector3 com = SetMass(2.0f);
-
-            body.MoveTo(polozaj, Matrix.Identity);
-            skin.ApplyLocalTransform(new JigLibX.Math.Transform(-com, Matrix.Identity));
-            body.EnableBody();
-            body.Immovable = true;
 
             content.Add(this);
         }
@@ -113,25 +96,6 @@ namespace rimmprojekt.Razredi
         {
             //polozaj = body.Position;
             return UpdateFrequency.FullUpdate60hz;
-        }
-
-        private Vector3 SetMass(float mass)
-        {
-            PrimitiveProperties primitiveProperties = new PrimitiveProperties(
-                PrimitiveProperties.MassDistributionEnum.Solid,
-                PrimitiveProperties.MassTypeEnum.Mass, mass);
-
-            float junk;
-            Vector3 com;
-            Matrix it;
-            Matrix itCoM;
-
-            skin.GetMassProperties(primitiveProperties, out junk, out com, out it, out itCoM);
-
-            body.BodyInertia = itCoM;
-            body.Mass = junk;
-
-            return com;
         }
     }
 }

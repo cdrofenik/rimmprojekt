@@ -154,11 +154,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\animations.txt">
-      <Name>animations</Name>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Models\dog_maker.X">
       <Name>dog_maker</Name>
       <Importer>XImporter</Importer>
@@ -172,12 +167,12 @@
     <Compile Include="Models\minotaur.X">
       <Name>minotaur</Name>
       <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+      <Processor>ModelImporter</Processor>
     </Compile>
     <Compile Include="Models\player.X">
       <Name>player</Name>
       <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+      <Processor>ModelImporter</Processor>
     </Compile>
     <Compile Include="Models\shield.tga">
       <Name>shield</Name>

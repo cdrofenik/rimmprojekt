@@ -44,9 +44,12 @@ namespace rimmprojekt.States
         public void Initalise(IGameStateManager stateManager)
         {
             this.stateManager = stateManager;
-            InitialisePhysics();
             mapa = new Razredi.Mapa("../../../../rimmprojektContent/labirint1.txt", stateManager.Application.Content, stateManager.Application.UpdateManager);
-            tezej = new Razredi.Tezej(30.0f, 1.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content);
+
+            List<Body> bodies = new List<Body>();
+            foreach (Razredi.Kocka k in mapa.zidovi)
+                bodies.Add(k.body);
+            tezej = new Razredi.Tezej(30.0f, -10.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
             inventory = new Razredi.Inventory(stateManager.Application.UpdateManager, stateManager.Application.Content);
 
             this.debugText = new TextElementRect(new Vector2(400, 100));
@@ -60,9 +63,7 @@ namespace rimmprojekt.States
 
         private void InitialisePhysics()
         {
-            PhysicsSystem world = new PhysicsSystem();
-            world.CollisionSystem = new CollisionSystemSAP();
-            world.Gravity = new Vector3(0.0f, -0.1f, 0.0f);
+
         }
 
         //simplified IDraw/IUpdate
@@ -98,12 +99,8 @@ namespace rimmprojekt.States
                 stateManager.SetState(new MenuState());
                 MediaPlayer.Stop();
             }
-                
 
-            debugText.Text.SetText(tezej.polozaj.ToString());
-
-            float timeStep = (float)state.TotalTimeTicks / TimeSpan.TicksPerSecond;
-            PhysicsSystem.CurrentPhysicsSystem.Integrate(timeStep);
+            //debugText.Text.SetText(tezej.polozaj.ToString() + " " + tezej.collisions.Count.ToString());
         }
 
         void IContentOwner.LoadContent(ContentState state)

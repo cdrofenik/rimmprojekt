@@ -39,6 +39,13 @@ namespace rimmprojekt.Razredi
         public Int32 luck;
         private Boolean hasLeveledUp = false;
 
+        List<Body> bodies;
+        private CollisionSystem collisionSystem;
+        private Body body;
+        private CollisionSkin skin;
+        public List<CollisionInfo> collisions;
+        private BasicCollisionFunctor collisionFunctor;
+
         #region drawing elements
         //avatar,leveling and status parameters
         private TextElementRect damageBarText;
@@ -73,10 +80,7 @@ namespace rimmprojekt.Razredi
         private IShader shader;
         private ModelInstance model;
 
-        private Body body;
-        private CollisionSkin skin;
-
-        public Tezej(float x, float y, float z, UpdateManager manager, ContentRegister content)
+        public Tezej(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies)
         {
             manager.Add(this);
             model = new ModelInstance();
@@ -132,19 +136,29 @@ namespace rimmprojekt.Razredi
             material.LightCollection = lights;
             shader = material;
 
+            collisionSystem = new CollisionSystemSAP();
+            collisionSystem.UseSweepTests = false;
+
+            collisions = new List<CollisionInfo>();
+            collisionFunctor = new BasicCollisionFunctor(collisions);
+
+            this.bodies = new List<Body>(bodies);
+            foreach (Body b in bodies)
+                collisionSystem.AddCollisionSkin(b.CollisionSkin);
+
             body = new Body();
             skin = new CollisionSkin(body);
             body.CollisionSkin = skin;
 
-            Box box = new Box(new Vector3(5f, 5f, 5f), Matrix.Identity, new Vector3(5.0f, 4.0f, 5.0f));
-            skin.AddPrimitive(box, new MaterialProperties(0.0f, 100.0f, 100.0f));
+            Box box = new Box(Vector3.Zero, Matrix.Identity, new Vector3(5.0f, 5.0f, 5.0f));
+            skin.AddPrimitive(box, new MaterialProperties(0.5f, 0.5f, 0.5f));
 
-            Vector3 com = SetMass(5f);
-
-            body.MoveTo(polozaj, Matrix.Identity);
-            skin.ApplyLocalTransform(new JigLibX.Math.Transform(-com, Matrix.Identity));
+            body.MoveTo(polozaj + new Vector3(7.5f, 7.5f, 7.5f), Matrix.Identity);
+            //skin.ApplyLocalTransform(new JigLibX.Math.Transform(polozaj, Matrix.Identity));
             body.EnableBody();
 
+            bodies.Add(body);
+            collisionSystem.AddCollisionSkin(body.CollisionSkin);
             content.Add(this);
         }
 
@@ -204,7 +218,9 @@ namespace rimmprojekt.Razredi
         }
 
         public UpdateFrequency Update(UpdateState state)
-        {         
+        {
+            collisions.Clear();
+
             if (hasLeveledUp)
             {
                 if (!hasPlayed)
@@ -240,15 +256,15 @@ namespace rimmprojekt.Razredi
             else
             {
                 hasPlayed = false;
-                polozaj = body.Position;
+                Vector3 premik = new Vector3(0f, 0f, 0f);
                 if (state.KeyboardState.KeyState.S.IsDown)
-                    polozaj.Z += 1.0f;
+                    premik.Z += 1.0f;
                 if (state.KeyboardState.KeyState.W.IsDown)
-                    polozaj.Z -= 1.0f;
+                    premik.Z -= 1.0f;
                 if (state.KeyboardState.KeyState.D.IsDown)
-                    polozaj.X += 1.0f;
+                    premik.X += 1.0f;
                 if (state.KeyboardState.KeyState.A.IsDown)
-                    polozaj.X -= 1.0f;
+                    premik.X -= 1.0f;
                 if (state.KeyboardState.KeyState.H.IsDown)
                     healthPoints -= 20;
                 if (state.KeyboardState.KeyState.M.IsDown)
@@ -258,9 +274,15 @@ namespace rimmprojekt.Razredi
                 if ((expPoints == maxExp) || (expPoints > maxExp))
                     hasLeveledUp = true;
 
-                //matrix =  Matrix.CreateRotationZ((float)Math.PI);
+                polozaj += premik;
+                body.MoveTo(polozaj + new Vector3(7.5f, 7.5f, 7.5f), Matrix.Identity);
+                collisionSystem.DetectCollisions(body, collisionFunctor, null, 0.05f);
+                if (collisions.Count > 0)
+                    polozaj -= premik;
                 matrix = Matrix.CreateTranslation(polozaj);
-                body.Position = polozaj;
+                
+                
+                //collisionSystem.DetectAllCollisions(this.bodies, collisionFunctor, null, 0.05f);
             }
             //matrix=Matrix.CreateScale(0.04f,0.04f,0.04f) *
             //    skin.GetPrimitiveLocal(0).Transform.Orientation *
