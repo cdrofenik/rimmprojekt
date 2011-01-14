@@ -26,8 +26,8 @@ namespace rimmprojekt.Razredi
         protected readonly IIndices indices;
         protected MaterialShader material;
 
-        private Body body;
-        public CollisionSkin skin;
+        public Body body;
+        private CollisionSkin skin;
 
         public Kocka(float x, float y, float z, ContentRegister content, UpdateManager manager)
         {
@@ -114,15 +114,15 @@ namespace rimmprojekt.Razredi
             skin = new CollisionSkin(body);
             body.CollisionSkin = skin;
 
-            Box box = new Box(new Vector3(10f, 10f, 10f), Matrix.Identity, new Vector3(20.0f, 20.0f, 20.0f));
+            Box box = new Box(Vector3.Zero, Matrix.Identity, new Vector3(20.0f, 20.0f, 20.0f));
             skin.AddPrimitive(box, new MaterialProperties(0.0f, 1.0f, 1.0f));
 
-            Vector3 com = SetMass(1.0f);
+            //Vector3 com = SetMass(1.0f);
 
-            body.MoveTo(polozaj+new Vector3(10f,10f,10f), Matrix.Identity);
-            skin.ApplyLocalTransform(new JigLibX.Math.Transform(-com, Matrix.Identity));
+            body.MoveTo(polozaj, Matrix.Identity);
+            //skin.ApplyLocalTransform(new JigLibX.Math.Transform(polozaj, Matrix.Identity));
             body.EnableBody();
-            body.Immovable = true;
+            //body.Immovable = true;
 
             content.Add(this);
         }
@@ -164,28 +164,27 @@ namespace rimmprojekt.Razredi
 
         public UpdateFrequency Update(UpdateState state)
         {
-            polozaj = body.Position;
-            matrix = Matrix.CreateTranslation(polozaj);
+            body.MoveTo(polozaj, Matrix.Identity);
             return UpdateFrequency.FullUpdate60hz;
         }
 
-        private Vector3 SetMass(float mass)
-        {
-            PrimitiveProperties primitiveProperties = new PrimitiveProperties(
-                PrimitiveProperties.MassDistributionEnum.Solid,
-                PrimitiveProperties.MassTypeEnum.Mass, mass);
+        //private Vector3 SetMass(float mass)
+        //{
+        //    PrimitiveProperties primitiveProperties = new PrimitiveProperties(
+        //        PrimitiveProperties.MassDistributionEnum.Solid,
+        //        PrimitiveProperties.MassTypeEnum.Mass, mass);
 
-            float junk;
-            Vector3 com;
-            Matrix it;
-            Matrix itCoM;
+        //    float junk;
+        //    Vector3 com;
+        //    Matrix it;
+        //    Matrix itCoM;
 
-            skin.GetMassProperties(primitiveProperties, out junk, out com, out it, out itCoM);
+        //    skin.GetMassProperties(primitiveProperties, out junk, out com, out it, out itCoM);
 
-            body.BodyInertia = itCoM;
-            body.Mass = junk;
+        //    body.BodyInertia = itCoM;
+        //    body.Mass = junk;
 
-            return com;
-        }
+        //    return com;
+        //}
     }
 }

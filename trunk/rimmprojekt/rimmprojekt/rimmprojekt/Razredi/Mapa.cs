@@ -22,7 +22,7 @@ namespace rimmprojekt.Razredi
 {
     class Mapa : IDraw
     {
-        private ArrayList zidovi;
+        public ArrayList zidovi;
         private Tla tla;
 
         public Mapa(string pot, ContentRegister content, UpdateManager manager)
@@ -41,15 +41,15 @@ namespace rimmprojekt.Razredi
                     for (int j = 0; j < velikost.Y; j++)
                     {
                         if (sr.Read() - 48 == 0)
-                            zidovi.Add(new Kocka((float)j * 20.0f, -10.0f, (float)i * 20.0f, content, manager));
+                            zidovi.Add(new Kocka((float)j * 20.0f, 0.0f, (float)i * 20.0f, content, manager));
                     }
                     sr.Read();
                     sr.Read();
                 }
             }
 
-            foreach (Kocka k in zidovi)
-                tla.skin.NonCollidables.Add(k.skin);
+            //foreach (Kocka k in zidovi)
+            //    tla.skin.NonCollidables.Add(k.skin);
         }
 
         public void Draw(DrawState state)
