@@ -62,7 +62,7 @@ namespace rimmprojekt.States
         {
             PhysicsSystem world = new PhysicsSystem();
             world.CollisionSystem = new CollisionSystemSAP();
-            world.Gravity = new Vector3(0.0f, -0.01f, 0.0f);
+            world.Gravity = new Vector3(0.0f, -0.1f, 0.0f);
         }
 
         //simplified IDraw/IUpdate
