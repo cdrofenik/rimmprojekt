@@ -136,10 +136,10 @@ namespace rimmprojekt.Razredi
             skin = new CollisionSkin(body);
             body.CollisionSkin = skin;
 
-            Box box = new Box(new Vector3(5f, 5f, 5f), Matrix.Identity, new Vector3(5.0f, 5.0f, 5.0f));
-            skin.AddPrimitive(box, new MaterialProperties(0.0f, 1.0f, 1.0f));
+            Box box = new Box(new Vector3(5f, 5f, 5f), Matrix.Identity, new Vector3(5.0f, 4.0f, 5.0f));
+            skin.AddPrimitive(box, new MaterialProperties(0.0f, 100.0f, 100.0f));
 
-            Vector3 com = SetMass(1f);
+            Vector3 com = SetMass(5f);
 
             body.MoveTo(polozaj, Matrix.Identity);
             skin.ApplyLocalTransform(new JigLibX.Math.Transform(-com, Matrix.Identity));
