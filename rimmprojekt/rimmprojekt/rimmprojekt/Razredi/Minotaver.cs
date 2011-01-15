@@ -249,8 +249,8 @@ namespace rimmprojekt.Razredi
 
         private void checkKeysPressed(UpdateState state)
         {
-            if (!state.KeyboardState.KeyState.S.IsDown && !state.KeyboardState.KeyState.W.IsDown && !state.KeyboardState.KeyState.D.IsDown
-                && !state.KeyboardState.KeyState.A.IsDown)
+            if (!state.KeyboardState.KeyState.Down.IsDown && !state.KeyboardState.KeyState.Up.IsDown && !state.KeyboardState.KeyState.Right.IsDown
+                && !state.KeyboardState.KeyState.Left.IsDown)
             {
                 isHeIdle();
             }
