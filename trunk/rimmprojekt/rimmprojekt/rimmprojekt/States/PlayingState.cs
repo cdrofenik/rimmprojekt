@@ -35,6 +35,7 @@ namespace rimmprojekt.States
         private Razredi.Tezej tezej;
         private Razredi.Mapa mapa;
         private Razredi.Inventory inventory;
+        private Razredi.Minotaver minotaver;
 
         public PlayingState(Application application)
         {
@@ -49,11 +50,14 @@ namespace rimmprojekt.States
             List<Body> bodies = new List<Body>();
             foreach (Razredi.Kocka k in mapa.zidovi)
                 bodies.Add(k.body);
-            tezej = new Razredi.Tezej(30.0f, -10.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
+            tezej = new Razredi.Tezej(30.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
             inventory = new Razredi.Inventory(stateManager.Application.UpdateManager, stateManager.Application.Content);
+            minotaver = new Razredi.Minotaver(35.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
 
             this.debugText = new TextElementRect(new Vector2(400, 100));
-            this.debugText.Text.SetText("Pritisni [ENTER]");
+            this.debugText.Position = new Vector2(340, 240);
+            this.debugText.Colour = Color.Pink;
+            this.debugText.Text.SetText("Debug Text");
             this.debugText.VerticalAlignment = VerticalAlignment.Centre;
             this.debugText.HorizontalAlignment = HorizontalAlignment.Centre;
             this.debugText.TextHorizontalAlignment = TextHorizontalAlignment.Centre;
@@ -78,8 +82,9 @@ namespace rimmprojekt.States
             camera.LookAt(target, position, Vector3.UnitY);
             state.Camera.SetCamera(camera);
 
-
+            
             mapa.Draw(state);
+            minotaver.Draw(state);
             tezej.Draw(state);
             inventory.Draw(state);
             this.debugText.Draw(state);

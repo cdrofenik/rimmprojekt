@@ -80,11 +80,26 @@ namespace rimmprojekt.Razredi
         private IShader shader;
         private ModelInstance model;
 
+        #region kontrole modelov in animacij
+        private AnimationController animationController;
+        private AnimationInstance animation;
+        private string orientiranModel;
+        private Boolean isRunning;
+        private Boolean isIdle;
+        #endregion
+
         public Tezej(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies)
         {
+            isRunning = false;
+            isIdle = true;
+            orientiranModel = "down";
             manager.Add(this);
             model = new ModelInstance();
+            animationController = model.GetAnimationController();
+
             content.Add(this);
+
+            animation = animationController.PlayLoopingAnimation(1);
 
             hasPlayed = false;
 
@@ -153,7 +168,7 @@ namespace rimmprojekt.Razredi
             Box box = new Box(Vector3.Zero, Matrix.Identity, new Vector3(5.0f, 5.0f, 5.0f));
             skin.AddPrimitive(box, new MaterialProperties(0.5f, 0.5f, 0.5f));
 
-            body.MoveTo(polozaj + new Vector3(7.5f, 7.5f, 7.5f), Matrix.Identity);
+            body.MoveTo(polozaj + new Vector3(15.5f, 15.5f, 15.5f), Matrix.Identity);
             //skin.ApplyLocalTransform(new JigLibX.Math.Transform(polozaj, Matrix.Identity));
             body.EnableBody();
 
@@ -223,6 +238,7 @@ namespace rimmprojekt.Razredi
 
             if (hasLeveledUp)
             {
+                #region level up
                 if (!hasPlayed)
                 {
                     levelUpSoundEffect.Play();
@@ -252,19 +268,38 @@ namespace rimmprojekt.Razredi
                     pointsCounter = 0;
                     sideElement.Remove(expElement);
                 }
+                #endregion
             }
             else
             {
                 hasPlayed = false;
                 Vector3 premik = new Vector3(0f, 0f, 0f);
                 if (state.KeyboardState.KeyState.S.IsDown)
+                {
+                    isHeRunning();
+                    changeAngele(orientiranModel, "down");
                     premik.Z += 1.0f;
+                }
                 if (state.KeyboardState.KeyState.W.IsDown)
+                {
+                    isHeRunning();
+                    changeAngele(orientiranModel, "up");
                     premik.Z -= 1.0f;
+                }
                 if (state.KeyboardState.KeyState.D.IsDown)
+                {
+                    isHeRunning();
+                    changeAngele(orientiranModel, "right");
                     premik.X += 1.0f;
+                }
                 if (state.KeyboardState.KeyState.A.IsDown)
+                {
+                    isHeRunning();
+                    changeAngele(orientiranModel, "left");
                     premik.X -= 1.0f;
+                }
+                checkKeysPressed(state);
+
                 if (state.KeyboardState.KeyState.H.IsDown)
                     healthPoints -= 20;
                 if (state.KeyboardState.KeyState.M.IsDown)
@@ -279,9 +314,7 @@ namespace rimmprojekt.Razredi
                 collisionSystem.DetectCollisions(body, collisionFunctor, null, 0.05f);
                 if (collisions.Count > 0)
                     polozaj -= premik;
-                matrix = Matrix.CreateTranslation(polozaj);
-                
-                
+                //matrix = Matrix.CreateTranslation(polozaj);
                 //collisionSystem.DetectAllCollisions(this.bodies, collisionFunctor, null, 0.05f);
             }
             //matrix=Matrix.CreateScale(0.04f,0.04f,0.04f) *
@@ -346,6 +379,69 @@ namespace rimmprojekt.Razredi
             damageBarText.TextHorizontalAlignment = TextHorizontalAlignment.Centre;
 
             lvlUpElement.Add(damageBarText);
+        }
+
+        private void changeAngele(string prvotnaSmer, string zeljenaSmer)
+        {
+            if (prvotnaSmer.Equals(zeljenaSmer))
+            {
+                matrix = Matrix.CreateTranslation(polozaj);
+            }
+            else
+            {
+                if (prvotnaSmer.Equals("down") && zeljenaSmer.Equals("up"))
+                {
+                    matrix = Matrix.CreateRotationZ((float)Math.PI) * Matrix.CreateRotationX((float)(Math.PI));
+                    matrix *= Matrix.CreateTranslation(polozaj);
+                }
+                if (prvotnaSmer.Equals("down") && zeljenaSmer.Equals("left"))
+                {
+                    matrix = Matrix.CreateRotationZ((float)(Math.PI / 2)) * Matrix.CreateRotationX((float)(Math.PI / 2)) * Matrix.CreateRotationZ((float)(-Math.PI / 2));
+                    matrix *= Matrix.CreateTranslation(polozaj);
+                }
+                if (prvotnaSmer.Equals("down") && zeljenaSmer.Equals("right"))
+                {
+                    matrix = Matrix.CreateRotationZ((float)(-Math.PI / 2)) * Matrix.CreateRotationX((float)(Math.PI / 2)) * Matrix.CreateRotationZ((float)(Math.PI / 2));
+                    matrix *= Matrix.CreateTranslation(polozaj);
+                }
+            }
+        }
+
+        private void isHeRunning()
+        {
+            if (!isRunning)
+            {
+                animation.StopAnimation();
+                animation = animationController.PlayLoopingAnimation(0);
+                isRunning = true;
+                isIdle = false;
+            }
+        }
+
+        private void isHeIdle()
+        {
+            if (!isIdle)
+            {
+                animation.StopAnimation();
+                animation = animationController.PlayLoopingAnimation(1);
+                isIdle = true;
+                isRunning = false;
+            }
+        }
+
+        private void checkKeysPressed(UpdateState state)
+        {
+            if (!state.KeyboardState.KeyState.S.IsDown && !state.KeyboardState.KeyState.W.IsDown && !state.KeyboardState.KeyState.D.IsDown
+                && !state.KeyboardState.KeyState.A.IsDown)
+            {
+                isHeIdle();
+            }
+        }
+
+        private void heIsDead()
+        {
+            animation.StopAnimation();
+            animation = animationController.PlayLoopingAnimation(12);
         }
     }
 }
