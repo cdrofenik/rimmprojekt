@@ -221,7 +221,7 @@ namespace rimmprojekt.Razredi
         public void LoadContent(ContentState state)
         {
             //load the model data into the model instance
-            model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/player");
+            model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/minotaur");
             sideBarTexture = state.Load<Texture2D>(@"Tezej/tezejus");
             tezejHpTexture = state.Load<Texture2D>(@"Tezej/hpbar");
             tezejMpTexture = state.Load<Texture2D>(@"Tezej/manabar");
@@ -322,25 +322,6 @@ namespace rimmprojekt.Razredi
             //    body.Orientation *
             //    Matrix.CreateTranslation(body.Position);
             return UpdateFrequency.FullUpdate60hz;
-        }
-
-        private Vector3 SetMass(float mass)
-        {
-            PrimitiveProperties primitiveProperties = new PrimitiveProperties(
-                PrimitiveProperties.MassDistributionEnum.Solid,
-                PrimitiveProperties.MassTypeEnum.Mass, mass);
-
-            float junk;
-            Vector3 com;
-            Matrix it;
-            Matrix itCoM;
-
-            skin.GetMassProperties(primitiveProperties, out junk, out com, out it, out itCoM);
-
-            body.BodyInertia = itCoM;
-            body.Mass = junk;
-
-            return com;
         }
 
         private void setDisplayBars()

@@ -45,6 +45,7 @@ namespace rimmprojekt.States
         public void Initalise(IGameStateManager stateManager)
         {
             this.stateManager = stateManager;
+
             mapa = new Razredi.Mapa("../../../../rimmprojektContent/labirint1.txt", stateManager.Application.Content, stateManager.Application.UpdateManager);
 
             List<Body> bodies = new List<Body>();
@@ -82,12 +83,11 @@ namespace rimmprojekt.States
             camera.LookAt(target, position, Vector3.UnitY);
             state.Camera.SetCamera(camera);
 
-            
             mapa.Draw(state);
             minotaver.Draw(state);
             tezej.Draw(state);
             inventory.Draw(state);
-            this.debugText.Draw(state);
+            //this.debugText.Draw(state);
         }
 
         public void Update(UpdateState state)
