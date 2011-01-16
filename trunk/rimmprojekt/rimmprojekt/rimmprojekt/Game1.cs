@@ -26,6 +26,8 @@ namespace rimmprojekt
     public class Game1 : Application
     {
         private DrawTargetScreen drawToScreen;
+        private DrawTargetTexture2D drawToTexture;
+
         private Xen.Ex.Graphics2D.Statistics.DrawStatisticsDisplay statisticsOverlay;
 
         //This method gets called just before the window is shown, and the device is created
@@ -33,18 +35,26 @@ namespace rimmprojekt
         {
             //create the draw target.
             drawToScreen = new DrawTargetScreen(new Camera3D());
-            
+
             //Set the screen clear colour to blue
             //(Draw targets have a built in ClearBuffer object)
             drawToScreen.ClearBuffer.ClearColour = Color.Black;
             Window.Title = "RIMM";
             Window.AllowUserResizing = true;
 
+            drawToTexture = new DrawTargetTexture2D(new Camera3D(), drawToScreen.Width, drawToScreen.Height, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+
             States.GameStateManager manager = new States.GameStateManager(this);
-            this.drawToScreen.Add(manager);
+            this.drawToTexture.Add(manager);
             this.UpdateManager.Add(manager);
 
             statisticsOverlay = new Xen.Ex.Graphics2D.Statistics.DrawStatisticsDisplay(this.UpdateManager);
+
+            Vector2 sizeInPixels = new Vector2(drawToScreen.Width, drawToScreen.Height);
+            Xen.Ex.Graphics2D.TexturedElement displayTexture = null;
+            displayTexture = new TexturedElement(drawToTexture, sizeInPixels);
+            drawToScreen.Add(displayTexture);
+
             drawToScreen.Add(statisticsOverlay);
         }
 
@@ -54,7 +64,17 @@ namespace rimmprojekt
         //Note: Player input and Updating is explained in more detail in Tutorial 13
         protected override void Update(UpdateState state)
         {
-            
+            if (state.KeyboardState.KeyState.F5.OnReleased)
+            {
+                Texture2D slika = drawToTexture.GetTexture();
+                string datoteka = DateTime.Now.ToString();
+                datoteka = datoteka.Replace(".", "");
+                datoteka = datoteka.Replace(":", "");
+                datoteka = datoteka.Replace(" ", "");
+                string pot = this.Content.RootDirectory + @"/Screenshots/" + datoteka + ".png";
+                System.IO.FileStream fs = new System.IO.FileStream(pot, System.IO.FileMode.OpenOrCreate);
+                slika.SaveAsPng(fs, drawToTexture.Width, drawToTexture.Height);
+            }
         }
 
         //This is the main application draw method. All drawing code should go in here.
@@ -66,6 +86,7 @@ namespace rimmprojekt
         protected override void Frame(FrameState state)
         {
             //perform the draw to the screen.
+            drawToTexture.Draw(state);
             drawToScreen.Draw(state);
 
             //at this point the screen has been drawn...

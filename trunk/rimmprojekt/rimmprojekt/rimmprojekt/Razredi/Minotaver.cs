@@ -180,25 +180,6 @@ namespace rimmprojekt.Razredi
             return UpdateFrequency.FullUpdate60hz;
         }
 
-        private Vector3 SetMass(float mass)
-        {
-            PrimitiveProperties primitiveProperties = new PrimitiveProperties(
-                PrimitiveProperties.MassDistributionEnum.Solid,
-                PrimitiveProperties.MassTypeEnum.Mass, mass);
-
-            float junk;
-            Vector3 com;
-            Matrix it;
-            Matrix itCoM;
-
-            skin.GetMassProperties(primitiveProperties, out junk, out com, out it, out itCoM);
-
-            body.BodyInertia = itCoM;
-            body.Mass = junk;
-
-            return com;
-        }
-
         private void changeAngele(string prvotnaSmer, string zeljenaSmer)
         {
             if (prvotnaSmer.Equals(zeljenaSmer))
