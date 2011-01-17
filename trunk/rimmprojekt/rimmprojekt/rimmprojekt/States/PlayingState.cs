@@ -46,7 +46,7 @@ namespace rimmprojekt.States
         {
             this.stateManager = stateManager;
 
-            mapa = new Razredi.Mapa("../../../../rimmprojektContent/labirint1.txt", stateManager.Application.Content, stateManager.Application.UpdateManager);
+            mapa = new Razredi.Mapa("../../../../rimmprojektContent/lab1.txt", stateManager.Application.Content, stateManager.Application.UpdateManager);
 
             List<Body> bodies = new List<Body>();
             foreach (Razredi.Kocka k in mapa.zidovi)
