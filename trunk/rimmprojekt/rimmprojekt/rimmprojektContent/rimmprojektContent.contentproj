@@ -162,7 +162,7 @@
     <Compile Include="Models\epic_sword.X">
       <Name>epic_sword</Name>
       <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+      <Processor>ModelImporter</Processor>
     </Compile>
     <Compile Include="Models\minotaur.X">
       <Name>minotaur</Name>
