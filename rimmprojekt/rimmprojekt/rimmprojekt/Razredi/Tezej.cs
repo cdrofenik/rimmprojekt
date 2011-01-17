@@ -79,6 +79,7 @@ namespace rimmprojekt.Razredi
         private Matrix matrix;
         private IShader shader;
         private ModelInstance model;
+        private ModelInstance sword;
 
         #region kontrole modelov in animacij
         private AnimationController animationController;
@@ -86,21 +87,36 @@ namespace rimmprojekt.Razredi
         private string orientiranModel;
         private Boolean isRunning;
         private Boolean isIdle;
+        public Boolean isAttacking;
+        public Boolean isBlocking;
         #endregion
 
         public Tezej(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies)
         {
+            model = new ModelInstance();
+            sword = new ModelInstance();
+
+            manager.Add(this);
+            content.Add(this);
+
+            #region animacije
+            isBlocking = false;
+            isAttacking = false;
             isRunning = false;
             isIdle = true;
             orientiranModel = "down";
-            manager.Add(this);
-            model = new ModelInstance();
+
             animationController = model.GetAnimationController();
-
-            content.Add(this);
-
             animation = animationController.PlayLoopingAnimation(1);
 
+            int boneR = model.ModelData.Skeleton.GetBoneIndexByName("helperR");
+            int boneL = model.ModelData.Skeleton.GetBoneIndexByName("helperL");
+            //ModelBone bone = new ModelBone();
+            //bone = model.ModelData.Skeleton.BoneData.ElementAt(boneR)
+
+            #endregion
+
+            #region parametri
             hasPlayed = false;
 
             healthPoints = 361;
@@ -110,6 +126,7 @@ namespace rimmprojekt.Razredi
             damage = 1;
             durability = 1;
             luck = 1;
+            #endregion
 
             #region leveling up elements
             //inicializacija leveling elementa
@@ -189,6 +206,7 @@ namespace rimmprojekt.Razredi
                     {
                         //draw the custom geometry
                         model.Draw(state);
+                        sword.Draw(state);
                     }
                 }
             }
@@ -221,7 +239,8 @@ namespace rimmprojekt.Razredi
         public void LoadContent(ContentState state)
         {
             //load the model data into the model instance
-            model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/minotaur");
+            model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/player");
+            sword.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/epic_sword");
             sideBarTexture = state.Load<Texture2D>(@"Tezej/tezejus");
             tezejHpTexture = state.Load<Texture2D>(@"Tezej/hpbar");
             tezejMpTexture = state.Load<Texture2D>(@"Tezej/manabar");
@@ -244,7 +263,7 @@ namespace rimmprojekt.Razredi
                     levelUpSoundEffect.Play();
                     hasPlayed = true;
                 }
-                
+
                 if (state.KeyboardState.KeyState.B.OnPressed)
                 {
                     damage += 1;
@@ -274,6 +293,8 @@ namespace rimmprojekt.Razredi
             {
                 hasPlayed = false;
                 Vector3 premik = new Vector3(0f, 0f, 0f);
+
+                #region keyboard input
                 if (state.KeyboardState.KeyState.S.IsDown)
                 {
                     isHeRunning();
@@ -298,7 +319,20 @@ namespace rimmprojekt.Razredi
                     changeAngele(orientiranModel, "left");
                     premik.X -= 1.0f;
                 }
+                #endregion
+
                 checkKeysPressed(state);
+
+                #region mouse input
+                if (state.MouseState.LeftButton.IsDown)
+                {
+                    isHeFighting(state);
+                }
+                if (state.MouseState.RightButton.IsDown)
+                {
+                    isHeBlocking(state);
+                }
+                #endregion
 
                 if (state.KeyboardState.KeyState.H.IsDown)
                     healthPoints -= 20;
@@ -322,6 +356,25 @@ namespace rimmprojekt.Razredi
             //    body.Orientation *
             //    Matrix.CreateTranslation(body.Position);
             return UpdateFrequency.FullUpdate60hz;
+        }
+
+        private Vector3 SetMass(float mass)
+        {
+            PrimitiveProperties primitiveProperties = new PrimitiveProperties(
+                PrimitiveProperties.MassDistributionEnum.Solid,
+                PrimitiveProperties.MassTypeEnum.Mass, mass);
+
+            float junk;
+            Vector3 com;
+            Matrix it;
+            Matrix itCoM;
+
+            skin.GetMassProperties(primitiveProperties, out junk, out com, out it, out itCoM);
+
+            body.BodyInertia = itCoM;
+            body.Mass = junk;
+
+            return com;
         }
 
         private void setDisplayBars()
@@ -388,6 +441,15 @@ namespace rimmprojekt.Razredi
             }
         }
 
+        private void checkKeysPressed(UpdateState state)
+        {
+            if (!state.KeyboardState.KeyState.S.IsDown && !state.KeyboardState.KeyState.W.IsDown && !state.KeyboardState.KeyState.D.IsDown
+                && !state.KeyboardState.KeyState.A.IsDown && !state.MouseState.LeftButton.IsDown)
+            {
+                isHeIdle();
+            }
+        }
+
         private void isHeRunning()
         {
             if (!isRunning)
@@ -396,6 +458,7 @@ namespace rimmprojekt.Razredi
                 animation = animationController.PlayLoopingAnimation(0);
                 isRunning = true;
                 isIdle = false;
+                isAttacking = false;
             }
         }
 
@@ -404,18 +467,10 @@ namespace rimmprojekt.Razredi
             if (!isIdle)
             {
                 animation.StopAnimation();
-                animation = animationController.PlayLoopingAnimation(1);
+                animation = animationController.PlayLoopingAnimation(3);
                 isIdle = true;
                 isRunning = false;
-            }
-        }
-
-        private void checkKeysPressed(UpdateState state)
-        {
-            if (!state.KeyboardState.KeyState.S.IsDown && !state.KeyboardState.KeyState.W.IsDown && !state.KeyboardState.KeyState.D.IsDown
-                && !state.KeyboardState.KeyState.A.IsDown)
-            {
-                isHeIdle();
+                isAttacking = false;
             }
         }
 
@@ -423,6 +478,44 @@ namespace rimmprojekt.Razredi
         {
             animation.StopAnimation();
             animation = animationController.PlayLoopingAnimation(12);
+        }
+
+        private void isHeFighting(UpdateState state)
+        {
+            if (state.MouseState.LeftButton.DownDuration > 0.9)
+            {
+                animation.StopAnimation();
+                animation = animationController.PlayAnimation(3);
+                isIdle = false;
+                isRunning = false;
+                isAttacking = true;
+                isBlocking = false;
+            }
+            else
+            {
+                if (!isAttacking)
+                {
+                    animation.StopAnimation();
+                    animation = animationController.PlayAnimation(4);
+                    isIdle = false;
+                    isRunning = false;
+                    isAttacking = true;
+                    isBlocking = false;
+                }
+            }
+        }
+
+        private void isHeBlocking(UpdateState state)
+        {
+            if (state.MouseState.RightButton.DownDuration > 0.1)
+            {
+                animation.StopAnimation();
+                animation = animationController.PlayAnimation(8);
+                isIdle = false;
+                isRunning = false;
+                isAttacking = false;
+                isBlocking = true;
+            }
         }
     }
 }
