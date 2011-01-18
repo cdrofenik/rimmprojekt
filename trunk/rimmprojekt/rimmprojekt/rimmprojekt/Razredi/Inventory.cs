@@ -22,16 +22,14 @@ namespace rimmprojekt.Razredi
         private Texture2D inventoryTexture;
         private Texture2D hpPotionTexture;
         private Texture2D mpPotionTexture;
+        private Texture2D emptyTexture;
         private TexturedElement element;
         private Vector2 sizeOfElement;
         private Vector2 beginVectorFirstInventoryRow;
         private Vector2 beginVectorSecondInventoryRow;
         private Tezej tezej;
-
-        private List<TexturedElement> inventoryList = new List<TexturedElement>();
-        private List<String> typeList = new List<String>();
-        private List<Int32> valueList = new List<Int32>();
-
+        private TexturedElement[] inventoryTextureArray = new TexturedElement[12];
+        private Potion[] inventoryPotionArray = new Potion[12];
         private Boolean isVisable = false;
         #endregion
 
@@ -45,6 +43,7 @@ namespace rimmprojekt.Razredi
             sizeOfElement = new Vector2(330.0f, 332.0f);
             element = new TexturedElement(inventoryTexture,sizeOfElement);
             element.AlphaBlendState = Xen.Graphics.AlphaBlendState.Modulate;
+            inicializeInventoryItems();
 		}
 
         public void Draw(DrawState state)
@@ -58,7 +57,7 @@ namespace rimmprojekt.Razredi
                         element.Position = new Vector2(state.Application.WindowWidth - 380, state.Application.WindowHeight - 340);
                         element.Draw(state);
 
-                        foreach (TexturedElement el in inventoryList)
+                        foreach (TexturedElement el in inventoryTextureArray)
                         {
                             el.Draw(state);
                         }
@@ -85,6 +84,7 @@ namespace rimmprojekt.Razredi
                     isVisable = true;
                 }
             }
+
 
             if (state.KeyboardState.KeyState.F.OnPressed)
             {
@@ -135,8 +135,6 @@ namespace rimmprojekt.Razredi
             }
             #endregion
 
-            sortInventoryItems();
-
             element = new TexturedElement(inventoryTexture, sizeOfElement);
             return UpdateFrequency.FullUpdate60hz;
         }
@@ -146,69 +144,92 @@ namespace rimmprojekt.Razredi
             inventoryTexture = state.Load<Texture2D>(@"inventory");
             hpPotionTexture = state.Load<Texture2D>(@"Textures/hPotion");
             mpPotionTexture = state.Load<Texture2D>(@"Textures/mPotion");
+            emptyTexture = state.Load<Texture2D>(@"Textures/emptyInventoryItem");
         }
 
         //custom methods
         public void addHpPotion()
         {
-            inventoryList.Add(new TexturedElement(hpPotionTexture, new Vector2(37, 36)));
-            typeList.Add("hp");
-            valueList.Add(20);
+            addPotion("hp", 20);
         }
 
         public void addManaPotion()
         {
-            inventoryList.Add(new TexturedElement(mpPotionTexture, new Vector2(37, 36)));
-            typeList.Add("mp");
-            valueList.Add(20);
+            addPotion("mp", 20);
         }
 
-        public void removeItem(int index)
+        private void useItem(Int32 index)
         {
-            inventoryList.RemoveAt(index);
-            typeList.RemoveAt(index);
-            valueList.RemoveAt(index);
+            if (!inventoryPotionArray[index].type.Equals(""))
+            {
+                if (inventoryPotionArray[index].type.Equals("hp"))
+                {
+                    tezej.healthPoints = tezej.healthPoints + inventoryPotionArray[index].value;
+                    inventoryTextureArray[index].Texture = emptyTexture;
+                    inventoryPotionArray[index] = new Potion();
+                }
+                else
+                {
+                    tezej.manaPoints = tezej.manaPoints + inventoryPotionArray[index].value;
+                    inventoryTextureArray[index].Texture = emptyTexture;
+                    inventoryPotionArray[index] = new Potion();
+                }
+            }
         }
 
-        private void sortInventoryItems()
+        private void inicializeInventoryItems()
         {
             int counter = 0;
             int odmikX = 0;
-            foreach(TexturedElement tmpElement in inventoryList)
+            for(int i = 0; i < 12;i++)
             {
                 if (counter == 0)
                 {
-                    tmpElement.Position = new Vector2(beginVectorFirstInventoryRow.X, beginVectorFirstInventoryRow.Y);
+                    inventoryTextureArray[i] = new TexturedElement(new Vector2(37, 36));
+                    inventoryTextureArray[i].Position = new Vector2(beginVectorFirstInventoryRow.X, beginVectorFirstInventoryRow.Y);
+                    inventoryTextureArray[i].Texture = emptyTexture;
+                    inventoryPotionArray[i] = new Potion();
                 }
                 else if (counter > 0 && counter < 6)
                 {
                     odmikX = counter * 40;
-                    //odmikY = counter * 36;
-                    tmpElement.Position = new Vector2(beginVectorFirstInventoryRow.X + odmikX, beginVectorFirstInventoryRow.Y);
+                    inventoryTextureArray[i] = new TexturedElement(new Vector2(37, 36));
+                    inventoryTextureArray[i].Position = new Vector2(beginVectorFirstInventoryRow.X + odmikX, beginVectorFirstInventoryRow.Y);
+                    inventoryTextureArray[i].Texture = emptyTexture;
+                    inventoryPotionArray[i] = new Potion();
                 }
                 else
                 {
                     odmikX = (counter-6) * 40;
-                    //odmikY = counter * 36;
-                    tmpElement.Position = new Vector2(beginVectorSecondInventoryRow.X + odmikX, beginVectorSecondInventoryRow.Y);
+                    inventoryTextureArray[i] = new TexturedElement(new Vector2(37, 36));
+                    inventoryTextureArray[i].Position = new Vector2(beginVectorSecondInventoryRow.X + odmikX, beginVectorSecondInventoryRow.Y);
+                    inventoryTextureArray[i].Texture = emptyTexture;
+                    inventoryPotionArray[i] = new Potion();
                 }
                 counter++;
             }
         }
 
-        private void useItem(Int32 index)
+        public void addPotion(String potionType, Int32 potionValue)
         {
-            if (inventoryList.Count > 0)
+            for(int i = 0; i < 12;i++)
             {
-                if (typeList.IndexOf("hp") == index)
+                if (inventoryPotionArray[i].type == "")
                 {
-                    tezej.healthPoints = tezej.healthPoints + 20;
-                    removeItem(0);
+                    inventoryPotionArray[i] = new Potion(potionType, potionValue);
+                    if (potionType == "hp")
+                    {
+                        inventoryTextureArray[i].Texture = hpPotionTexture;
+                    }
+                    else
+                    {
+                        inventoryTextureArray[i].Texture = mpPotionTexture;
+                    }
+                    break;
                 }
                 else
                 {
-                    tezej.manaPoints = tezej.manaPoints + 20;
-                    removeItem(0);
+                    //inventory is full!
                 }
             }
         }
