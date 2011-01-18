@@ -127,6 +127,7 @@
     <Compile Include="Razredi\Kocka.cs" />
     <Compile Include="Razredi\Mapa.cs" />
     <Compile Include="Razredi\Oprema.cs" />
+    <Compile Include="Razredi\Potion.cs" />
     <Compile Include="Razredi\Tezej.cs" />
     <Compile Include="Razredi\Tla.cs" />
     <Compile Include="States\Gallery.cs" />
