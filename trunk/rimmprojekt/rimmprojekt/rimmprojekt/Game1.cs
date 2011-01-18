@@ -28,6 +28,9 @@ namespace rimmprojekt
         private DrawTargetScreen drawToScreen;
         private DrawTargetTexture2D drawToTexture;
 
+        //graphicManager that is used for fullscreen mode
+        private GraphicsDeviceManager graphicsManager;
+
         private Xen.Ex.Graphics2D.Statistics.DrawStatisticsDisplay statisticsOverlay;
 
         //This method gets called just before the window is shown, and the device is created
@@ -75,6 +78,12 @@ namespace rimmprojekt
                 System.IO.FileStream fs = new System.IO.FileStream(pot, System.IO.FileMode.OpenOrCreate);
                 slika.SaveAsPng(fs, drawToTexture.Width, drawToTexture.Height);
             }
+
+            if (graphicsManager != null && state.KeyboardState[Microsoft.Xna.Framework.Input.Keys.F1].OnReleased)
+            {
+                graphicsManager.IsFullScreen = !graphicsManager.IsFullScreen;
+                graphicsManager.ApplyChanges();
+            }
         }
 
         //This is the main application draw method. All drawing code should go in here.
@@ -100,6 +109,8 @@ namespace rimmprojekt
                 graphics.PreferredBackBufferHeight = 720;
                 graphics.PreferMultiSampling = true;
             }
+
+            graphicsManager = graphics;
         }
 
         protected override void InitialisePlayerInput(Xen.Input.PlayerInputCollection playerInput)
