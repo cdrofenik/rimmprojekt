@@ -26,7 +26,8 @@ namespace rimmprojekt.Razredi
 {
     class Tezej : IDraw, IContentOwner, IUpdate
     {
-        Boolean hasPlayed;
+        #region parameters
+        private Boolean hasPlayed;
         //leveling up info
         private Int32 lvlUpMaxPoints = 5;
         private Int32 pointsCounter = 0;
@@ -69,12 +70,10 @@ namespace rimmprojekt.Razredi
         private Vector2 sizeOfSideElement;
         #endregion
 
-
         //audio
         SoundEffect levelUpSoundEffect;
 
         //displaying properties
-
         public Vector3 polozaj;
         private Matrix matrix;
         private IShader shader;
@@ -89,6 +88,8 @@ namespace rimmprojekt.Razredi
         private Boolean isIdle;
         public Boolean isAttacking;
         public Boolean isBlocking;
+        #endregion
+
         #endregion
 
         public Tezej(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies)
@@ -471,6 +472,7 @@ namespace rimmprojekt.Razredi
                 isIdle = true;
                 isRunning = false;
                 isAttacking = false;
+                isBlocking = false;
             }
         }
 

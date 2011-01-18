@@ -3,9 +3,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 
 using Xen;
 using Xen.Camera;
@@ -16,52 +13,78 @@ using Xen.Ex.Geometry;
 using Xen.Ex.Graphics.Content;
 using Xen.Ex.Material;
 
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
+
+using JigLibX.Math;
+using JigLibX.Physics;
+using JigLibX.Geometry;
+using JigLibX.Collision;
 
 namespace rimmprojekt.States
 {
-    class Gallery : IDraw, IContentOwner, IUpdate
+    class Gallery : IGameState, IContentOwner
     {
+        private DrawTargetScreen drawToScreen;
+        private IGameStateManager stateManager;
+
+        private Texture2D frameTexture;
+        private TexturedElement frame;
         private List<Texture2D> textureScreenShotov;
         private List<TexturedElement> seznamElementov;
         private Int32 counter;
 
-        private IShader shader;
-
-        public Gallery(UpdateManager manager, ContentRegister content)
+        public Gallery(Application application)
         {
-            manager.Add(this);
-            content.Add(this);
+
+            drawToScreen = new DrawTargetScreen(new Camera3D());
+        }
+
+        public void Initalise(IGameStateManager stateManager)
+        {
+            this.stateManager = stateManager;
 
             counter = 0;
             textureScreenShotov = new List<Texture2D>();
             seznamElementov = new List<TexturedElement>();
+
+           
+
+            stateManager.Application.Content.Add(this);
         }
 
-        public void Draw(DrawState state) {
-
+        public void DrawScreen(DrawState state)
+        {
             using (state.Shader.Push())
             {
                 if (CullTest(state))
                 {
+                    frame.Draw(state);
                     seznamElementov.ElementAt(counter).Draw(state);
                 }
             }
         }
 
-        public void LoadContent(ContentState state) 
+        void IContentOwner.LoadContent(ContentState state)
         {
+            frameTexture = state.Load<Texture2D>(@"Textures/galleryFrame");
+
             string[] filePaths = Directory.GetFiles(@"Screenshots", "*.jpg");
-            foreach (string file in filePaths)
-            {
-                string path = "\""+file+"\"";
-                textureScreenShotov.Add(state.Load<Texture2D>(@path));
-            }
+            //foreach (string file in filePaths)
+            //{
+            //    string path = file;
+                textureScreenShotov.Add(state.Load<Texture2D>(@"Screenshots/ss1"));
+                textureScreenShotov.Add(state.Load<Texture2D>(@"Screenshots/ss2"));
+                textureScreenShotov.Add(state.Load<Texture2D>(@"Screenshots/ss3"));
+            //}
+            setFrames();
         }
 
-        public UpdateFrequency Update(UpdateState state) 
+        public void Update(UpdateState state)
         {
-            if (state.KeyboardState.KeyState.Left)
+            if (state.KeyboardState.KeyState.Left.OnPressed)
             {
                 if (counter != 0)
                 {
@@ -69,23 +92,36 @@ namespace rimmprojekt.States
                 }
             }
 
-            if (state.KeyboardState.KeyState.Right)
+            if (state.KeyboardState.KeyState.Right.OnPressed)
             {
-                counter++;
+                if (textureScreenShotov.Count-1 == counter || textureScreenShotov.Count < counter)
+                {
+                    counter = textureScreenShotov.Count-1;
+                }
+                else
+                {
+                    counter++;
+                }
             }
-
-            return UpdateFrequency.FullUpdate60hz; 
         }
 
         private void setFrames()
         {
             Int32 elementCounter = 0;
-            foreach(TexturedElement element in seznamElementov)
+            for (int i = 0; i < textureScreenShotov.Count;i++ )
             {
-                element.Texture =  textureScreenShotov.ElementAt(elementCounter);
-                element.Position = new Vector2(100, 200);
+                TexturedElement element = new TexturedElement(new Vector2(700, 350));
+                element.Texture = textureScreenShotov.ElementAt(elementCounter);
+                element.Position = new Vector2(280, 170);
                 elementCounter++;
+                seznamElementov.Add(element);
             }
+
+            frame = new TexturedElement(frameTexture, new Vector2(1000, 600));
+            //frame.Position = new Vector2(100, 600);
+            frame.AlphaBlendState = Xen.Graphics.AlphaBlendState.Alpha;
+            frame.VerticalAlignment = VerticalAlignment.Centre;
+            frame.HorizontalAlignment = HorizontalAlignment.Centre;
         }
 
         public bool CullTest(ICuller culler)
