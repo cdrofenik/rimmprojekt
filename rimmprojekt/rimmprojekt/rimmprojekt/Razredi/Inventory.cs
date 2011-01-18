@@ -85,55 +85,47 @@ namespace rimmprojekt.Razredi
                 }
             }
 
-
-            if (state.KeyboardState.KeyState.F.OnPressed)
+            if (isVisable)
             {
-                addHpPotion();
+                #region number buttons
+                if (state.KeyboardState.KeyState.D1.OnPressed)
+                {
+                    useItem(0);
+                }
+                if (state.KeyboardState.KeyState.D2.OnPressed)
+                {
+                    useItem(1);
+                }
+                if (state.KeyboardState.KeyState.D3.OnPressed)
+                {
+                    useItem(2);
+                }
+                if (state.KeyboardState.KeyState.D4.OnPressed)
+                {
+                    useItem(3);
+                }
+                if (state.KeyboardState.KeyState.D5.OnPressed)
+                {
+                    useItem(4);
+                }
+                if (state.KeyboardState.KeyState.D6.OnPressed)
+                {
+                    useItem(5);
+                }
+                if (state.KeyboardState.KeyState.D7.OnPressed)
+                {
+                    useItem(6);
+                }
+                if (state.KeyboardState.KeyState.D8.OnPressed)
+                {
+                    useItem(7);
+                }
+                if (state.KeyboardState.KeyState.D9.OnPressed)
+                {
+                    useItem(8);
+                }
+                #endregion
             }
-
-            if (state.KeyboardState.KeyState.G.OnPressed)
-            {
-                addManaPotion();
-            }
-
-            #region number buttons
-            if (state.KeyboardState.KeyState.D1.OnPressed)
-            {
-                useItem(0);
-            }
-            if (state.KeyboardState.KeyState.D2.OnPressed)
-            {
-                useItem(1);
-            }
-            if (state.KeyboardState.KeyState.D3.OnPressed)
-            {
-                useItem(2);
-            }
-            if (state.KeyboardState.KeyState.D4.OnPressed)
-            {
-                useItem(3);
-            }
-            if (state.KeyboardState.KeyState.D5.OnPressed)
-            {
-                useItem(4);
-            }
-            if (state.KeyboardState.KeyState.D6.OnPressed)
-            {
-                useItem(5);
-            }
-            if (state.KeyboardState.KeyState.D7.OnPressed)
-            {
-                useItem(6);
-            }
-            if (state.KeyboardState.KeyState.D8.OnPressed)
-            {
-                useItem(7);
-            }
-            if (state.KeyboardState.KeyState.D9.OnPressed)
-            {
-                useItem(8);
-            }
-            #endregion
 
             element = new TexturedElement(inventoryTexture, sizeOfElement);
             return UpdateFrequency.FullUpdate60hz;
@@ -148,16 +140,6 @@ namespace rimmprojekt.Razredi
         }
 
         //custom methods
-        public void addHpPotion()
-        {
-            addPotion("hp", 20);
-        }
-
-        public void addManaPotion()
-        {
-            addPotion("mp", 20);
-        }
-
         private void useItem(Int32 index)
         {
             if (!inventoryPotionArray[index].type.Equals(""))

@@ -29,7 +29,7 @@ namespace rimmprojekt.States
             this.stateManager = stateManager;
 
             //display an incredibly complex line of text
-            this.menuText.Add(new TextElementRect(new Vector2(400, 150)));
+            this.menuText.Add(new TextElementRect(new Vector2(400, 250)));
             this.menuText[0].Text.SetText("Nova igra [ENTER]");
             this.menuText[0].VerticalAlignment = VerticalAlignment.Bottom;
             this.menuText[0].HorizontalAlignment = HorizontalAlignment.Left;
@@ -41,6 +41,12 @@ namespace rimmprojekt.States
             this.menuText[1].HorizontalAlignment = HorizontalAlignment.Left;
             this.menuText[1].TextHorizontalAlignment = TextHorizontalAlignment.Left;
 
+            this.menuText.Add(new TextElementRect(new Vector2(400, 170)));
+            this.menuText[2].Text.SetText("Galerija [Gs]");
+            this.menuText[2].VerticalAlignment = VerticalAlignment.Bottom;
+            this.menuText[2].HorizontalAlignment = HorizontalAlignment.Left;
+            this.menuText[2].TextHorizontalAlignment = TextHorizontalAlignment.Left;
+
             //set the text font (using global content)
             stateManager.Application.Content.Add(this);
         }
@@ -50,6 +56,7 @@ namespace rimmprojekt.States
             //display the 'menu' :-)
             menuText[0].Draw(state);
             menuText[1].Draw(state);
+            menuText[2].Draw(state);
         }
 
         public void Update(UpdateState state)
@@ -70,6 +77,16 @@ namespace rimmprojekt.States
                 return;
             }
 
+            if (state.KeyboardState.KeyState.G.OnReleased)
+            {
+                //start gallery display
+                Gallery galleryState = new Gallery(this.stateManager.Application);
+
+                //go to the loading state.
+                this.stateManager.SetState(galleryState);
+                return;
+            }
+
             if (input.Buttons.Back.OnPressed)
             {
                 //quit when back is pressed in the menu
@@ -83,6 +100,7 @@ namespace rimmprojekt.States
             //load the text font.
             this.menuText[0].Font = state.Load<SpriteFont>("MenuFont");
             this.menuText[1].Font = state.Load<SpriteFont>("MenuFont");
+            this.menuText[2].Font = state.Load<SpriteFont>("MenuFont");
         }
     }
 }
