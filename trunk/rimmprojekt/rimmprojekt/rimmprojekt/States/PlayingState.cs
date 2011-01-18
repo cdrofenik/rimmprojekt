@@ -52,7 +52,7 @@ namespace rimmprojekt.States
             foreach (Razredi.Kocka k in mapa.zidovi)
                 bodies.Add(k.body);
             tezej = new Razredi.Tezej(30.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
-            inventory = new Razredi.Inventory(stateManager.Application.UpdateManager, stateManager.Application.Content);
+            inventory = new Razredi.Inventory(stateManager.Application.UpdateManager, stateManager.Application.Content,tezej);
             minotaver = new Razredi.Minotaver(35.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
 
             this.debugText = new TextElementRect(new Vector2(400, 100));
