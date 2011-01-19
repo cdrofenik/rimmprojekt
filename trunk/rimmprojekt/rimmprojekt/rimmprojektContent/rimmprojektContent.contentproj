@@ -255,23 +255,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Screenshots\ss1.jpg">
-      <Name>ss1</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Screenshots\ss2.jpg">
-      <Name>ss2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Screenshots\ss3.jpg">
-      <Name>ss3</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Textures\galleryFrame.png">
       <Name>galleryFrame</Name>
       <Importer>TextureImporter</Importer>
