@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -46,6 +47,7 @@ namespace rimmprojekt
             Window.AllowUserResizing = true;
 
             drawToTexture = new DrawTargetTexture2D(new Camera3D(), drawToScreen.Width, drawToScreen.Height, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+            drawToTexture.ClearBuffer.ClearColour = Color.Black;
 
             States.GameStateManager manager = new States.GameStateManager(this);
             this.drawToTexture.Add(manager);
@@ -75,7 +77,7 @@ namespace rimmprojekt
                 datoteka = datoteka.Replace(":", "");
                 datoteka = datoteka.Replace(" ", "");
                 string pot = this.Content.RootDirectory + @"/Screenshots/" + datoteka + ".png";
-                System.IO.FileStream fs = new System.IO.FileStream(pot, System.IO.FileMode.OpenOrCreate);
+                FileStream fs = new System.IO.FileStream(pot, System.IO.FileMode.OpenOrCreate);
                 slika.SaveAsPng(fs, drawToTexture.Width, drawToTexture.Height);
             }
 
