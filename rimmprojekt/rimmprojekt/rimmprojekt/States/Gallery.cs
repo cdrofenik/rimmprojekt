@@ -29,7 +29,7 @@ namespace rimmprojekt.States
     {
         private DrawTargetScreen drawToScreen;
         private IGameStateManager stateManager;
-
+        private GraphicsDevice graphics;
         private Texture2D frameTexture;
         private TexturedElement frame;
         private List<Texture2D> textureScreenShotov;
@@ -38,14 +38,14 @@ namespace rimmprojekt.States
 
         public Gallery(Application application)
         {
-
+            Type appType = application.GetType().BaseType;
+            graphics = (GraphicsDevice)appType.GetField("graphics", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(application);
             drawToScreen = new DrawTargetScreen(new Camera3D());
         }
 
         public void Initalise(IGameStateManager stateManager)
         {
             this.stateManager = stateManager;
-
             counter = 0;
             textureScreenShotov = new List<Texture2D>();
             seznamElementov = new List<TexturedElement>();
@@ -71,14 +71,18 @@ namespace rimmprojekt.States
         {
             frameTexture = state.Load<Texture2D>(@"Textures/galleryFrame");
 
-            //string[] filePaths = Directory.GetFiles(@"Screenshots", "*.jpg");
-            //foreach (string file in filePaths)
-            //{
-            //    string path = file;
-                textureScreenShotov.Add(state.Load<Texture2D>(@"Screenshots/ss1"));
-                textureScreenShotov.Add(state.Load<Texture2D>(@"Screenshots/ss2"));
-                textureScreenShotov.Add(state.Load<Texture2D>(@"Screenshots/ss3"));
-            //}
+            //FileStream fs = new System.IO.FileStream(@"archiov.png", System.IO.FileMode.OpenOrCreate);
+            //textureScreenShotov.Add(Texture2D.FromStream(graphics, fs));
+            string[] filePaths = Directory.GetFiles(@"Content/Screenshots", "*.png");
+            foreach (string file in filePaths)
+            {
+                string path = file;
+                FileStream fs = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate);
+                textureScreenShotov.Add(Texture2D.FromStream(graphics, fs));
+                //textureScreenShotov.Add(state.Load<Texture2D>(@"Screenshots/ss1"));
+                //textureScreenShotov.Add(state.Load<Texture2D>(@"Screenshots/ss2"));
+                //textureScreenShotov.Add(state.Load<Texture2D>(@"Screenshots/ss3"));
+            }
             setFrames();
         }
 
