@@ -125,6 +125,11 @@ namespace rimmprojekt.Razredi
                     useItem(8);
                 }
                 #endregion
+
+                if (state.KeyboardState.KeyState.F.OnPressed)
+                {
+                    addPotion("mp", 20);
+                }
             }
 
             element = new TexturedElement(inventoryTexture, sizeOfElement);

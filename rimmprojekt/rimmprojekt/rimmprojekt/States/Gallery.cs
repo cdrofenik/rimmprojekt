@@ -27,14 +27,21 @@ namespace rimmprojekt.States
 {
     class Gallery : IGameState, IContentOwner
     {
+        #region parameters
+        private SpriteFont trueFont;
+        private Int32 counter;
         private DrawTargetScreen drawToScreen;
         private IGameStateManager stateManager;
         private GraphicsDevice graphics;
         private Texture2D frameTexture;
         private TexturedElement frame;
+        
+        private TextElementRect txtElement;
+
+        private List<String> fileNameList;
         private List<Texture2D> textureScreenShotov;
         private List<TexturedElement> seznamElementov;
-        private Int32 counter;
+        #endregion
 
         public Gallery(Application application)
         {
@@ -49,6 +56,7 @@ namespace rimmprojekt.States
             counter = 0;
             textureScreenShotov = new List<Texture2D>();
             seznamElementov = new List<TexturedElement>();
+            fileNameList = new List<String>();
 
            
 
@@ -61,8 +69,12 @@ namespace rimmprojekt.States
             {
                 if (CullTest(state))
                 {
+                    
                     seznamElementov.ElementAt(counter).Draw(state);
                     frame.Draw(state);
+
+                    txtElement.Text.SetText("\n\nFile: " + fileNameList.ElementAt(counter));
+                    txtElement.Draw(state);
                 }
             }
         }
@@ -70,6 +82,7 @@ namespace rimmprojekt.States
         void IContentOwner.LoadContent(ContentState state)
         {
             frameTexture = state.Load<Texture2D>(@"Textures/galleryFrame");
+            trueFont = state.Load<SpriteFont>("Arial");
 
             string[] filePaths = Directory.GetFiles(@"Content/Screenshots", "*.png");
             foreach (string file in filePaths)
@@ -77,6 +90,7 @@ namespace rimmprojekt.States
                 string path = file;
                 FileStream fs = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate);
                 textureScreenShotov.Add(Texture2D.FromStream(graphics, fs));
+                fileNameList.Add(path);
             }
             setFrames();
         }
@@ -110,10 +124,17 @@ namespace rimmprojekt.States
             }
         }
 
+        public bool CullTest(ICuller culler)
+        {
+            return true;
+        }
+
+        //custom methods
         private void setFrames()
         {
+
             Int32 elementCounter = 0;
-            for (int i = 0; i < textureScreenShotov.Count;i++ )
+            for (int i = 0; i < textureScreenShotov.Count; i++)
             {
                 TexturedElement element = new TexturedElement(new Vector2(800, 450));
                 element.Texture = textureScreenShotov.ElementAt(elementCounter);
@@ -127,11 +148,19 @@ namespace rimmprojekt.States
             frame.AlphaBlendState = Xen.Graphics.AlphaBlendState.Alpha;
             frame.VerticalAlignment = VerticalAlignment.Centre;
             frame.HorizontalAlignment = HorizontalAlignment.Centre;
+
+            setTxtElement();
         }
 
-        public bool CullTest(ICuller culler)
+        private void setTxtElement()
         {
-            return true;
+            txtElement = new TextElementRect(new Vector2(300, 100));
+            //txtElement.Position = new Vector2(100, 40);
+            txtElement.Colour = Color.White;
+            txtElement.VerticalAlignment = VerticalAlignment.Top;
+            txtElement.HorizontalAlignment = HorizontalAlignment.Centre;
+            txtElement.TextHorizontalAlignment = TextHorizontalAlignment.Left;
+            txtElement.Font = trueFont;
         }
     }
 }
