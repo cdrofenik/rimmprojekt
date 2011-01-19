@@ -58,8 +58,6 @@ namespace rimmprojekt.States
             seznamElementov = new List<TexturedElement>();
             fileNameList = new List<String>();
 
-           
-
             stateManager.Application.Content.Add(this);
         }
 
@@ -73,7 +71,7 @@ namespace rimmprojekt.States
                     seznamElementov.ElementAt(counter).Draw(state);
                     frame.Draw(state);
 
-                    txtElement.Text.SetText("\n\nFile: " + fileNameList.ElementAt(counter));
+                    txtElement.Text.SetText("\n\n" + (counter + 1) + "/" + textureScreenShotov.Count + "\nFile: " + fileNameList.ElementAt(counter));
                     txtElement.Draw(state);
                 }
             }
@@ -84,7 +82,7 @@ namespace rimmprojekt.States
             frameTexture = state.Load<Texture2D>(@"Textures/galleryFrame");
             trueFont = state.Load<SpriteFont>("Arial");
 
-            string[] filePaths = Directory.GetFiles(@"Content/Screenshots", "*.png");
+            string[] filePaths = Directory.GetFiles(@"Content\Screenshots", "*.png");
             foreach (string file in filePaths)
             {
                 string path = file;
@@ -105,22 +103,14 @@ namespace rimmprojekt.States
 
             if (state.KeyboardState.KeyState.Left.OnPressed)
             {
-                if (counter != 0)
-                {
-                    counter--;
-                }
+                counter--;
+                if (counter < 0)
+                    counter = textureScreenShotov.Count - 1;
             }
 
             if (state.KeyboardState.KeyState.Right.OnPressed)
             {
-                if (textureScreenShotov.Count-1 == counter || textureScreenShotov.Count < counter)
-                {
-                    counter = textureScreenShotov.Count-1;
-                }
-                else
-                {
-                    counter++;
-                }
+                counter = (counter + 1) % textureScreenShotov.Count;
             }
         }
 
@@ -159,7 +149,7 @@ namespace rimmprojekt.States
             txtElement.Colour = Color.White;
             txtElement.VerticalAlignment = VerticalAlignment.Top;
             txtElement.HorizontalAlignment = HorizontalAlignment.Centre;
-            txtElement.TextHorizontalAlignment = TextHorizontalAlignment.Left;
+            txtElement.TextHorizontalAlignment = TextHorizontalAlignment.Centre;
             txtElement.Font = trueFont;
         }
     }
