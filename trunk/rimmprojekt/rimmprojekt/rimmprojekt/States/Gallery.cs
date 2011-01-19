@@ -71,17 +71,12 @@ namespace rimmprojekt.States
         {
             frameTexture = state.Load<Texture2D>(@"Textures/galleryFrame");
 
-            //FileStream fs = new System.IO.FileStream(@"archiov.png", System.IO.FileMode.OpenOrCreate);
-            //textureScreenShotov.Add(Texture2D.FromStream(graphics, fs));
             string[] filePaths = Directory.GetFiles(@"Content/Screenshots", "*.png");
             foreach (string file in filePaths)
             {
                 string path = file;
                 FileStream fs = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate);
                 textureScreenShotov.Add(Texture2D.FromStream(graphics, fs));
-                //textureScreenShotov.Add(state.Load<Texture2D>(@"Screenshots/ss1"));
-                //textureScreenShotov.Add(state.Load<Texture2D>(@"Screenshots/ss2"));
-                //textureScreenShotov.Add(state.Load<Texture2D>(@"Screenshots/ss3"));
             }
             setFrames();
         }
