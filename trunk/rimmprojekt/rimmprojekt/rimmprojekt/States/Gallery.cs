@@ -71,7 +71,7 @@ namespace rimmprojekt.States
         {
             frameTexture = state.Load<Texture2D>(@"Textures/galleryFrame");
 
-            string[] filePaths = Directory.GetFiles(@"Screenshots", "*.jpg");
+            //string[] filePaths = Directory.GetFiles(@"Screenshots", "*.jpg");
             //foreach (string file in filePaths)
             //{
             //    string path = file;
@@ -118,7 +118,7 @@ namespace rimmprojekt.States
             {
                 TexturedElement element = new TexturedElement(new Vector2(800, 450));
                 element.Texture = textureScreenShotov.ElementAt(elementCounter);
-                element.Position = new Vector2(220, 120);
+                element.Position = new Vector2(225, 135);
                 elementCounter++;
                 seznamElementov.Add(element);
             }
