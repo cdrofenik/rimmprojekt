@@ -61,8 +61,8 @@ namespace rimmprojekt.States
             {
                 if (CullTest(state))
                 {
-                    frame.Draw(state);
                     seznamElementov.ElementAt(counter).Draw(state);
+                    frame.Draw(state);
                 }
             }
         }
@@ -84,6 +84,12 @@ namespace rimmprojekt.States
 
         public void Update(UpdateState state)
         {
+            if (state.KeyboardState.KeyState.Escape.OnReleased)
+            {
+                stateManager.SetState(new MenuState());
+                return;
+            }
+
             if (state.KeyboardState.KeyState.Left.OnPressed)
             {
                 if (counter != 0)
@@ -110,9 +116,9 @@ namespace rimmprojekt.States
             Int32 elementCounter = 0;
             for (int i = 0; i < textureScreenShotov.Count;i++ )
             {
-                TexturedElement element = new TexturedElement(new Vector2(700, 350));
+                TexturedElement element = new TexturedElement(new Vector2(800, 450));
                 element.Texture = textureScreenShotov.ElementAt(elementCounter);
-                element.Position = new Vector2(280, 170);
+                element.Position = new Vector2(220, 120);
                 elementCounter++;
                 seznamElementov.Add(element);
             }
