@@ -13,7 +13,7 @@
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
     <XnaPlatform>Windows</XnaPlatform>
-    <XnaProfile>Reach</XnaProfile>
+    <XnaProfile>HiDef</XnaProfile>
     <XnaCrossPlatformGroupID>a045ebba-8ea6-442e-b5fc-363fe62c2ba5</XnaCrossPlatformGroupID>
     <XnaOutputType>Game</XnaOutputType>
     <ApplicationIcon>Game.ico</ApplicationIcon>
@@ -130,6 +130,7 @@
     <Compile Include="Razredi\Potion.cs" />
     <Compile Include="Razredi\Tezej.cs" />
     <Compile Include="Razredi\Tla.cs" />
+    <Compile Include="States\BattlingState.cs" />
     <Compile Include="States\Gallery.cs" />
     <Compile Include="States\GameStateManager.cs" />
     <Compile Include="States\Interfaces.cs" />

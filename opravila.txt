@@ -1,13 +1,30 @@
-Modeli in animacije
-Mapa
-Skini
-slika odzadja (game1.cs) ali posebj draw state
+Crtomir:
+Bojevanje (Battling state)
 
-Žiga:
-collision detection
-screenshots
+Ziga:
+State-i, sprememba in parametri pri prehodih
 
-Toše:
-Meni ( shranjevanje, pauziranje, pregled slik(galerija), help)
-intro
-fullscreen mode!
+Tose:
+Vkljuci intro
+Glavni in Pause meni
+
+
+
+Glavni meni: - se prikaze takoj po introtu in ima sledece opcije:
+- New Game
+- Load Game
+- Galerija
+- Help/About
+- Quit Game
+
+Pause meni: - se prikaze bo pritisko ene tipke na tipkovnici, vsebuje opcije:
+- Items 		( mora se kreirati razred, s seznamom vseh predmetov(Potioni, itd.)) (1.0)
+- Settings  		( sprememba glasnosti glasbe in efektov, gamma svetlost, itd.)
+- Mapa	    		( 2D prikaz mape)
+- Save Game 		( moznost shranjevanja stanja igre)
+- Quit to main menu	( vrnitev v glavni meni)
+
+Bojevanje: - meni, ki sluzi kot nadzor tezeja:
+- Attack	( preprosti napad minotavra na njegovi lokaciji)
+- Block		( sprememba stanja v "blocking")
+- Items		( moznost uporabe predmetov iz seznama predmetov (glej Items 1.0))

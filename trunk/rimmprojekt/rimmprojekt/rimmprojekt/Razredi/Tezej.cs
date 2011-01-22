@@ -206,8 +206,8 @@ namespace rimmprojekt.Razredi
                     using (state.Shader.Push(shader))
                     {
                         //draw the custom geometry
-                        model.Draw(state);
                         sword.Draw(state);
+                        model.Draw(state);
                     }
                 }
             }
