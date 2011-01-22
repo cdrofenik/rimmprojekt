@@ -46,7 +46,7 @@ namespace rimmprojekt.States
         {
             this.stateManager = stateManager;
 
-            mapa = new Razredi.Mapa("../../../../rimmprojektContent/lab1.txt", stateManager.Application.Content, stateManager.Application.UpdateManager);
+            mapa = new Razredi.Mapa("../../../../rimmprojektContent/labirint1.txt", stateManager.Application.Content, stateManager.Application.UpdateManager);
 
             List<Body> bodies = new List<Body>();
             foreach (Razredi.Kocka k in mapa.zidovi)
@@ -97,6 +97,12 @@ namespace rimmprojekt.States
                 MediaPlayer.Play(backgroundSong);
                 MediaPlayer.Volume = 0.6f;
                 backgroundSongStart = true;
+            }
+
+            if (state.KeyboardState.KeyState.K.OnPressed)
+            {
+                BattlingState bs = new BattlingState(tezej, minotaver, this.stateManager.Application);
+                this.stateManager.SetState(bs);
             }
 
             if (state.KeyboardState.KeyState.Escape.OnReleased)

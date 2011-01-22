@@ -85,6 +85,10 @@ namespace rimmprojekt.Razredi
                 }
             }
 
+            if (state.KeyboardState.KeyState.O.OnPressed)
+            {
+                addPotion("mp", 300);
+            }
             if (isVisable)
             {
                 #region number buttons
