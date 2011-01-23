@@ -26,9 +26,10 @@ namespace rimmprojekt.Razredi
 {
     class Tezej : IDraw, IContentOwner, IUpdate
     {
+        public Boolean isInBattle;
+
         #region parameters
         private Boolean hasPlayed;
-        public Boolean isInBattle;
 
         #region stats
         private Int32 lvlUpMaxPoints = 5;
@@ -106,6 +107,7 @@ namespace rimmprojekt.Razredi
 
             #region animacije
             senseCollision = true;
+            isInBattle = false;
             isAttackingEnemyInBattle = false;
             movementCounter = 0;
             isBlocking = false;
@@ -312,26 +314,14 @@ namespace rimmprojekt.Razredi
                         premik.X -= 1.0f;
                     }
                     #endregion
-                    checkKeysPressed(state);
                 }
-                else
-                {
-                    if (isAttackingEnemyInBattle)
-                    {
-                        if ((polozaj.X != 90.0f) && (polozaj.X < 90.0f))
-                        {
-                            isHeRunning();
-                            changeAngele(orientiranModel, "down");
-                            premik.X += 1.0f;
-                        }
-                        else
-                        {
-                            checkKeysPressed(state);
-                        }
-                    }
-                }
-                
 
+                checkKeysPressed(state);
+
+                if (state.KeyboardState.KeyState.D1.IsDown)
+                    healthPoints -= 20;
+                if (state.KeyboardState.KeyState.D2.IsDown)
+                    manaPoints -= 20;
                 if (state.KeyboardState.KeyState.E.IsDown)
                     expPoints += 20;
                 if ((expPoints == maxExp) || (expPoints > maxExp))
