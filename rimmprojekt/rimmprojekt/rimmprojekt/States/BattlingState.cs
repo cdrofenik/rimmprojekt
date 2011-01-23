@@ -61,10 +61,13 @@ namespace rimmprojekt.States
         private TextElementRect txtEleRectLeftBar;
         private TextElement HealthTxtElement;
         private TextElement ManaTxtElement;
+        private TextElement TimeTxtElement;
         private TextElement AttackTxtElement;
         private TextElement BlockTxtElement;
         private TextElement MagicTxtElement;
         private TextElement ItemsTxtElement;
+
+        private TextElement debug;
         #endregion
         
         private Razredi.Mapa mapa;
@@ -87,7 +90,7 @@ namespace rimmprojekt.States
         {
             this.stateManager = stateManager;
 
-            tempActionTime = 9999.0f;
+            tempActionTime = 7.0f;
             actionTable = new TexturedElement[4];
             actionSelected = new String[4];
             isCharSelected = false;
@@ -167,13 +170,9 @@ namespace rimmprojekt.States
 
         public void Update(UpdateState state)
         {
-            PlayingTime += state.DeltaTimeSeconds;
+            debug.Text.SetText(Int32.Parse(Math.Round(PlayingTime).ToString()));
 
-            if (((Math.Round(PlayingTime) % 9) == 0))   //  && (enemyAttack == false)
-            {
-                float asdf = PlayingTime;
-                enemyAttack = true;
-            }
+            PlayingTime += state.DeltaTimeSeconds;
 
             if(!canDoAction)
                 ActionTime += state.DeltaTimeSeconds;
@@ -182,6 +181,18 @@ namespace rimmprojekt.States
             HealthTxtElement.Text.SetText("HP:   " + tezej.healthPoints + " / " + tezej.maxHealthPoints);
             ManaTxtElement.Text.SetText("MP:   " + tezej.manaPoints + " / " + tezej.maxManaPoints);
 
+            #region AI
+            if (Math.Round(PlayingTime) == tempActionTime || Math.Round(PlayingTime) > tempActionTime)
+            {
+                    minotaverChar.goAttackEnemy(tezejChar.polozaj.X, 0);
+                    tezejChar.isTakingDamage = true;
+                    enemyAttack = false;
+                    tezej.healthPoints = tezej.healthPoints - 20;
+                    tempActionTime = PlayingTime + 8.5f;
+            }
+            #endregion
+
+            #region notAI
             if (canDoAction)
             {
                 #region choose character
@@ -197,6 +208,7 @@ namespace rimmprojekt.States
                                 tezejChar.goAttackEnemy(minotaverChar.polozaj.X, 0);
                                 minotaverChar.isTakingDamage = true;
                                 actionDone(actionSelected[actionPointer]);
+                                tempActionTime += 1.9f;
                             }
                             else if (actionSelected[actionPointer].Equals("Block"))
                             {
@@ -216,37 +228,28 @@ namespace rimmprojekt.States
                 if (isCharSelected)
                 {
                     #region keyboard input
-            if (state.KeyboardState.KeyState.W.OnPressed || state.KeyboardState.KeyState.D.OnPressed || state.KeyboardState.KeyState.Up.OnPressed
-                || state.KeyboardState.KeyState.Right.OnPressed)
-            {
-                if (actionPointer == 3)
-                    actionPointer = 0;
-                else
-                    actionPointer++;
-            }
+                        if (state.KeyboardState.KeyState.W.OnPressed || state.KeyboardState.KeyState.D.OnPressed || state.KeyboardState.KeyState.Up.OnPressed
+                            || state.KeyboardState.KeyState.Right.OnPressed)
+                        {
+                            if (actionPointer == 3)
+                                actionPointer = 0;
+                            else
+                                actionPointer++;
+                        }
 
-            if (state.KeyboardState.KeyState.S.OnPressed || state.KeyboardState.KeyState.A.OnPressed || state.KeyboardState.KeyState.Down.OnPressed
-                || state.KeyboardState.KeyState.Left.OnPressed)
-            {
-                if (actionPointer == 0)
-                    actionPointer = 3;
-                else
-                    actionPointer--;
-            }
-            #endregion
+                        if (state.KeyboardState.KeyState.S.OnPressed || state.KeyboardState.KeyState.A.OnPressed || state.KeyboardState.KeyState.Down.OnPressed
+                            || state.KeyboardState.KeyState.Left.OnPressed)
+                        {
+                            if (actionPointer == 0)
+                                actionPointer = 3;
+                            else
+                                actionPointer--;
+                        }
+                    #endregion
                 }
             }
+            #endregion
 
-            if (!canDoAction)
-            {
-                if (ActionTime < 3)
-                    if (enemyAttack)
-                    {
-                        minotaverChar.goAttackEnemy(tezejChar.polozaj.X, 0);
-                        tezejChar.isTakingDamage = true;
-                        enemyAttack = false;
-                    }
-            }
         }
 
         private void setVisualSettings()
@@ -278,45 +281,53 @@ namespace rimmprojekt.States
             HealthTxtElement.Font = smallFont;
             HealthTxtElement.Text.SetText("HP: ");
             HealthTxtElement.Colour = Color.White;
-            HealthTxtElement.Position = new Vector2(280, 10);
+            HealthTxtElement.Position = new Vector2(280, 4);
 
             ManaTxtElement = new TextElement("MP: ");
             ManaTxtElement.Font = smallFont;
             ManaTxtElement.Text.SetText("MP: ");
             ManaTxtElement.Colour = Color.White;
-            ManaTxtElement.Position = new Vector2(430, 10);
+            ManaTxtElement.Position = new Vector2(430, 4);
+
+            TimeTxtElement = new TextElement("TIME: ");
+            TimeTxtElement.Font = smallFont;
+            TimeTxtElement.Text.SetText("TIME: ");
+            TimeTxtElement.Colour = Color.White;
+            TimeTxtElement.Position = new Vector2(570, 0);
 
             txtEleRectLeftBar.Add(HealthTxtElement);
             txtEleRectLeftBar.Add(ManaTxtElement);
+            txtEleRectLeftBar.Add(TimeTxtElement);
 
             #region actionBar
             AttackTxtElement = new TextElement("Attack");
             AttackTxtElement.Font = bigFont;
             AttackTxtElement.Text.SetText("Attack");
-            AttackTxtElement.Colour = Color.Yellow;
+            AttackTxtElement.Colour = Color.White;
             AttackTxtElement.Position = new Vector2(120, 20);
 
             BlockTxtElement = new TextElement("Block");
             BlockTxtElement.Font = bigFont;
             BlockTxtElement.Text.SetText("Block");
-            BlockTxtElement.Colour = Color.Yellow;
+            BlockTxtElement.Colour = Color.White;
             BlockTxtElement.Position = new Vector2(120, -20);
 
             MagicTxtElement = new TextElement("Magic");
             MagicTxtElement.Font = bigFont;
             MagicTxtElement.Text.SetText("Magic");
-            MagicTxtElement.Colour = Color.Yellow;
+            MagicTxtElement.Colour = Color.White;
             MagicTxtElement.Position = new Vector2(120, -60);
 
             ItemsTxtElement = new TextElement("Items");
             ItemsTxtElement.Font = bigFont;
             ItemsTxtElement.Text.SetText("Items");
-            ItemsTxtElement.Colour = Color.Yellow;
+            ItemsTxtElement.Colour = Color.White;
             ItemsTxtElement.Position = new Vector2(120, -100);
             #endregion
 
             #endregion
 
+            #region health, mana and time bars
             barArray[0] = new TexturedElement(new Vector2(100, 4));
             barArray[0].Texture = hpBar;
             barArray[0].Position = new Vector2(320, 145);
@@ -325,7 +336,7 @@ namespace rimmprojekt.States
             barArray[1].Position = new Vector2(470, 145);
             barArray[2] = new TexturedElement(new Vector2(100, 15));
             barArray[2].Texture = timeBar;
-            barArray[2].Position = new Vector2(630, 150);
+            barArray[2].Position = new Vector2(650, 145);
 
             emptybarArray[0] = new TexturedElement(new Vector2(100, 4));
             emptybarArray[0].Texture = empty;
@@ -335,21 +346,29 @@ namespace rimmprojekt.States
             emptybarArray[1].Position = new Vector2(470, 145);
             emptybarArray[2] = new TexturedElement(new Vector2(100, 15));
             emptybarArray[2].Texture = empty;
-            emptybarArray[2].Position = new Vector2(630, 150);
+            emptybarArray[2].Position = new Vector2(650, 145);
+            #endregion
 
 
-            actionTable[0] = new TexturedElement(new Vector2(25, 25));
+            Vector2 pointerSize = new Vector2(20, 20);
+            actionTable[0] = new TexturedElement(pointerSize);
             actionTable[0].Position = new Vector2( 130, 34);
-            actionTable[1] = new TexturedElement(new Vector2(25, 25));
+            actionTable[1] = new TexturedElement(pointerSize);
             actionTable[1].Position = new Vector2( 130, 74);
-            actionTable[2] = new TexturedElement(new Vector2(25, 25));
+            actionTable[2] = new TexturedElement(pointerSize);
             actionTable[2].Position = new Vector2( 130, 114);
-            actionTable[3] = new TexturedElement(new Vector2(25, 25));
+            actionTable[3] = new TexturedElement(pointerSize);
             actionTable[3].Position = new Vector2( 130, 154);
 
             backgroundElement = new TexturedElement(new Vector2(1280, 400));
             backgroundElement.Position = new Vector2(0,400);
             backgroundElement.Texture = backgroundPicture;
+
+            debug = new TextElement();
+            debug.Font = smallFont;
+            debug.Position = new Vector2(400, 500);
+
+            txtEleRectLeftBar.Add(debug);
         }
 
         private void setFunctionalSettings()
@@ -406,7 +425,7 @@ namespace rimmprojekt.States
                 timeSize = Math.Round((ActionTime * 100) / 5);
                 barArray[2] = new TexturedElement(new Vector2(Int32.Parse(timeSize.ToString()), 15));
                 barArray[2].Texture = timeBar;
-                barArray[2].Position = new Vector2(630, 150);
+                barArray[2].Position = new Vector2(650, 145);
             }
 
             if (timeSize == 100 || timeSize > 100)
