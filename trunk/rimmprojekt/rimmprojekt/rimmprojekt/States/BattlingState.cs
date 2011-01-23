@@ -31,6 +31,7 @@ namespace rimmprojekt.States
         private float ActionTime;
         private float tempActionTime;
         private Boolean canDoAction;
+        private Boolean enemyAttack;
 
         #region risanje
         public Boolean isCharSelected;
@@ -168,6 +169,12 @@ namespace rimmprojekt.States
         {
             PlayingTime += state.DeltaTimeSeconds;
 
+            if (((Math.Round(PlayingTime) % 9) == 0))   //  && (enemyAttack == false)
+            {
+                float asdf = PlayingTime;
+                enemyAttack = true;
+            }
+
             if(!canDoAction)
                 ActionTime += state.DeltaTimeSeconds;
 
@@ -176,7 +183,7 @@ namespace rimmprojekt.States
             ManaTxtElement.Text.SetText("MP:   " + tezej.manaPoints + " / " + tezej.maxManaPoints);
 
             if (canDoAction)
-            { 
+            {
                 #region choose character
                 if (state.KeyboardState.KeyState.Enter.OnPressed || state.KeyboardState.KeyState.Space.OnPressed)
                 {
@@ -228,6 +235,17 @@ namespace rimmprojekt.States
             }
             #endregion
                 }
+            }
+
+            if (!canDoAction)
+            {
+                if (ActionTime < 3)
+                    if (enemyAttack)
+                    {
+                        minotaverChar.goAttackEnemy(tezejChar.polozaj.X, 0);
+                        tezejChar.isTakingDamage = true;
+                        enemyAttack = false;
+                    }
             }
         }
 
