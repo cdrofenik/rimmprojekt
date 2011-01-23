@@ -1,0 +1,406 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using Xen;
+using Xen.Camera;
+using Xen.Graphics;
+using Xen.Ex.Graphics;
+using Xen.Ex.Graphics2D;
+using Xen.Ex.Geometry;
+using Xen.Ex.Graphics.Content;
+using Xen.Ex.Material;
+
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
+
+using JigLibX.Math;
+using JigLibX.Physics;
+using JigLibX.Geometry;
+using JigLibX.Collision;
+
+namespace rimmprojekt.States
+{
+    class BattlingState : IGameState, IContentOwner
+    {
+        private const String presledki = "                         ";
+        private float PlayingTime;
+        private float ActionTime;
+        private float tempActionTime;
+        private Boolean canDoAction;
+
+        #region risanje
+        public Boolean isCharSelected;
+
+        //risanje
+        private Texture2D backgroundPicture;
+        private Texture2D pointer;
+        private Texture2D leftBar;
+        private Texture2D rightBar;
+        private Texture2D hpBar;    //naredi sliko
+        private Texture2D mpBar;    //naredi sliko
+        private Texture2D timeBar;  //naredi sliko
+        private Texture2D empty;  //naredi sliko
+        private TexturedElement backgroundElement;
+        private TexturedElement leftBarElement;
+        private TexturedElement rightBarElement;
+        private TexturedElement actionBarElement;
+        private TexturedElement[] barArray;
+        private TexturedElement[] emptybarArray;
+
+        //risanje teksta
+        private Int32 actionPointer;
+        private String[] actionSelected;
+        private TexturedElement[] actionTable;
+        private SpriteFont smallFont;
+        private SpriteFont bigFont;
+        private TextElementRect txtEleRectLeftBar;
+        private TextElement HealthTxtElement;
+        private TextElement ManaTxtElement;
+        private TextElement AttackTxtElement;
+        private TextElement BlockTxtElement;
+        private TextElement MagicTxtElement;
+        private TextElement ItemsTxtElement;
+        #endregion
+        
+        private Razredi.Mapa mapa;
+        private DrawTargetScreen drawToScreen;
+        private IGameStateManager stateManager;
+        private Razredi.Tezej tezej;
+        private Razredi.Minotaver minotaver;
+
+        private Razredi.Character tezejChar;
+        private Razredi.Character minotaverChar;
+
+        public BattlingState(Razredi.Tezej theseus, Razredi.Minotaver minek,Application application)
+        {
+            drawToScreen = new DrawTargetScreen(new Camera3D());
+            this.tezej = theseus;
+            this.minotaver = minek;
+        }
+
+        public void Initalise(IGameStateManager stateManager)
+        {
+            this.stateManager = stateManager;
+
+            tempActionTime = 9999.0f;
+            actionTable = new TexturedElement[4];
+            actionSelected = new String[4];
+            isCharSelected = false;
+            actionPointer = 3;
+            barArray = new TexturedElement[3];
+            emptybarArray = new TexturedElement[3];
+
+            #region mapa tezej minotaver
+            mapa = new Razredi.Mapa("../../../../rimmprojektContent/battleMap.txt", stateManager.Application.Content, stateManager.Application.UpdateManager);
+
+            tezejChar = new Razredi.Character(10.0f, 0.0f, 40.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, "tezej");
+            minotaverChar = new Razredi.Character(80.0f, 0.0f, 40.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, "minotaver");
+            #endregion
+
+            stateManager.Application.Content.Add(this);
+        }
+
+        public void DrawScreen(DrawState state)
+        {
+            ///Vector3 target = new Vector3(tezej.polozaj.X, tezej.polozaj.Y - 35.0f, tezej.polozaj.Z - 35.0f);
+            if (tezejChar.isAttacking)
+            {
+                Vector3 target = new Vector3(tezejChar.polozaj.X, 0.0f, tezejChar.polozaj.Z);
+                Vector3 position = new Vector3(tezejChar.polozaj.X - 15.0f, tezejChar.polozaj.Y + 25.0f, tezejChar.polozaj.Z + 20.0f);
+                Camera3D camera = new Camera3D();
+                camera.LookAt(target, position, Vector3.UnitY);
+                state.Camera.SetCamera(camera);
+            }
+            else
+            {
+                Vector3 target = new Vector3(30.0f, 0.0f, 60.0f);
+                Vector3 position = new Vector3(20, 22.0f, 90.0f);
+                Camera3D camera = new Camera3D();
+                camera.LookAt(target, position, Vector3.UnitY);
+                state.Camera.SetCamera(camera);
+            }
+
+            //backgroundElement.Draw(state);
+            mapa.Draw(state);
+            minotaverChar.Draw(state);
+            tezejChar.Draw(state);
+
+            leftBarElement.Draw(state);
+            rightBarElement.Draw(state);
+
+            foreach (TexturedElement i in emptybarArray)
+                i.Draw(state);
+
+            foreach (TexturedElement i in barArray)
+                i.Draw(state);
+
+            if (isCharSelected)
+            {
+                actionBarElement.Draw(state);
+                actionTable[actionPointer].Texture = pointer;
+                actionTable[actionPointer].Draw(state);
+            }
+            txtEleRectLeftBar.Draw(state);
+        }
+
+        void IContentOwner.LoadContent(ContentState state)
+        {
+            pointer = state.Load<Texture2D>(@"Battle/pointer");
+            smallFont = state.Load<SpriteFont>("Arial");
+            bigFont = state.Load<SpriteFont>("ArialBattle");
+            leftBar = state.Load<Texture2D>(@"Battle/leftBar");
+            rightBar = state.Load<Texture2D>(@"Battle/rightBar");
+            backgroundPicture = state.Load<Texture2D>(@"backBattle");
+            hpBar = state.Load<Texture2D>(@"Tezej/hpbar");
+            mpBar = state.Load<Texture2D>(@"Tezej/manabar");
+            timeBar = state.Load<Texture2D>(@"Tezej/timebar");
+            empty = state.Load<Texture2D>(@"Tezej/emptybar");
+
+            setVisualSettings();
+            setFunctionalSettings();
+        }
+
+        public void Update(UpdateState state)
+        {
+            PlayingTime += state.DeltaTimeSeconds;
+
+            if(!canDoAction)
+                ActionTime += state.DeltaTimeSeconds;
+
+            changeStatusBars();
+            HealthTxtElement.Text.SetText("HP:   " + tezej.healthPoints + " / " + tezej.maxHealthPoints);
+            ManaTxtElement.Text.SetText("MP:   " + tezej.manaPoints + " / " + tezej.maxManaPoints);
+
+            if (canDoAction)
+            { 
+                #region choose character
+                if (state.KeyboardState.KeyState.Enter.OnPressed || state.KeyboardState.KeyState.Space.OnPressed)
+                {
+                        if (isCharSelected)
+                        {
+                            isCharSelected = false;
+                            setActionBox(isCharSelected);
+                            tezej.senseCollision = false;
+                            if(actionSelected[actionPointer].Equals("Attack"))
+                            {
+                                tezejChar.goAttackEnemy(minotaverChar.polozaj.X, 0);
+                                minotaverChar.isTakingDamage = true;
+                                actionDone(actionSelected[actionPointer]);
+                            }
+                            else if (actionSelected[actionPointer].Equals("Block"))
+                            {
+                                tezejChar.goBlock();
+                                actionDone(actionSelected[actionPointer]);
+                            }
+                    
+                        }
+                        else
+                        {
+                            isCharSelected = true;
+                            setActionBox(isCharSelected);
+                        }
+                    }
+                    #endregion
+
+                if (isCharSelected)
+                {
+                    #region keyboard input
+            if (state.KeyboardState.KeyState.W.OnPressed || state.KeyboardState.KeyState.D.OnPressed || state.KeyboardState.KeyState.Up.OnPressed
+                || state.KeyboardState.KeyState.Right.OnPressed)
+            {
+                if (actionPointer == 3)
+                    actionPointer = 0;
+                else
+                    actionPointer++;
+            }
+
+            if (state.KeyboardState.KeyState.S.OnPressed || state.KeyboardState.KeyState.A.OnPressed || state.KeyboardState.KeyState.Down.OnPressed
+                || state.KeyboardState.KeyState.Left.OnPressed)
+            {
+                if (actionPointer == 0)
+                    actionPointer = 3;
+                else
+                    actionPointer--;
+            }
+            #endregion
+                }
+            }
+        }
+
+        private void setVisualSettings()
+        {
+            #region PrimaryBars
+            leftBarElement = new TexturedElement(leftBar, new Vector2(230, 190));
+            leftBarElement.AlphaBlendState = Xen.Graphics.AlphaBlendState.Alpha;
+            leftBarElement.VerticalAlignment = VerticalAlignment.Bottom;
+            leftBarElement.HorizontalAlignment = HorizontalAlignment.Left;
+            rightBarElement = new TexturedElement(rightBar, new Vector2(600, 190));
+            rightBarElement.Position = new Vector2(230, 0);
+            #endregion
+
+            actionBarElement = new TexturedElement(leftBar, new Vector2(190, 190));
+            actionBarElement.Position = new Vector2(110, 14);
+
+            #region Text on bars
+            txtEleRectLeftBar = new TextElementRect(new Vector2(700, 50));
+            txtEleRectLeftBar.Font = bigFont;
+            txtEleRectLeftBar.AlphaBlendState = Xen.Graphics.AlphaBlendState.Alpha;
+            txtEleRectLeftBar.VerticalAlignment = VerticalAlignment.Bottom;
+            txtEleRectLeftBar.HorizontalAlignment = HorizontalAlignment.Left;
+            txtEleRectLeftBar.TextHorizontalAlignment = TextHorizontalAlignment.Left;
+            txtEleRectLeftBar.Colour = Color.White;
+            txtEleRectLeftBar.Position = new Vector2(40, 110);
+            txtEleRectLeftBar.Text.SetText("Tezej");
+
+            HealthTxtElement = new TextElement("HP: ");
+            HealthTxtElement.Font = smallFont;
+            HealthTxtElement.Text.SetText("HP: ");
+            HealthTxtElement.Colour = Color.White;
+            HealthTxtElement.Position = new Vector2(280, 10);
+
+            ManaTxtElement = new TextElement("MP: ");
+            ManaTxtElement.Font = smallFont;
+            ManaTxtElement.Text.SetText("MP: ");
+            ManaTxtElement.Colour = Color.White;
+            ManaTxtElement.Position = new Vector2(430, 10);
+
+            txtEleRectLeftBar.Add(HealthTxtElement);
+            txtEleRectLeftBar.Add(ManaTxtElement);
+
+            #region actionBar
+            AttackTxtElement = new TextElement("Attack");
+            AttackTxtElement.Font = bigFont;
+            AttackTxtElement.Text.SetText("Attack");
+            AttackTxtElement.Colour = Color.Yellow;
+            AttackTxtElement.Position = new Vector2(120, 20);
+
+            BlockTxtElement = new TextElement("Block");
+            BlockTxtElement.Font = bigFont;
+            BlockTxtElement.Text.SetText("Block");
+            BlockTxtElement.Colour = Color.Yellow;
+            BlockTxtElement.Position = new Vector2(120, -20);
+
+            MagicTxtElement = new TextElement("Magic");
+            MagicTxtElement.Font = bigFont;
+            MagicTxtElement.Text.SetText("Magic");
+            MagicTxtElement.Colour = Color.Yellow;
+            MagicTxtElement.Position = new Vector2(120, -60);
+
+            ItemsTxtElement = new TextElement("Items");
+            ItemsTxtElement.Font = bigFont;
+            ItemsTxtElement.Text.SetText("Items");
+            ItemsTxtElement.Colour = Color.Yellow;
+            ItemsTxtElement.Position = new Vector2(120, -100);
+            #endregion
+
+            #endregion
+
+            barArray[0] = new TexturedElement(new Vector2(100, 4));
+            barArray[0].Texture = hpBar;
+            barArray[0].Position = new Vector2(320, 145);
+            barArray[1] = new TexturedElement(new Vector2(100, 4));
+            barArray[1].Texture = mpBar;
+            barArray[1].Position = new Vector2(470, 145);
+            barArray[2] = new TexturedElement(new Vector2(100, 15));
+            barArray[2].Texture = timeBar;
+            barArray[2].Position = new Vector2(630, 150);
+
+            emptybarArray[0] = new TexturedElement(new Vector2(100, 4));
+            emptybarArray[0].Texture = empty;
+            emptybarArray[0].Position = new Vector2(320, 145);
+            emptybarArray[1] = new TexturedElement(new Vector2(100, 4));
+            emptybarArray[1].Texture = empty;
+            emptybarArray[1].Position = new Vector2(470, 145);
+            emptybarArray[2] = new TexturedElement(new Vector2(100, 15));
+            emptybarArray[2].Texture = empty;
+            emptybarArray[2].Position = new Vector2(630, 150);
+
+
+            actionTable[0] = new TexturedElement(new Vector2(25, 25));
+            actionTable[0].Position = new Vector2( 130, 34);
+            actionTable[1] = new TexturedElement(new Vector2(25, 25));
+            actionTable[1].Position = new Vector2( 130, 74);
+            actionTable[2] = new TexturedElement(new Vector2(25, 25));
+            actionTable[2].Position = new Vector2( 130, 114);
+            actionTable[3] = new TexturedElement(new Vector2(25, 25));
+            actionTable[3].Position = new Vector2( 130, 154);
+
+            backgroundElement = new TexturedElement(new Vector2(1280, 400));
+            backgroundElement.Position = new Vector2(0,400);
+            backgroundElement.Texture = backgroundPicture;
+        }
+
+        private void setFunctionalSettings()
+        {
+            actionSelected[3] = "Attack";
+            actionSelected[2] = "Block";
+            actionSelected[1] = "Magic";
+            actionSelected[0] = "Items";
+
+            tezej.isInBattle = true;
+            tezejChar.changeCharacterOrientation("down", "right");
+
+            minotaverChar.changeCharacterOrientation("down", "left");
+        }
+
+        private void setActionBox(Boolean value)
+        {
+            if (value)
+            {
+                actionBarElement.AlphaBlendState = Xen.Graphics.AlphaBlendState.Alpha;
+                actionBarElement.VerticalAlignment = VerticalAlignment.Bottom;
+                actionBarElement.HorizontalAlignment = HorizontalAlignment.Left;
+
+                txtEleRectLeftBar.Add(AttackTxtElement);
+                txtEleRectLeftBar.Add(BlockTxtElement);
+                txtEleRectLeftBar.Add(MagicTxtElement);
+                txtEleRectLeftBar.Add(ItemsTxtElement);
+            }
+            else
+            {
+                txtEleRectLeftBar.Remove(AttackTxtElement);
+                txtEleRectLeftBar.Remove(BlockTxtElement);
+                txtEleRectLeftBar.Remove(MagicTxtElement);
+                txtEleRectLeftBar.Remove(ItemsTxtElement);
+            }
+        }
+
+        private void changeStatusBars()
+        {
+            double timeSize = 0;
+
+            double hpSize = (tezej.healthPoints * 100) / tezej.maxHealthPoints;
+            barArray[0] = new TexturedElement(new Vector2(Int32.Parse(hpSize.ToString()), 4));
+            barArray[0].Texture = hpBar;
+            barArray[0].Position = new Vector2(320, 145);
+
+            double mpSize = (tezej.manaPoints * 100) / tezej.maxManaPoints;
+            barArray[1] = new TexturedElement(new Vector2(Int32.Parse(mpSize.ToString()), 4));
+            barArray[1].Texture = mpBar;
+            barArray[1].Position = new Vector2(470, 145);
+
+            if (!canDoAction)
+            {
+                timeSize = Math.Round((ActionTime * 100) / 5);
+                barArray[2] = new TexturedElement(new Vector2(Int32.Parse(timeSize.ToString()), 15));
+                barArray[2].Texture = timeBar;
+                barArray[2].Position = new Vector2(630, 150);
+            }
+
+            if (timeSize == 100 || timeSize > 100)
+            {
+                canDoAction = true;
+            }
+        }
+
+        private void actionDone(String action)
+        {
+            ActionTime = 0.0f;
+            canDoAction = false;
+        }
+    }
+}
