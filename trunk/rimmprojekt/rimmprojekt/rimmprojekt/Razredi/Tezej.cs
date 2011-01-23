@@ -28,17 +28,22 @@ namespace rimmprojekt.Razredi
     {
         #region parameters
         private Boolean hasPlayed;
-        //leveling up info
+        public Boolean isInBattle;
+
+        #region stats
         private Int32 lvlUpMaxPoints = 5;
         private Int32 pointsCounter = 0;
         private Int32 maxExp = 404;
         public Int32 healthPoints;
+        public Int32 maxHealthPoints = 361;
+        public Int32 maxManaPoints = 361;
         public Int32 manaPoints;
         public Int32 expPoints;
         public Int32 damage;
         public Int32 durability;
         public Int32 luck;
         private Boolean hasLeveledUp = false;
+        #endregion
 
         List<Body> bodies;
         private CollisionSystem collisionSystem;
@@ -49,26 +54,25 @@ namespace rimmprojekt.Razredi
 
         #region drawing elements
         //avatar,leveling and status parameters
-        private TextElementRect damageBarText;
+
+        public Boolean senseCollision;
+
+
+        //leveling
+        private TextElementRect levelUpText;
         private TextElementRect durabilityBarText;
         private TextElementRect luckBarText;
         private SpriteFont trueFont;
-        private Texture2D sideBarTexture;
-        private Texture2D tezejHpTexture;
-        private Texture2D tezejMpTexture;
-        private Texture2D tezejExpTexture;
         private Texture2D tezejLevelUpTexture;
         private Texture2D tezejLevelUpButtonTexture;
-        private TexturedElement sideElement;
-        private TexturedElement hpElement;
-        private TexturedElement manaElement;
-        private TexturedElement expElement;
         private TexturedElement lvlUpElement;
         private TexturedElement lvlUpFirstButtonElement;
         private TexturedElement lvlUpSecondButtonElement;
         private TexturedElement lvlUpThirdButtonElement;
-        private Vector2 sizeOfSideElement;
         #endregion
+
+        private Int32 movementCounter;
+        private Boolean isAttackingEnemyInBattle;
 
         //audio
         SoundEffect levelUpSoundEffect;
@@ -101,6 +105,9 @@ namespace rimmprojekt.Razredi
             content.Add(this);
 
             #region animacije
+            senseCollision = true;
+            isAttackingEnemyInBattle = false;
+            movementCounter = 0;
             isBlocking = false;
             isAttacking = false;
             isRunning = false;
@@ -108,7 +115,7 @@ namespace rimmprojekt.Razredi
             orientiranModel = "down";
 
             animationController = model.GetAnimationController();
-            animation = animationController.PlayLoopingAnimation(1);
+            animation = animationController.PlayLoopingAnimation(3);
 
             int boneR = model.ModelData.Skeleton.GetBoneIndexByName("helperR");
             int boneL = model.ModelData.Skeleton.GetBoneIndexByName("helperL");
@@ -148,14 +155,7 @@ namespace rimmprojekt.Razredi
             setCharacterStatusValuseOnLevelUp();
             #endregion
 
-            #region side elements
-            //inicializacija stranskega elementa
-            sizeOfSideElement = new Vector2(649, 160);
-            sideElement = new TexturedElement(sideBarTexture, sizeOfSideElement);
-            sideElement.AlphaBlendState = Xen.Graphics.AlphaBlendState.Alpha;
-            setDisplayBars();                 //narise hp in mana bars
-            #endregion
-
+            #region collision
             polozaj = new Vector3(x, y, z);
             matrix = Matrix.CreateTranslation(polozaj);
             MaterialShader material = new MaterialShader();
@@ -192,6 +192,9 @@ namespace rimmprojekt.Razredi
 
             bodies.Add(body);
             collisionSystem.AddCollisionSkin(body.CollisionSkin);
+
+            #endregion
+
             content.Add(this);
         }
 
@@ -199,13 +202,10 @@ namespace rimmprojekt.Razredi
         {
             using (state.WorldMatrix.PushMultiply(ref matrix))
             {
-                //cull test the custom geometry
                 if (CullTest(state))
                 {
-                    //bind the shader
                     using (state.Shader.Push(shader))
                     {
-                        //draw the custom geometry
                         sword.Draw(state);
                         model.Draw(state);
                     }
@@ -216,15 +216,9 @@ namespace rimmprojekt.Razredi
             {
                 if (CullTest(state))
                 {
-                    sideElement.Remove(manaElement);
-                    sideElement.Remove(hpElement);
-                    sideElement.Remove(expElement);
-                    setDisplayBars();
-
-                    sideElement.Draw(state);
                     if (hasLeveledUp)
                     {
-                        lvlUpElement.Remove(damageBarText);
+                        lvlUpElement.Remove(levelUpText);
                         setCharacterStatusValuseOnLevelUp();
                         lvlUpElement.Draw(state);
                     }
@@ -242,10 +236,6 @@ namespace rimmprojekt.Razredi
             //load the model data into the model instance
             model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/player");
             sword.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/epic_sword");
-            sideBarTexture = state.Load<Texture2D>(@"Tezej/tezejus");
-            tezejHpTexture = state.Load<Texture2D>(@"Tezej/hpbar");
-            tezejMpTexture = state.Load<Texture2D>(@"Tezej/manabar");
-            tezejExpTexture = state.Load<Texture2D>(@"Tezej/expbar");
             tezejLevelUpTexture = state.Load<Texture2D>(@"Tezej/LvlUpTexture");
             tezejLevelUpButtonTexture = state.Load<Texture2D>(@"Tezej/lvlUpButton");
             levelUpSoundEffect = state.Load<SoundEffect>(@"Tezej/lvlupEffect");
@@ -255,6 +245,8 @@ namespace rimmprojekt.Razredi
         public UpdateFrequency Update(UpdateState state)
         {
             collisions.Clear();
+
+            Vector3 premik = new Vector3(0f, 0f, 0f);
 
             if (hasLeveledUp)
             {
@@ -286,59 +278,60 @@ namespace rimmprojekt.Razredi
                     expPoints = 0;
                     hasLeveledUp = false;
                     pointsCounter = 0;
-                    sideElement.Remove(expElement);
                 }
                 #endregion
             }
             else
             {
                 hasPlayed = false;
-                Vector3 premik = new Vector3(0f, 0f, 0f);
+                if (!isInBattle)
+                {
+                    #region keyboard input for free roaming
+                    if (state.KeyboardState.KeyState.S.IsDown)
+                    {
+                        isHeRunning();
+                        changeAngele(orientiranModel, "down");
+                        premik.Z += 1.0f;
+                    }
+                    if (state.KeyboardState.KeyState.W.IsDown)
+                    {
+                        isHeRunning();
+                        changeAngele(orientiranModel, "up");
+                        premik.Z -= 1.0f;
+                    }
+                    if (state.KeyboardState.KeyState.D.IsDown)
+                    {
+                        isHeRunning();
+                        changeAngele(orientiranModel, "right");
+                        premik.X += 1.0f;
+                    }
+                    if (state.KeyboardState.KeyState.A.IsDown)
+                    {
+                        isHeRunning();
+                        changeAngele(orientiranModel, "left");
+                        premik.X -= 1.0f;
+                    }
+                    #endregion
+                    checkKeysPressed(state);
+                }
+                else
+                {
+                    if (isAttackingEnemyInBattle)
+                    {
+                        if ((polozaj.X != 90.0f) && (polozaj.X < 90.0f))
+                        {
+                            isHeRunning();
+                            changeAngele(orientiranModel, "down");
+                            premik.X += 1.0f;
+                        }
+                        else
+                        {
+                            checkKeysPressed(state);
+                        }
+                    }
+                }
+                
 
-                #region keyboard input
-                if (state.KeyboardState.KeyState.S.IsDown)
-                {
-                    isHeRunning();
-                    changeAngele(orientiranModel, "down");
-                    premik.Z += 1.0f;
-                }
-                if (state.KeyboardState.KeyState.W.IsDown)
-                {
-                    isHeRunning();
-                    changeAngele(orientiranModel, "up");
-                    premik.Z -= 1.0f;
-                }
-                if (state.KeyboardState.KeyState.D.IsDown)
-                {
-                    isHeRunning();
-                    changeAngele(orientiranModel, "right");
-                    premik.X += 1.0f;
-                }
-                if (state.KeyboardState.KeyState.A.IsDown)
-                {
-                    isHeRunning();
-                    changeAngele(orientiranModel, "left");
-                    premik.X -= 1.0f;
-                }
-                #endregion
-
-                checkKeysPressed(state);
-
-                #region mouse input
-                if (state.MouseState.LeftButton.IsDown)
-                {
-                    isHeFighting(state);
-                }
-                if (state.MouseState.RightButton.IsDown)
-                {
-                    isHeBlocking(state);
-                }
-                #endregion
-
-                if (state.KeyboardState.KeyState.H.IsDown)
-                    healthPoints -= 20;
-                if (state.KeyboardState.KeyState.M.IsDown)
-                    manaPoints -= 20;
                 if (state.KeyboardState.KeyState.E.IsDown)
                     expPoints += 20;
                 if ((expPoints == maxExp) || (expPoints > maxExp))
@@ -346,9 +339,12 @@ namespace rimmprojekt.Razredi
 
                 polozaj += premik;
                 body.MoveTo(polozaj + new Vector3(7.5f, 7.5f, 7.5f), Matrix.Identity);
-                collisionSystem.DetectCollisions(body, collisionFunctor, null, 0.05f);
-                if (collisions.Count > 0)
-                    polozaj -= premik;
+                if (senseCollision)
+                {
+                    collisionSystem.DetectCollisions(body, collisionFunctor, null, 0.05f);
+                    if (collisions.Count > 0)
+                        polozaj -= premik;
+                }
                 //matrix = Matrix.CreateTranslation(polozaj);
                 //collisionSystem.DetectAllCollisions(this.bodies, collisionFunctor, null, 0.05f);
             }
@@ -359,45 +355,27 @@ namespace rimmprojekt.Razredi
             return UpdateFrequency.FullUpdate60hz;
         }
 
-        private void setDisplayBars()
-        {
-            //risanje hpja
-            this.hpElement = new TexturedElement(tezejHpTexture, new Vector2(healthPoints, 15));
-            this.hpElement.Position = new Vector2(170, 106);
-            this.sideElement.Add(hpElement);
-
-            //risanje mane
-            this.manaElement = new TexturedElement(tezejMpTexture, new Vector2(manaPoints, 15));
-            this.manaElement.Position = new Vector2(170, 62);
-            this.sideElement.Add(manaElement);
-
-            //risanje exp
-            this.expElement = new TexturedElement(tezejExpTexture, new Vector2(expPoints, 7));
-            this.expElement.Position = new Vector2(67, 17);
-            this.sideElement.Add(expElement);
-        }
-
         private void setCharacterStatusValuseOnLevelUp()
         {
-            damageBarText = new TextElementRect(new Vector2(40, 40));
-            damageBarText.Position = new Vector2(134, 20);
-            damageBarText.Font = trueFont;
-            damageBarText.Colour = Color.DarkBlue;
-            damageBarText.Text.AppendLine(damage.ToString());
-            damageBarText.Text.AppendLine();
-            damageBarText.Text.AppendLine();
-            damageBarText.Text.AppendLine(durability.ToString());
-            damageBarText.Text.AppendLine();
-            damageBarText.Text.AppendLine();
-            damageBarText.Text.AppendLine(luck.ToString());
-            damageBarText.VerticalAlignment = VerticalAlignment.Centre;
-            damageBarText.HorizontalAlignment = HorizontalAlignment.Centre;
-            damageBarText.TextHorizontalAlignment = TextHorizontalAlignment.Centre;
+            levelUpText = new TextElementRect(new Vector2(40, 40));
+            levelUpText.Position = new Vector2(134, 20);
+            levelUpText.Font = trueFont;
+            levelUpText.Colour = Color.DarkBlue;
+            levelUpText.Text.AppendLine(damage.ToString());
+            levelUpText.Text.AppendLine();
+            levelUpText.Text.AppendLine();
+            levelUpText.Text.AppendLine(durability.ToString());
+            levelUpText.Text.AppendLine();
+            levelUpText.Text.AppendLine();
+            levelUpText.Text.AppendLine(luck.ToString());
+            levelUpText.VerticalAlignment = VerticalAlignment.Centre;
+            levelUpText.HorizontalAlignment = HorizontalAlignment.Centre;
+            levelUpText.TextHorizontalAlignment = TextHorizontalAlignment.Centre;
 
-            lvlUpElement.Add(damageBarText);
+            lvlUpElement.Add(levelUpText);
         }
 
-        private void changeAngele(string prvotnaSmer, string zeljenaSmer)
+        public void changeAngele(string prvotnaSmer, string zeljenaSmer)
         {
             if (prvotnaSmer.Equals(zeljenaSmer))
             {
@@ -426,7 +404,7 @@ namespace rimmprojekt.Razredi
         private void checkKeysPressed(UpdateState state)
         {
             if (!state.KeyboardState.KeyState.S.IsDown && !state.KeyboardState.KeyState.W.IsDown && !state.KeyboardState.KeyState.D.IsDown
-                && !state.KeyboardState.KeyState.A.IsDown && !state.MouseState.LeftButton.IsDown)
+                && !state.KeyboardState.KeyState.A.IsDown)
             {
                 isHeIdle();
             }
@@ -499,6 +477,11 @@ namespace rimmprojekt.Razredi
                 isAttacking = false;
                 isBlocking = true;
             }
+        }
+
+        public void moveToEnemy()
+        {
+            isAttackingEnemyInBattle = true;
         }
     }
 }

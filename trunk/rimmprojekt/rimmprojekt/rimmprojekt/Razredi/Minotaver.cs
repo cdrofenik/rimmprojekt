@@ -62,7 +62,7 @@ namespace rimmprojekt.Razredi
 
             content.Add(this);
 
-            animation = animationController.PlayLoopingAnimation(1);
+            animation = animationController.PlayLoopingAnimation(3);
 
             healthPoints = 361;
             damage = 1;
@@ -180,7 +180,7 @@ namespace rimmprojekt.Razredi
             return UpdateFrequency.FullUpdate60hz;
         }
 
-        private void changeAngele(string prvotnaSmer, string zeljenaSmer)
+        public void changeAngele(string prvotnaSmer, string zeljenaSmer)
         {
             if (prvotnaSmer.Equals(zeljenaSmer))
             {
