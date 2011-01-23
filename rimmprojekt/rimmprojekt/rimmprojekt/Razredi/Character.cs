@@ -33,7 +33,9 @@ namespace rimmprojekt.Razredi
         private Boolean thisModelIsTezej;
         public Boolean isAttacking;
         public Boolean isBlocking;
+        
         private Vector2 enemyLocation;
+        private Boolean isAI;
 
         #region kontrole modelov in animacij
         private AnimationController animationController;
@@ -58,8 +60,15 @@ namespace rimmprojekt.Razredi
             model = new ModelInstance();
             sword = new ModelInstance();
 
-            if(character.Equals("tezej"))
+            if (character.Equals("tezej"))
+            {
                 thisModelIsTezej = true;
+                isAI = false;
+            }
+            else
+            {
+                isAI = true;
+            }   
 
             manager.Add(this);
             content.Add(this);
@@ -124,49 +133,85 @@ namespace rimmprojekt.Razredi
             Vector3 premik = new Vector3(0f, 0f, 0f);
             PlayingTime += state.DeltaTimeSeconds;
 
-            #region Attack
-            if (isAttacking)
+            if (!isAI)
             {
-                if ((polozaj.X != enemyLocation.X) && (polozaj.X < enemyLocation.X))
+                #region Attack
+                if (isAttacking)
                 {
-                    runToEnemy();
-                    changeCharacterOrientation("down", orientiranModel);
-                    premik.X += 1.0f;
-                    isHitting = true;
-                }
-                else
-                {
-                    hitEnemy(state);
-                    if (PlayingTime > actionTime)
+                    if ((polozaj.X != enemyLocation.X) && (polozaj.X < enemyLocation.X))
                     {
-                        returnToPosition();
-                        isAttacking = false;
-                        isRunning = false;
-                        isHitting = false;
+                        runToEnemy();
+                        changeCharacterOrientation("down", orientiranModel);
+                        premik.X += 1.0f;
+                        isHitting = true;
+                    }
+                    else
+                    {
+                        hitEnemy(state);
+                        if (PlayingTime > actionTime)
+                        {
+                            returnToPosition();
+                            isAttacking = false;
+                            isRunning = false;
+                            isHitting = false;
+                        }
                     }
                 }
-            }
-            #endregion
+                #endregion
 
-            #region Block
-            if (isBlocking)
-            {
-                setToBlock();
-                if (PlayingTime > actionTime)
+                #region Block
+                if (isBlocking)
                 {
-                    animation.StopAnimation();
-                    animation = animationController.PlayLoopingAnimation(3);
-                    isBlocking = false;
+                    setToBlock();
+                    if (PlayingTime > actionTime)
+                    {
+                        animation.StopAnimation();
+                        animation = animationController.PlayLoopingAnimation(3);
+                        isBlocking = false;
+                    }
                 }
-            }
-            #endregion
+                #endregion
 
-            #region Damaging
-            if (isTakingDamage)
-            {
-                takeDamage();
+                #region Damaging
+                if (isTakingDamage)
+                {
+                    takeDamage();
+                }
+                #endregion
             }
-            #endregion
+            else if (isAI)
+            {
+                #region Attack
+                if (isAttacking)
+                {
+                    if ((polozaj.X != enemyLocation.X) && (polozaj.X > enemyLocation.X))
+                    {
+                        runToEnemy();
+                        changeCharacterOrientation("down", "left");
+                        premik.X -= 1.0f;
+                        isHitting = true;
+                    }
+                    else
+                    {
+                        hitEnemy(state);
+                        if (PlayingTime > actionTime)
+                        {
+                            returnToPosition();
+                            isAttacking = false;
+                            isRunning = false;
+                            isHitting = false;
+                        }
+                    }
+                }
+                #endregion
+
+                #region Damaging
+                if (isTakingDamage)
+                {
+                    takeDamage();
+                }
+                #endregion
+            }
 
             polozaj += premik;
             return UpdateFrequency.FullUpdate60hz;
@@ -204,7 +249,11 @@ namespace rimmprojekt.Razredi
         public void goAttackEnemy(float x, float y)
         {
             isAttacking = true;
-            enemyLocation.X = x - 15;
+            if(!isAI)
+                enemyLocation.X = x - 13;
+            else
+                enemyLocation.X = x + 13;
+
             enemyLocation.Y = y;
         }
 

@@ -72,9 +72,6 @@ namespace rimmprojekt.Razredi
         private TexturedElement lvlUpThirdButtonElement;
         #endregion
 
-        private Int32 movementCounter;
-        private Boolean isAttackingEnemyInBattle;
-
         //audio
         SoundEffect levelUpSoundEffect;
 
@@ -108,8 +105,6 @@ namespace rimmprojekt.Razredi
             #region animacije
             senseCollision = true;
             isInBattle = false;
-            isAttackingEnemyInBattle = false;
-            movementCounter = 0;
             isBlocking = false;
             isAttacking = false;
             isRunning = false;
@@ -467,11 +462,6 @@ namespace rimmprojekt.Razredi
                 isAttacking = false;
                 isBlocking = true;
             }
-        }
-
-        public void moveToEnemy()
-        {
-            isAttackingEnemyInBattle = true;
         }
     }
 }
