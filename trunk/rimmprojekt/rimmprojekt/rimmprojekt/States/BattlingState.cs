@@ -32,12 +32,14 @@ namespace rimmprojekt.States
         private float tempActionTime;
         private Boolean canDoAction;
         private Boolean gameOver;
+        private Boolean gameFinished;
 
 
         #region risanje
         public Boolean isCharSelected;
 
         //risanje
+        private Texture2D winForeground;
         private Texture2D backgroundPicture;
         private Texture2D pointer;
         private Texture2D leftBar;
@@ -52,6 +54,7 @@ namespace rimmprojekt.States
         private TexturedElement rightBarElement;
         private TexturedElement actionBarElement;
         private TexturedElement GameOverElement;
+        private TexturedElement GameFinishedElement;
         private TexturedElement[] barArray;
         private TexturedElement[] emptybarArray;
 
@@ -93,6 +96,7 @@ namespace rimmprojekt.States
         {
             this.stateManager = stateManager;
 
+            gameFinished = false;
             gameOver = false;
             tempActionTime = 7.0f;
             actionTable = new TexturedElement[4];
@@ -160,6 +164,10 @@ namespace rimmprojekt.States
                 GameOverElement.Draw(state);
             }
 
+            if (gameFinished)
+            {
+                GameFinishedElement.Draw(state);
+            }
         }
 
         void IContentOwner.LoadContent(ContentState state)
@@ -175,12 +183,15 @@ namespace rimmprojekt.States
             timeBar = state.Load<Texture2D>(@"Tezej/timebar");
             empty = state.Load<Texture2D>(@"Tezej/emptybar");
             gameOverTexture = state.Load<Texture2D>(@"Battle/gameOver");
+            winForeground = state.Load<Texture2D>(@"Battle/winDisplay");
 
             setVisualSettings();
         }
 
         public void Update(UpdateState state)
         {
+            PlayingTime += state.DeltaTimeSeconds;
+
             if (tezejChar.isDead)
             {
                 gameOver = true;
@@ -190,89 +201,98 @@ namespace rimmprojekt.States
                 }
             }
 
-
-            #region text output (hp and mana)
-            changeStatusBars();
-            HealthTxtElement.Text.SetText("HP:   " + tezejChar.Health + " / " + tezejChar.maxHealth);
-            ManaTxtElement.Text.SetText("MP:   " + tezejChar.Mana + " / " + tezejChar.maxMana);
-            debug.Text.SetText(Int32.Parse(Math.Round(PlayingTime).ToString()) + "     HP: "+minotaverChar.Health.ToString());
-            #endregion
-
-            PlayingTime += state.DeltaTimeSeconds;
+            if (minotaverChar.isDead)
+            {
+                gameFinished = true;
+                if (state.KeyboardState.KeyState.Space.OnPressed)
+                {
+                    //change state to playingstate
+                }
+            }
 
             if(!canDoAction)
                 ActionTime += state.DeltaTimeSeconds;
 
             if (!gameOver)
             {
-                #region AI
-                if (Math.Round(PlayingTime) == tempActionTime || Math.Round(PlayingTime) > tempActionTime)
+                if (minotaverChar.Health > 0)
                 {
-                    minotaverChar.goAttackEnemy(tezejChar.polozaj.X, 0);
-                    tezejChar.damage = getAttackDamage(minotaverChar.Strength, tezejChar.Strength);
-                    tezejChar.isTakingDamage = true;
-                    tempActionTime = PlayingTime + 8.5f;
-                }
-                #endregion
-
-                #region notAI
-                if (canDoAction)
-                {
-                    #region choose character
-                    if (state.KeyboardState.KeyState.Enter.OnPressed || state.KeyboardState.KeyState.Space.OnPressed)
+                    #region AI
+                    if (Math.Round(PlayingTime) == tempActionTime || Math.Round(PlayingTime) > tempActionTime)
                     {
-                        if (isCharSelected)
-                        {
-                            isCharSelected = false;
-                            setActionBox(isCharSelected);
-                            if (actionSelected[actionPointer].Equals("Attack"))
-                            {
-                                tezejChar.goAttackEnemy(minotaverChar.polozaj.X, 0);
-                                minotaverChar.damage = getAttackDamage(tezejChar.Strength, minotaverChar.Strength);
-                                minotaverChar.isTakingDamage = true;
-                                actionDone(actionSelected[actionPointer]);
-                                tempActionTime += 1.9f;
-                            }
-                            else if (actionSelected[actionPointer].Equals("Block"))
-                            {
-                                tezejChar.goBlock();
-                                actionDone(actionSelected[actionPointer]);
-                            }
-
-                        }
-                        else
-                        {
-                            isCharSelected = true;
-                            setActionBox(isCharSelected);
-                        }
+                        minotaverChar.goAttackEnemy(tezejChar.polozaj.X, 0);
+                        tezejChar.damage = getAttackDamage(minotaverChar.Strength, tezejChar.Strength);
+                        tezejChar.isTakingDamage = true;
+                        tempActionTime = PlayingTime + 8.5f;
                     }
                     #endregion
 
-                    if (isCharSelected)
+                    #region notAI
+                    if (canDoAction)
                     {
-                        #region keyboard input
-                        if (state.KeyboardState.KeyState.W.OnPressed || state.KeyboardState.KeyState.D.OnPressed || state.KeyboardState.KeyState.Up.OnPressed
-                            || state.KeyboardState.KeyState.Right.OnPressed)
+                        #region choose character
+                        if (state.KeyboardState.KeyState.Enter.OnPressed || state.KeyboardState.KeyState.Space.OnPressed)
                         {
-                            if (actionPointer == 3)
-                                actionPointer = 0;
-                            else
-                                actionPointer++;
-                        }
+                            if (isCharSelected)
+                            {
+                                isCharSelected = false;
+                                setActionBox(isCharSelected);
+                                if (actionSelected[actionPointer].Equals("Attack"))
+                                {
+                                    tezejChar.goAttackEnemy(minotaverChar.polozaj.X, 0);
+                                    minotaverChar.damage = getAttackDamage(tezejChar.Strength, minotaverChar.Strength);
+                                    minotaverChar.isTakingDamage = true;
+                                    actionDone(actionSelected[actionPointer]);
+                                    tempActionTime += 1.9f;
+                                }
+                                else if (actionSelected[actionPointer].Equals("Block"))
+                                {
+                                    tezejChar.goBlock();
+                                    actionDone(actionSelected[actionPointer]);
+                                }
 
-                        if (state.KeyboardState.KeyState.S.OnPressed || state.KeyboardState.KeyState.A.OnPressed || state.KeyboardState.KeyState.Down.OnPressed
-                            || state.KeyboardState.KeyState.Left.OnPressed)
-                        {
-                            if (actionPointer == 0)
-                                actionPointer = 3;
+                            }
                             else
-                                actionPointer--;
+                            {
+                                isCharSelected = true;
+                                setActionBox(isCharSelected);
+                            }
                         }
                         #endregion
+
+                        if (isCharSelected)
+                        {
+                            #region keyboard input
+                            if (state.KeyboardState.KeyState.W.OnPressed || state.KeyboardState.KeyState.D.OnPressed || state.KeyboardState.KeyState.Up.OnPressed
+                                || state.KeyboardState.KeyState.Right.OnPressed)
+                            {
+                                if (actionPointer == 3)
+                                    actionPointer = 0;
+                                else
+                                    actionPointer++;
+                            }
+
+                            if (state.KeyboardState.KeyState.S.OnPressed || state.KeyboardState.KeyState.A.OnPressed || state.KeyboardState.KeyState.Down.OnPressed
+                                || state.KeyboardState.KeyState.Left.OnPressed)
+                            {
+                                if (actionPointer == 0)
+                                    actionPointer = 3;
+                                else
+                                    actionPointer--;
+                            }
+                            #endregion
+                        }
                     }
+                    #endregion
                 }
-                #endregion
             }
+
+            #region text output (hp and mana)
+            changeStatusBars();
+            HealthTxtElement.Text.SetText("HP:   " + tezejChar.Health + " / " + tezejChar.maxHealth);
+            ManaTxtElement.Text.SetText("MP:   " + tezejChar.Mana + " / " + tezejChar.maxMana);
+            debug.Text.SetText(Int32.Parse(Math.Round(PlayingTime).ToString()) + "     HP: " + minotaverChar.Health.ToString());
+            #endregion
         }
 
         private void setVisualSettings()
@@ -395,6 +415,10 @@ namespace rimmprojekt.States
 
             GameOverElement = new TexturedElement(new Vector2(1280, 720));
             GameOverElement.Texture = gameOverTexture;
+
+            GameFinishedElement = new TexturedElement(new Vector2(700, 502));
+            GameFinishedElement.Position = new Vector2(260, 140);
+            GameFinishedElement.Texture = winForeground;
         }
 
         private void setFunctionalSettings()
@@ -406,14 +430,14 @@ namespace rimmprojekt.States
 
             tezej.isInBattle = true;
             tezejChar.changeCharacterOrientation("down", "right");
-            tezejChar.Strength = tezej.strength;
+            tezejChar.Strength = tezej.strength+1000;
             tezejChar.Agility = tezej.agility;
             tezejChar.Intelligence = tezej.intelligence;
             tezejChar.Vitality = tezej.vitality;
             tezejChar.setStats();
 
             minotaverChar.changeCharacterOrientation("down", "left");
-            minotaverChar.Strength = 100;
+            minotaverChar.Strength = 100000;
             minotaverChar.Agility = 5;
             minotaverChar.Intelligence = 0;
             minotaverChar.Vitality = 20;
