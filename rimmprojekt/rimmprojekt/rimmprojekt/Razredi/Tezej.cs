@@ -32,17 +32,20 @@ namespace rimmprojekt.Razredi
         private Boolean hasPlayed;
 
         #region stats
-        private Int32 lvlUpMaxPoints = 5;
-        private Int32 pointsCounter = 0;
-        private Int32 maxExp = 404;
+        private Int32 lvlUpMaxPoints = 5;       //tocke za razporeditev skillov
+        private Int32 pointsCounter = 0;        //stevec razporejenih tock
+        public Int32 maxHealthPoints;     //zacetni maksimalni hp
+        public Int32 maxManaPoints;       //zacetni maksimalni mp
+        private Int32 maxExp = 404;             //meja za napredovanje levela
+
+
         public Int32 healthPoints;
-        public Int32 maxHealthPoints = 361;
-        public Int32 maxManaPoints = 361;
         public Int32 manaPoints;
         public Int32 expPoints;
-        public Int32 damage;
-        public Int32 durability;
-        public Int32 luck;
+        public Int32 strength;
+        public Int32 agility;
+        public Int32 intelligence;
+        public Int32 vitality;
         private Boolean hasLeveledUp = false;
         #endregion
 
@@ -56,20 +59,15 @@ namespace rimmprojekt.Razredi
         #region drawing elements
         //avatar,leveling and status parameters
 
-        public Boolean senseCollision;
-
-
         //leveling
         private TextElementRect levelUpText;
-        private TextElementRect durabilityBarText;
-        private TextElementRect luckBarText;
+        private TextElement strengthText;
+        private TextElement agilityText;
+        private TextElement intelligenceText;
+        private TextElement vitalityText;
         private SpriteFont trueFont;
         private Texture2D tezejLevelUpTexture;
-        private Texture2D tezejLevelUpButtonTexture;
         private TexturedElement lvlUpElement;
-        private TexturedElement lvlUpFirstButtonElement;
-        private TexturedElement lvlUpSecondButtonElement;
-        private TexturedElement lvlUpThirdButtonElement;
         #endregion
 
         //audio
@@ -80,7 +78,6 @@ namespace rimmprojekt.Razredi
         private Matrix matrix;
         private IShader shader;
         private ModelInstance model;
-        private ModelInstance sword;
 
         #region kontrole modelov in animacij
         private AnimationController animationController;
@@ -97,13 +94,11 @@ namespace rimmprojekt.Razredi
         public Tezej(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies)
         {
             model = new ModelInstance();
-            sword = new ModelInstance();
 
             manager.Add(this);
             content.Add(this);
 
             #region animacije
-            senseCollision = true;
             isInBattle = false;
             isBlocking = false;
             isAttacking = false;
@@ -114,42 +109,65 @@ namespace rimmprojekt.Razredi
             animationController = model.GetAnimationController();
             animation = animationController.PlayLoopingAnimation(3);
 
-            int boneR = model.ModelData.Skeleton.GetBoneIndexByName("helperR");
-            int boneL = model.ModelData.Skeleton.GetBoneIndexByName("helperL");
-            //ModelBone bone = new ModelBone();
-            //bone = model.ModelData.Skeleton.BoneData.ElementAt(boneR)
-
             #endregion
 
-            #region parametri
+            #region zacetni statsi
             hasPlayed = false;
 
-            healthPoints = 361;
-            manaPoints = 361;
-            expPoints = 0;
+            strength = 15;
+            agility = 12;
+            intelligence = 13;
+            vitality = 10;
 
-            damage = 1;
-            durability = 1;
-            luck = 1;
+            maxHealthPoints = 20 * vitality;
+            healthPoints = maxHealthPoints;
+
+            maxManaPoints = 10 * intelligence;
+            manaPoints = maxManaPoints;
+            expPoints = 0;
             #endregion
 
             #region leveling up elements
             //inicializacija leveling elementa
-            lvlUpFirstButtonElement = new TexturedElement(tezejLevelUpButtonTexture, new Vector2(98, 37));
-            lvlUpFirstButtonElement.Position = new Vector2(280, 214);        // pozicija damage bara
-
-            lvlUpSecondButtonElement = new TexturedElement(tezejLevelUpButtonTexture, new Vector2(98, 37));
-            lvlUpSecondButtonElement.Position = new Vector2(280, 167);        // pozicija durability bara
-
-            lvlUpThirdButtonElement = new TexturedElement(tezejLevelUpButtonTexture, new Vector2(98, 37));
-            lvlUpThirdButtonElement.Position = new Vector2(280, 117);        // pozicija luck bara
-
             lvlUpElement = new TexturedElement(tezejLevelUpTexture, new Vector2(403, 401));
             lvlUpElement.Position = new Vector2(400, 220);
-            lvlUpElement.Add(lvlUpFirstButtonElement);
-            lvlUpElement.Add(lvlUpSecondButtonElement);
-            lvlUpElement.Add(lvlUpThirdButtonElement);
-            setCharacterStatusValuseOnLevelUp();
+
+
+            Color textColor = Color.Black;
+
+            levelUpText = new TextElementRect(new Vector2(150, 300));
+            levelUpText.Position = new Vector2(130, 0);
+            levelUpText.Font = trueFont;
+            levelUpText.Colour = Color.Black;
+            levelUpText.AlphaBlendState = Xen.Graphics.AlphaBlendState.Alpha;
+            levelUpText.VerticalAlignment = VerticalAlignment.Centre;
+            levelUpText.HorizontalAlignment = HorizontalAlignment.Centre;
+            levelUpText.TextHorizontalAlignment = TextHorizontalAlignment.Centre;
+
+            strengthText = new TextElement("Strength");
+            strengthText.Font = trueFont;
+            strengthText.Colour = textColor;
+            strengthText.Position = new Vector2(0, -43);
+
+            agilityText= new TextElement("Agility");
+            agilityText.Font = trueFont;
+            agilityText.Colour = textColor;
+            agilityText.Position = new Vector2(0, -88);
+
+            intelligenceText = new TextElement("Intelligence");
+            intelligenceText.Font = trueFont;
+            intelligenceText.Colour = textColor;
+            intelligenceText.Position = new Vector2(0, -132);
+
+            vitalityText = new TextElement("Vitality");
+            vitalityText.Font = trueFont;
+            vitalityText.Colour = textColor;
+            vitalityText.Position = new Vector2(0, -179);
+
+            levelUpText.Add(strengthText);
+            levelUpText.Add(agilityText);
+            levelUpText.Add(intelligenceText);
+            levelUpText.Add(vitalityText);
             #endregion
 
             #region collision
@@ -203,23 +221,16 @@ namespace rimmprojekt.Razredi
                 {
                     using (state.Shader.Push(shader))
                     {
-                        sword.Draw(state);
                         model.Draw(state);
                     }
                 }
             }
 
-            using (state.Shader.Push())
+            if (hasLeveledUp)
             {
-                if (CullTest(state))
-                {
-                    if (hasLeveledUp)
-                    {
-                        lvlUpElement.Remove(levelUpText);
-                        setCharacterStatusValuseOnLevelUp();
-                        lvlUpElement.Draw(state);
-                    }
-                }
+                setCharacterStatusValuseOnLevelUp();
+                lvlUpElement.Draw(state);
+                levelUpText.Draw(state);
             }
         }
 
@@ -232,9 +243,7 @@ namespace rimmprojekt.Razredi
         {
             //load the model data into the model instance
             model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/player");
-            sword.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/epic_sword");
             tezejLevelUpTexture = state.Load<Texture2D>(@"Tezej/LvlUpTexture");
-            tezejLevelUpButtonTexture = state.Load<Texture2D>(@"Tezej/lvlUpButton");
             levelUpSoundEffect = state.Load<SoundEffect>(@"Tezej/lvlupEffect");
             trueFont = state.Load<SpriteFont>("Arial");
         }
@@ -254,28 +263,37 @@ namespace rimmprojekt.Razredi
                     hasPlayed = true;
                 }
 
-                if (state.KeyboardState.KeyState.B.OnPressed)
-                {
-                    damage += 1;
-                    pointsCounter++;
-                }
-                if (state.KeyboardState.KeyState.N.OnPressed)
-                {
-                    durability += 1;
-                    pointsCounter++;
-                }
-                if (state.KeyboardState.KeyState.M.OnPressed)
-                {
-                    luck += 1;
-                    pointsCounter++;
-                }
-
-                if (pointsCounter == lvlUpMaxPoints)
+                if (pointsCounter+1 == lvlUpMaxPoints)
                 {
                     expPoints = 0;
                     hasLeveledUp = false;
                     pointsCounter = 0;
                 }
+
+                if (hasLeveledUp)
+                {
+                    if (state.KeyboardState.KeyState.D1.OnPressed)
+                    {
+                        strength += 1;
+                        pointsCounter++;
+                    }
+                    if (state.KeyboardState.KeyState.D2.OnPressed)
+                    {
+                        agility += 1;
+                        pointsCounter++;
+                    }
+                    if (state.KeyboardState.KeyState.D3.OnPressed)
+                    {
+                        intelligence += 1;
+                        pointsCounter++;
+                    }
+                    if (state.KeyboardState.KeyState.D4.OnPressed)
+                    {
+                        vitality += 1;
+                        pointsCounter++;
+                    }
+                }
+                
                 #endregion
             }
             else
@@ -324,15 +342,12 @@ namespace rimmprojekt.Razredi
 
                 polozaj += premik;
                 body.MoveTo(polozaj + new Vector3(7.5f, 7.5f, 7.5f), Matrix.Identity);
-                if (senseCollision)
-                {
-                    collisionSystem.DetectCollisions(body, collisionFunctor, null, 0.05f);
-                    if (collisions.Count > 0)
-                        polozaj -= premik;
-                }
-                //matrix = Matrix.CreateTranslation(polozaj);
-                //collisionSystem.DetectAllCollisions(this.bodies, collisionFunctor, null, 0.05f);
+                collisionSystem.DetectCollisions(body, collisionFunctor, null, 0.05f);
+                if (collisions.Count > 0)
+                    polozaj -= premik;        
             }
+            //matrix = Matrix.CreateTranslation(polozaj);
+            //collisionSystem.DetectAllCollisions(this.bodies, collisionFunctor, null, 0.05f);
             //matrix=Matrix.CreateScale(0.04f,0.04f,0.04f) *
             //    skin.GetPrimitiveLocal(0).Transform.Orientation *
             //    body.Orientation *
@@ -342,22 +357,16 @@ namespace rimmprojekt.Razredi
 
         private void setCharacterStatusValuseOnLevelUp()
         {
-            levelUpText = new TextElementRect(new Vector2(40, 40));
-            levelUpText.Position = new Vector2(134, 20);
-            levelUpText.Font = trueFont;
-            levelUpText.Colour = Color.DarkBlue;
-            levelUpText.Text.AppendLine(damage.ToString());
-            levelUpText.Text.AppendLine();
-            levelUpText.Text.AppendLine();
-            levelUpText.Text.AppendLine(durability.ToString());
-            levelUpText.Text.AppendLine();
-            levelUpText.Text.AppendLine();
-            levelUpText.Text.AppendLine(luck.ToString());
-            levelUpText.VerticalAlignment = VerticalAlignment.Centre;
-            levelUpText.HorizontalAlignment = HorizontalAlignment.Centre;
-            levelUpText.TextHorizontalAlignment = TextHorizontalAlignment.Centre;
+            strengthText.Text.SetText(strength.ToString());
+            agilityText.Text.SetText(agility.ToString());
+            intelligenceText.Text.SetText(intelligence.ToString());
+            vitalityText.Text.SetText(vitality.ToString());
 
-            lvlUpElement.Add(levelUpText);
+            maxHealthPoints = vitality * 20;
+            healthPoints = maxHealthPoints;
+
+            maxManaPoints = intelligence * 10;
+            manaPoints = maxManaPoints;
         }
 
         public void changeAngele(string prvotnaSmer, string zeljenaSmer)
@@ -426,6 +435,8 @@ namespace rimmprojekt.Razredi
             animation = animationController.PlayLoopingAnimation(12);
         }
 
+        //mouse input
+        #region mouse input
         private void isHeFighting(UpdateState state)
         {
             if (state.MouseState.LeftButton.DownDuration > 0.9)
@@ -463,5 +474,6 @@ namespace rimmprojekt.Razredi
                 isBlocking = true;
             }
         }
+        #endregion
     }
 }
