@@ -26,9 +26,27 @@ namespace rimmprojekt.Razredi
 {
     class Character : IDraw, IContentOwner, IUpdate
     {
+        #region timers
+        private float dyingTimer;
+        #endregion
+
+
+        #region stats
+        public Int32 damage;
+        public Int32 Strength;
+        public Int32 Agility;
+        public Int32 Intelligence;
+        public Int32 Vitality;
+        public Int32 Health;
+        public Int32 maxHealth;
+        public Int32 Mana;
+        public Int32 maxMana;
+        #endregion
+
         public Boolean isHitting;
         public Boolean isTakingDamage;
-
+        public Boolean isDead;
+        private Boolean checker;
         private Boolean firstTimeAnimationSet;
         private Boolean thisModelIsTezej;
         public Boolean isAttacking;
@@ -73,15 +91,19 @@ namespace rimmprojekt.Razredi
             manager.Add(this);
             content.Add(this);
 
+            checker = true;
             orientiranModel = "down";
             actionTime = 0.0f;
             actionTimeSecond = 999.0f;
+            dyingTimer = 999.0f;
+            isDead = false;
             startingPosition = new Vector3(x, y, z);
             isAttacking = false;
             isBlocking = false;
             isRunning = false;
             firstTimeAnimationSet = false;
             enemyLocation = new Vector2();
+
 
             animationController = model.GetAnimationController();
             animation = animationController.PlayLoopingAnimation(3);
@@ -133,84 +155,102 @@ namespace rimmprojekt.Razredi
             Vector3 premik = new Vector3(0f, 0f, 0f);
             PlayingTime += state.DeltaTimeSeconds;
 
-            if (!isAI)
+            if (PlayingTime > dyingTimer)
             {
-                #region Attack
-                if (isAttacking)
-                {
-                    if ((polozaj.X != enemyLocation.X) && (polozaj.X < enemyLocation.X))
-                    {
-                        runToEnemy();
-                        changeCharacterOrientation("down", orientiranModel);
-                        premik.X += 1.0f;
-                        isHitting = true;
-                    }
-                    else
-                    {
-                        hitEnemy(state);
-                        if (PlayingTime > actionTime)
-                        {
-                            returnToPosition();
-                            isAttacking = false;
-                            isRunning = false;
-                            isHitting = false;
-                        }
-                    }
-                }
-                #endregion
-
-                #region Block
-                if (isBlocking)
-                {
-                    setToBlock();
-                    if (PlayingTime > actionTime)
-                    {
-                        animation.StopAnimation();
-                        animation = animationController.PlayLoopingAnimation(3);
-                        isBlocking = false;
-                    }
-                }
-                #endregion
-
-                #region Damaging
-                if (isTakingDamage)
-                {
-                    takeDamage();
-                }
-                #endregion
+                isDead = true;
             }
-            else if (isAI)
+
+            if (this.Health < 0 || this.Health == 0)
             {
-                #region Attack
-                if (isAttacking)
+                if (checker)
                 {
-                    if ((polozaj.X != enemyLocation.X) && (polozaj.X > enemyLocation.X))
+                    dyingTimer = PlayingTime + 1.0f;
+                    animation.StopAnimation();
+                    animation = animationController.PlayLoopingAnimation(12);
+                    checker = false;
+                }
+            }
+            else
+            {
+                if (!isAI)
+                {
+                    #region Attack
+                    if (isAttacking)
                     {
-                        runToEnemy();
-                        changeCharacterOrientation("down", "left");
-                        premik.X -= 1.0f;
-                        isHitting = true;
-                    }
-                    else
-                    {
-                        hitEnemy(state);
-                        if (PlayingTime > actionTime)
+                        if ((polozaj.X != enemyLocation.X) && (polozaj.X < enemyLocation.X))
                         {
-                            returnToPosition();
-                            isAttacking = false;
-                            isRunning = false;
-                            isHitting = false;
+                            runToEnemy();
+                            changeCharacterOrientation("down", orientiranModel);
+                            premik.X += 1.0f;
+                            isHitting = true;
+                        }
+                        else
+                        {
+                            hitEnemy(state);
+                            if (PlayingTime > actionTime)
+                            {
+                                returnToPosition();
+                                isAttacking = false;
+                                isRunning = false;
+                                isHitting = false;
+                            }
                         }
                     }
-                }
-                #endregion
+                    #endregion
 
-                #region Damaging
-                if (isTakingDamage)
-                {
-                    takeDamage();
+                    #region Block
+                    if (isBlocking)
+                    {
+                        setToBlock();
+                        if (PlayingTime > actionTime)
+                        {
+                            animation.StopAnimation();
+                            animation = animationController.PlayLoopingAnimation(3);
+                            isBlocking = false;
+                        }
+                    }
+                    #endregion
+
+                    #region Damaging
+                    if (isTakingDamage)
+                    {
+                        takeDamage();
+                    }
+                    #endregion
                 }
-                #endregion
+                else if (isAI)
+                {
+                    #region Attack
+                    if (isAttacking)
+                    {
+                        if ((polozaj.X != enemyLocation.X) && (polozaj.X > enemyLocation.X))
+                        {
+                            runToEnemy();
+                            changeCharacterOrientation("down", "left");
+                            premik.X -= 1.0f;
+                            isHitting = true;
+                        }
+                        else
+                        {
+                            hitEnemy(state);
+                            if (PlayingTime > actionTime)
+                            {
+                                returnToPosition();
+                                isAttacking = false;
+                                isRunning = false;
+                                isHitting = false;
+                            }
+                        }
+                    }
+                    #endregion
+
+                    #region Damaging
+                    if (isTakingDamage)
+                    {
+                        takeDamage();
+                    }
+                    #endregion
+                }
             }
 
             polozaj += premik;
@@ -243,6 +283,15 @@ namespace rimmprojekt.Razredi
                     matrix *= Matrix.CreateTranslation(polozaj);
                 }
             }
+        }
+
+        public void setStats()
+        {
+            maxHealth = Vitality * 20;
+            Health = maxHealth;
+
+            maxMana = Intelligence * 10;
+            Mana = maxMana;
         }
 
         #region Attacking
@@ -307,7 +356,7 @@ namespace rimmprojekt.Razredi
         #endregion
 
         #region Take Damage
-        private void takeDamage()
+        public void takeDamage()
         {
             if (!firstTimeAnimationSet)
             {
@@ -325,6 +374,7 @@ namespace rimmprojekt.Razredi
 
             if (PlayingTime > actionTimeSecond)
             {
+                Health -= damage;
                 actionTime = 0.0f;
                 actionTimeSecond = 999.0f;
                 animation.StopAnimation();
@@ -334,5 +384,7 @@ namespace rimmprojekt.Razredi
             }
         }
         #endregion
+
+        
     }
 }
