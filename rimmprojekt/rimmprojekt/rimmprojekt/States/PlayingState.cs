@@ -42,6 +42,8 @@ namespace rimmprojekt.States
         private Razredi.Enemy minotavek;
         private List<Razredi.Enemy> sovarzniki;
 
+        private bool IsActive;
+
         public PlayingState(Application application)
         {
             drawToScreen = new DrawTargetScreen(new Camera3D());
@@ -77,6 +79,12 @@ namespace rimmprojekt.States
             stateManager.Application.Content.Add(this);
         }
 
+        bool IGameState.isActive
+        {
+            get { return IsActive; }
+            set { IsActive = value; }
+        }
+
         private void InitialisePhysics()
         {
 
@@ -87,32 +95,37 @@ namespace rimmprojekt.States
         //For simplicity this only provides drawing directly to the screen.
         public void DrawScreen(DrawState state)
         {
-            Vector3 target = new Vector3(tezej.polozaj.X, tezej.polozaj.Y - 35.0f, tezej.polozaj.Z - 35.0f);
-            Vector3 position = new Vector3(tezej.polozaj.X, tezej.polozaj.Y + 35.0f, tezej.polozaj.Z + 35.0f);
-            Vector3 position2 = new Vector3(tezej.polozaj.X, 35.0f, 35.0f);
-            Camera3D camera = new Camera3D();
-            camera.LookAt(target, position, Vector3.UnitY);
-            state.Camera.SetCamera(camera);
+            if (IsActive)
+            {
+                Vector3 target = new Vector3(tezej.polozaj.X, tezej.polozaj.Y - 35.0f, tezej.polozaj.Z - 35.0f);
+                Vector3 position = new Vector3(tezej.polozaj.X, tezej.polozaj.Y + 35.0f, tezej.polozaj.Z + 35.0f);
+                Vector3 position2 = new Vector3(tezej.polozaj.X, 35.0f, 35.0f);
+                Camera3D camera = new Camera3D();
+                camera.LookAt(target, position, Vector3.UnitY);
+                state.Camera.SetCamera(camera);
 
-            mapa.Draw(state);
-            foreach (Razredi.Enemy goblin in sovarzniki)
-                goblin.Draw(state);
+                mapa.Draw(state);
+                foreach (Razredi.Enemy goblin in sovarzniki)
+                    goblin.Draw(state);
 
-            minotavek.Draw(state);
-            //minotaver.Draw(state);
-            tezej.Draw(state);
-            inventory.Draw(state);
-            this.debugText.Draw(state);
+                minotavek.Draw(state);
+                //minotaver.Draw(state);
+                tezej.Draw(state);
+                inventory.Draw(state);
+                this.debugText.Draw(state);
+            }
         }
 
         public void Update(UpdateState state)
         {
-            if (!backgroundSongStart)
+            if (IsActive)
             {
-                //MediaPlayer.Play(backgroundSong);
-                MediaPlayer.Volume = 0.6f;
-                backgroundSongStart = true;
-            }
+                if (!backgroundSongStart)
+                {
+                    //MediaPlayer.Play(backgroundSong);
+                    MediaPlayer.Volume = 0.6f;
+                    backgroundSongStart = true;
+                }
 
             if (state.KeyboardState.KeyState.K.OnPressed)
             {
@@ -120,10 +133,11 @@ namespace rimmprojekt.States
                 this.stateManager.SetState(bs);
             }
 
-            if (state.KeyboardState.KeyState.Escape.OnReleased)
-            {
-                stateManager.SetState(new MenuState());
-                MediaPlayer.Stop();
+                if (state.KeyboardState.KeyState.Escape.OnReleased)
+                {
+                    stateManager.SetState(new MenuState());
+                    MediaPlayer.Stop();
+                }
             }
 
             if (state.KeyboardState.KeyState.F.OnPressed)

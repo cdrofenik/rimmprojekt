@@ -22,7 +22,7 @@ namespace rimmprojekt.States
     {
         private List<TextElementRect> menuText = new List<TextElementRect>();
         private IGameStateManager stateManager;
-
+        private bool IsActive;
 
         public void Initalise(IGameStateManager stateManager)
         {
@@ -49,6 +49,12 @@ namespace rimmprojekt.States
 
             //set the text font (using global content)
             stateManager.Application.Content.Add(this);
+        }
+
+        bool IGameState.isActive
+        {
+            get { return IsActive; }
+            set { IsActive = value; }
         }
 
         public void DrawScreen(DrawState state)

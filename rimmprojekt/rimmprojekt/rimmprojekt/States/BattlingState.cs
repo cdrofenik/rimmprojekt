@@ -38,6 +38,7 @@ namespace rimmprojekt.States
         private Boolean canDoAction;
         private Boolean gameOver;
         private Boolean gameFinished;
+        private bool IsActive;
 
         #region Razredi.
         private Razredi.Tezej tezej;
@@ -177,6 +178,12 @@ namespace rimmprojekt.States
 
             setFunctionalSettings();
             stateManager.Application.Content.Add(this);
+        }
+
+        bool IGameState.isActive
+        {
+            get { return IsActive; }
+            set { IsActive = value; }
         }
 
         public void DrawScreen(DrawState state)
