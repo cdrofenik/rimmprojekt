@@ -20,7 +20,6 @@ namespace rimmprojekt.States
 {
     class GameStateManager : IGameStateManager, IDraw, IUpdate
     {
-        private DrawTargetScreen drawToScreen;
         private readonly Application application;
         private PlayerIndex playerIndex;
 

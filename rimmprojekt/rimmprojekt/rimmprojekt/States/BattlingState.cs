@@ -26,8 +26,6 @@ namespace rimmprojekt.States
 {
     class BattlingState : IGameState, IContentOwner
     {
-        private Int32 inventoryPointer;
-
         private const float diskRadius = 30;
         private IDraw lightSourceDrawer;
         private LightsAndMaterials.GroundDisk ground;

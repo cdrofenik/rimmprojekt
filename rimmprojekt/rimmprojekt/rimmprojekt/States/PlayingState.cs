@@ -32,11 +32,15 @@ namespace rimmprojekt.States
 
         private DrawTargetScreen drawToScreen;
         private IGameStateManager stateManager;
-        private List<Razredi.Enemy> sovarzniki;
+        
+
+        private Razredi.Minotaver minotaver;
+
         private Razredi.Tezej tezej;
         private Razredi.Mapa mapa;
         private Razredi.Inventory inventory;
-        private Razredi.Minotaver minotaver;
+        private Razredi.Enemy minotavek;
+        private List<Razredi.Enemy> sovarzniki;
 
         public PlayingState(Application application)
         {
@@ -53,8 +57,10 @@ namespace rimmprojekt.States
             foreach (Razredi.Kocka k in mapa.zidovi)
                 bodies.Add(k.body);
 
-            minotaver = new Razredi.Minotaver(35.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
+            
+            //minotaver = new Razredi.Minotaver(35.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
             sovarzniki = generateEnemys(stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
+            minotavek = new Razredi.Enemy(20.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies, "");
 
             tezej = new Razredi.Tezej(30.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
             inventory = new Razredi.Inventory(stateManager.Application.UpdateManager, stateManager.Application.Content,tezej);
@@ -92,10 +98,11 @@ namespace rimmprojekt.States
             foreach (Razredi.Enemy goblin in sovarzniki)
                 goblin.Draw(state);
 
-            minotaver.Draw(state);
+            minotavek.Draw(state);
+            //minotaver.Draw(state);
             tezej.Draw(state);
             inventory.Draw(state);
-            //this.debugText.Draw(state);
+            this.debugText.Draw(state);
         }
 
         public void Update(UpdateState state)
@@ -123,7 +130,8 @@ namespace rimmprojekt.States
             {
                 inventory.addPotion("hp", 20);
             }
-            //debugText.Text.SetText(tezej.polozaj.ToString() + " " + tezej.collisions.Count.ToString());
+
+            debugText.Text.SetText(tezej.polozaj.ToString() + " " + tezej.collisions.Count.ToString());
         }
 
         void IContentOwner.LoadContent(ContentState state)
@@ -135,11 +143,12 @@ namespace rimmprojekt.States
 
         private List<Razredi.Enemy> generateEnemys(UpdateManager updateMng, ContentRegister contntrg, List<Body> telesa)
         {
+            String skin_ = "goblin";
             List<Razredi.Enemy> result = new List<Razredi.Enemy>();
             for(int i=0;i<6;i++)
             {
                 Vector3 pozition = getEnemyPozition(i);
-                result.Add(new Razredi.Enemy(pozition.X, pozition.Y, pozition.Z, updateMng, contntrg, telesa));
+                result.Add(new Razredi.Enemy(pozition.X, pozition.Y, pozition.Z, updateMng, contntrg, telesa,skin_));
             }
 
             return result;

@@ -26,11 +26,13 @@ namespace rimmprojekt.Razredi
 {
     class Tezej : IDraw, IContentOwner, IUpdate
     {
-        private Quaternion itemRotateAnim;
-        private Xen.Transform helperTransformStatic, helperTransformAnim;
-        private int boneIndex;
-        private Matrix helperMatrix;
-        private Matrix itemRot;
+        #region animacije za sablo
+        //private Quaternion itemRotateAnim;
+        //private Xen.Transform helperTransformStatic, helperTransformAnim;
+        //private int boneIndex;
+        //private Matrix helperMatrix;
+        //private Matrix itemRot;
+        #endregion
 
         public Boolean isInBattle;
         private TextElement debug;
@@ -243,17 +245,17 @@ namespace rimmprojekt.Razredi
                 }
             }
 
-            using (state.WorldMatrix.PushMultiply(ref helperMatrix))
-            {
-                if (CullTest(state))
-                {
-                    using (state.Shader.Push(shader))
-                    {
-                        updateItemPosition(state, "asdf");
-                        sword.Draw(state);
-                    }
-                }
-            }
+            //using (state.WorldMatrix.PushMultiply(ref helperMatrix))
+            //{
+            //    if (CullTest(state))
+            //    {
+            //        using (state.Shader.Push(shader))
+            //        {
+            //            //updateItemPosition(state, "asdf");
+            //            //sword.Draw(state);
+            //        }
+            //    }
+            //}
 
             if (hasLeveledUp)
             {
@@ -513,26 +515,29 @@ namespace rimmprojekt.Razredi
         }
         #endregion
 
-        private void updateItemPosition(DrawState state, String item)
-        {
-            boneIndex = model.ModelData.Skeleton.GetBoneIndexByName("helperR");
+        #region risanje sable
+        //private void updateItemPosition(DrawState state, String item)
+        //{
+        //    boneIndex = model.ModelData.Skeleton.GetBoneIndexByName("helperR");
 
-            itemRotateAnim = animationController.GetTransformedBones(state)[boneIndex].Rotation;
+        //    itemRotateAnim = animationController.GetTransformedBones(state)[boneIndex].Rotation;
 
-            itemRot = Matrix.Identity;
-            itemRot *= body.Orientation;
+        //    itemRot = Matrix.Identity;
+        //    itemRot *= body.Orientation;
 
-            helperTransformAnim = animationController.GetTransformedBones(state)[boneIndex];
-            helperTransformStatic = model.ModelData.Skeleton.BoneWorldTransforms[boneIndex];
-            helperTransformStatic.Translation -= model.ModelData.Skeleton.BoneWorldTransforms[0].Translation;
+        //    helperTransformAnim = animationController.GetTransformedBones(state)[boneIndex];
+        //    helperTransformStatic = model.ModelData.Skeleton.BoneWorldTransforms[boneIndex];
+        //    helperTransformStatic.Translation -= model.ModelData.Skeleton.BoneWorldTransforms[0].Translation;
 
-            helperTransformStatic *= helperTransformAnim;
-            helperTransformStatic.GetMatrix(out helperMatrix);
-            helperMatrix *= body.Orientation;
+        //    helperTransformStatic *= helperTransformAnim;
+        //    helperTransformStatic.GetMatrix(out helperMatrix);
+        //    helperMatrix *= body.Orientation;
 
-            body.MoveTo(polozaj + new Vector3(3.0f,3.0f,3.0f), Matrix.CreateFromQuaternion(itemRotateAnim)*itemRot);
-            //helperMatrix *= boxObject.Body.Orientation;
-            //model.Body.MoveTo(boxObject.Body.Position + helperMatrix.Translation, Matrix.CreateFromQuaternion(itemRotateAnim) * itemRot);
-        }
+        //    body.MoveTo(polozaj + new Vector3(3.0f,3.0f,3.0f), Matrix.CreateFromQuaternion(itemRotateAnim)*itemRot);
+        //    //helperMatrix *= boxObject.Body.Orientation;
+        //    //model.Body.MoveTo(boxObject.Body.Position + helperMatrix.Translation, Matrix.CreateFromQuaternion(itemRotateAnim) * itemRot);
+        //}
+
+        #endregion
     }
 }

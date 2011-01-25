@@ -43,12 +43,18 @@ namespace rimmprojekt.Razredi
         public Int32 vitality;
         #endregion
 
+        #region collision
         List<Body> bodies;
         private CollisionSystem collisionSystem;
         private Body body;
         private CollisionSkin skin;
         public List<CollisionInfo> collisions;
         private BasicCollisionFunctor collisionFunctor;
+        #endregion
+
+        private Boolean skinGoblin;
+        public String skinName;
+        public Boolean hasHitTezej;
 
         //displaying properties
         public Vector3 polozaj;
@@ -64,18 +70,24 @@ namespace rimmprojekt.Razredi
 
         #endregion
 
-        public Enemy(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies)
+        public Enemy(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies, String skinChosen)
         {
-            model = new ModelInstance();
+            skinGoblin = true;
+            skinName = "";
+            if (skinChosen.Equals(skinName))
+                skinGoblin = false;
 
             manager.Add(this);
+
+            model = new ModelInstance();
+            animationController = model.GetAnimationController();
+            
             content.Add(this);
 
             #region animacije
             isInBattle = false;
             isIdle = true;
 
-            animationController = model.GetAnimationController();
             animation = animationController.PlayLoopingAnimation(3);
 
             #endregion
@@ -160,7 +172,10 @@ namespace rimmprojekt.Razredi
         public void LoadContent(ContentState state)
         {
             //load the model data into the model instance
-            model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/goblin");
+            if (skinGoblin)
+                model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/goblin");
+            else
+                model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/minotaur");
         }
 
         public UpdateFrequency Update(UpdateState state)
