@@ -119,7 +119,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LightsAndMaterials\GroundDisk.cs" />
+    <Compile Include="LightsAndMaterials\LightSourceDrawer.cs" />
     <Compile Include="Razredi\Character.cs" />
+    <Compile Include="Razredi\Enemy.cs" />
     <Compile Include="Razredi\Minotaver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />

@@ -28,6 +28,7 @@ namespace rimmprojekt.Razredi
     {
         #region timers
         private float dyingTimer;
+        private float takeDamageTimer;
         #endregion
 
 
@@ -73,10 +74,14 @@ namespace rimmprojekt.Razredi
         private ModelInstance model;
         private ModelInstance sword;
 
-        public Character(float x, float y, float z, UpdateManager manager, ContentRegister content, String character)
+        public Character(float x, float y, float z, MaterialLightCollection light, UpdateManager manager, ContentRegister content, String character)
         {
             model = new ModelInstance();
             sword = new ModelInstance();
+
+            //force the model to render using spherical harmonic lighting
+            //this will significantly improve performance on some hardware when GPU limited
+            model.ShaderProvider = new Xen.Ex.Graphics.Provider.LightingDisplayShaderProvider(LightingDisplayModel.ForceSphericalHarmonic, model.ShaderProvider);
 
             if (character.Equals("tezej"))
             {
@@ -110,14 +115,16 @@ namespace rimmprojekt.Razredi
 
             polozaj = new Vector3(x, y, z);
             matrix = Matrix.CreateTranslation(polozaj);
-            MaterialShader material = new MaterialShader();
-            material.SpecularColour = Color.LightYellow.ToVector3();//with a nice sheen
-            Vector3 lightDirection = new Vector3(0.5f, 1, -0.5f); //a less dramatic direction
-            MaterialLightCollection lights = new MaterialLightCollection();
-            lights.AmbientLightColour = Color.White.ToVector3() * 0.5f;
-            lights.CreateDirectionalLight(lightDirection, Color.Red);
-            material.LightCollection = lights;
-            shader = material;
+
+            model.LightCollection = light;
+            //MaterialShader material = new MaterialShader();
+            //material.SpecularColour = Color.LightYellow.ToVector3();//with a nice sheen
+            //Vector3 lightDirection = new Vector3(0.5f, 1, -0.5f); //a less dramatic direction
+            //MaterialLightCollection lights = new MaterialLightCollection();
+            //lights.AmbientLightColour = Color.White.ToVector3() * 0.5f;
+            //lights.CreateDirectionalLight(lightDirection, Color.Red);
+            //material.LightCollection = lights;
+            //shader = material;
 
             content.Add(this);
         }
@@ -126,14 +133,8 @@ namespace rimmprojekt.Razredi
         {
             using (state.WorldMatrix.PushMultiply(ref matrix))
             {
-                if (CullTest(state))
-                {
-                    using (state.Shader.Push(shader))
-                    {
-                        //sword.Draw(state);
-                        model.Draw(state);
-                    }
-                }
+                //sword.Draw(state);
+                model.Draw(state);
             }
         }
 
@@ -356,11 +357,17 @@ namespace rimmprojekt.Razredi
         #endregion
 
         #region Take Damage
+        public void doDamageAnimation(float timing)
+        {
+            isTakingDamage = true;
+            takeDamageTimer = timing;
+        }
+
         public void takeDamage()
         {
             if (!firstTimeAnimationSet)
             {
-                actionTime = PlayingTime + 1.3f;        //spremeni za pravi timing
+                actionTime = PlayingTime + takeDamageTimer;        //spremeni za pravi timing
                 firstTimeAnimationSet = true;
             }
 
@@ -384,7 +391,5 @@ namespace rimmprojekt.Razredi
             }
         }
         #endregion
-
-        
     }
 }

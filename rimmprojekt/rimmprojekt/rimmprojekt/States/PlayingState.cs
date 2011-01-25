@@ -32,6 +32,7 @@ namespace rimmprojekt.States
 
         private DrawTargetScreen drawToScreen;
         private IGameStateManager stateManager;
+        private List<Razredi.Enemy> sovarzniki;
         private Razredi.Tezej tezej;
         private Razredi.Mapa mapa;
         private Razredi.Inventory inventory;
@@ -51,9 +52,13 @@ namespace rimmprojekt.States
             List<Body> bodies = new List<Body>();
             foreach (Razredi.Kocka k in mapa.zidovi)
                 bodies.Add(k.body);
+
+            minotaver = new Razredi.Minotaver(35.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
+            sovarzniki = generateEnemys(stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
+
             tezej = new Razredi.Tezej(30.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
             inventory = new Razredi.Inventory(stateManager.Application.UpdateManager, stateManager.Application.Content,tezej);
-            minotaver = new Razredi.Minotaver(35.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
+           
 
             this.debugText = new TextElementRect(new Vector2(400, 100));
             this.debugText.Position = new Vector2(340, 240);
@@ -84,6 +89,9 @@ namespace rimmprojekt.States
             state.Camera.SetCamera(camera);
 
             mapa.Draw(state);
+            foreach (Razredi.Enemy goblin in sovarzniki)
+                goblin.Draw(state);
+
             minotaver.Draw(state);
             tezej.Draw(state);
             inventory.Draw(state);
@@ -101,7 +109,7 @@ namespace rimmprojekt.States
 
             if (state.KeyboardState.KeyState.K.OnPressed)
             {
-                BattlingState bs = new BattlingState(tezej, minotaver, this.stateManager.Application);
+                BattlingState bs = new BattlingState(tezej, minotaver, inventory,this.stateManager.Application);
                 this.stateManager.SetState(bs);
             }
 
@@ -111,6 +119,10 @@ namespace rimmprojekt.States
                 MediaPlayer.Stop();
             }
 
+            if (state.KeyboardState.KeyState.F.OnPressed)
+            {
+                inventory.addPotion("hp", 20);
+            }
             //debugText.Text.SetText(tezej.polozaj.ToString() + " " + tezej.collisions.Count.ToString());
         }
 
@@ -119,6 +131,42 @@ namespace rimmprojekt.States
             this.debugText.Font = state.Load<SpriteFont>("Arial");
             backgroundSong = state.Load<Song>(@"backgroundSong");
             MediaPlayer.IsRepeating = true;
+        }
+
+        private List<Razredi.Enemy> generateEnemys(UpdateManager updateMng, ContentRegister contntrg, List<Body> telesa)
+        {
+            List<Razredi.Enemy> result = new List<Razredi.Enemy>();
+            for(int i=0;i<6;i++)
+            {
+                Vector3 pozition = getEnemyPozition(i);
+                result.Add(new Razredi.Enemy(pozition.X, pozition.Y, pozition.Z, updateMng, contntrg, telesa));
+            }
+
+            return result;
+        }
+
+        private Vector3 getEnemyPozition(Int32 i)
+        {
+            Random rndm = new Random();
+            float[] x = new float[6];
+            x[0] = float.Parse("21");
+            x[1] = float.Parse("181");
+            x[2] = float.Parse(rndm.Next(222,380).ToString());
+            x[3] = float.Parse(rndm.Next(184, 376).ToString());
+            x[4] = float.Parse("459");
+            x[5] = float.Parse("459");
+
+            float[] z = new float[6];
+            z[0] = float.Parse(rndm.Next(150, 455).ToString());
+            z[1] = float.Parse(rndm.Next(220, 455).ToString());
+            z[2] = float.Parse("299");
+            z[3] = float.Parse("99");
+            z[4] = float.Parse(rndm.Next(23, 140).ToString());
+            z[5] = float.Parse(rndm.Next(180, 360).ToString());
+
+            Vector3 result = new Vector3(x[i],0.0f,z[i]);
+
+            return result;
         }
     }
 }
