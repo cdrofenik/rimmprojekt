@@ -120,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LightsAndMaterials\BattleArena.cs" />
+    <Compile Include="LightsAndMaterials\GroundDisk.cs" />
     <Compile Include="Razredi\Character.cs" />
     <Compile Include="Razredi\Enemy.cs" />
     <Compile Include="Razredi\Minotaver.cs" />
