@@ -47,7 +47,7 @@ namespace rimmprojekt.Razredi
                     new VertexPositionNormalTexture(new Vector3((float)velikost.Y*20.0f-10f, -10.0f, 0.0f), Vector3.Up, bottomRight)
                 };
             tla = new Vertices<VertexPositionNormalTexture>(tempTla);
-            tempTla = null;
+             //tempTla = null;
 
             ushort[] inds =
 			    {
@@ -59,10 +59,10 @@ namespace rimmprojekt.Razredi
             material = new MaterialShader();
             material.SpecularColour = Color.LightYellow.ToVector3();//with a nice sheen
 
-            Vector3 lightDirection = new Vector3(0.5f, 1, -0.5f); //a less dramatic direction
+            Vector3 lightDirection = new Vector3(0.7f, 0.1f, -0.5f); //a less dramatic direction
 
             MaterialLightCollection lights = new MaterialLightCollection();
-            lights.AmbientLightColour = Color.White.ToVector3() * 0.5f;
+            lights.AmbientLightColour = Color.White.ToVector3() * 0.2f;
             lights.CreateDirectionalLight(lightDirection, Color.White);
 
             material.LightCollection = lights;

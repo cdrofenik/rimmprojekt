@@ -26,7 +26,14 @@ namespace rimmprojekt.Razredi
 {
     class Tezej : IDraw, IContentOwner, IUpdate
     {
+        private Quaternion itemRotateAnim;
+        private Xen.Transform helperTransformStatic, helperTransformAnim;
+        private int boneIndex;
+        private Matrix helperMatrix;
+        private Matrix itemRot;
+
         public Boolean isInBattle;
+        private TextElement debug;
 
         #region parameters
         private Boolean hasPlayed;
@@ -78,6 +85,7 @@ namespace rimmprojekt.Razredi
         private Matrix matrix;
         private IShader shader;
         private ModelInstance model;
+        private ModelInstance sword;
 
         #region kontrole modelov in animacij
         private AnimationController animationController;
@@ -94,6 +102,7 @@ namespace rimmprojekt.Razredi
         public Tezej(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies)
         {
             model = new ModelInstance();
+            sword = new ModelInstance();
 
             manager.Add(this);
             content.Add(this);
@@ -173,6 +182,9 @@ namespace rimmprojekt.Razredi
             #region collision
             polozaj = new Vector3(x, y, z);
             matrix = Matrix.CreateTranslation(polozaj);
+
+            //helperMatrix = Matrix.CreateTranslation(new Vector3(-40, y, z));
+
             MaterialShader material = new MaterialShader();
             material.SpecularColour = Color.LightYellow.ToVector3();//with a nice sheen
 
@@ -210,6 +222,11 @@ namespace rimmprojekt.Razredi
 
             #endregion
 
+
+            debug = new TextElement("debug");
+            debug.Font = trueFont;
+            debug.Colour = Color.Yellow;
+
             content.Add(this);
         }
 
@@ -226,12 +243,26 @@ namespace rimmprojekt.Razredi
                 }
             }
 
+            using (state.WorldMatrix.PushMultiply(ref helperMatrix))
+            {
+                if (CullTest(state))
+                {
+                    using (state.Shader.Push(shader))
+                    {
+                        updateItemPosition(state, "asdf");
+                        sword.Draw(state);
+                    }
+                }
+            }
+
             if (hasLeveledUp)
             {
                 setCharacterStatusValuseOnLevelUp();
                 lvlUpElement.Draw(state);
                 levelUpText.Draw(state);
             }
+
+            //debug.Draw(state);
         }
 
         public bool CullTest(ICuller culler)
@@ -243,6 +274,7 @@ namespace rimmprojekt.Razredi
         {
             //load the model data into the model instance
             model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/player");
+            sword.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/epic_sword");
             tezejLevelUpTexture = state.Load<Texture2D>(@"Tezej/LvlUpTexture");
             levelUpSoundEffect = state.Load<SoundEffect>(@"Tezej/lvlupEffect");
             trueFont = state.Load<SpriteFont>("Arial");
@@ -251,7 +283,7 @@ namespace rimmprojekt.Razredi
         public UpdateFrequency Update(UpdateState state)
         {
             collisions.Clear();
-
+            
             Vector3 premik = new Vector3(0f, 0f, 0f);
 
             if (hasLeveledUp)
@@ -319,12 +351,14 @@ namespace rimmprojekt.Razredi
                         isHeRunning();
                         changeAngele(orientiranModel, "right");
                         premik.X += 1.0f;
+                        
                     }
                     if (state.KeyboardState.KeyState.A.IsDown)
                     {
                         isHeRunning();
                         changeAngele(orientiranModel, "left");
                         premik.X -= 1.0f;
+                        body.Velocity = Vector3.Transform(polozaj, body.Orientation);
                     }
                     #endregion
                 }
@@ -352,6 +386,9 @@ namespace rimmprojekt.Razredi
             //    skin.GetPrimitiveLocal(0).Transform.Orientation *
             //    body.Orientation *
             //    Matrix.CreateTranslation(body.Position);
+
+            debug.Text.SetText(polozaj.X + " , " + polozaj.Y + " , " + polozaj.Z + "\n"+body.Orientation.ToString());
+            //helperMatrix = Matrix.CreateTranslation(polozaj);
             return UpdateFrequency.FullUpdate60hz;
         }
 
@@ -475,5 +512,27 @@ namespace rimmprojekt.Razredi
             }
         }
         #endregion
+
+        private void updateItemPosition(DrawState state, String item)
+        {
+            boneIndex = model.ModelData.Skeleton.GetBoneIndexByName("helperR");
+
+            itemRotateAnim = animationController.GetTransformedBones(state)[boneIndex].Rotation;
+
+            itemRot = Matrix.Identity;
+            itemRot *= body.Orientation;
+
+            helperTransformAnim = animationController.GetTransformedBones(state)[boneIndex];
+            helperTransformStatic = model.ModelData.Skeleton.BoneWorldTransforms[boneIndex];
+            helperTransformStatic.Translation -= model.ModelData.Skeleton.BoneWorldTransforms[0].Translation;
+
+            helperTransformStatic *= helperTransformAnim;
+            helperTransformStatic.GetMatrix(out helperMatrix);
+            helperMatrix *= body.Orientation;
+
+            body.MoveTo(polozaj + new Vector3(3.0f,3.0f,3.0f), Matrix.CreateFromQuaternion(itemRotateAnim)*itemRot);
+            //helperMatrix *= boxObject.Body.Orientation;
+            //model.Body.MoveTo(boxObject.Body.Position + helperMatrix.Translation, Matrix.CreateFromQuaternion(itemRotateAnim) * itemRot);
+        }
     }
 }

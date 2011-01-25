@@ -99,10 +99,10 @@ namespace rimmprojekt.Razredi
             material = new MaterialShader();
             material.SpecularColour = Color.LightYellow.ToVector3();//with a nice sheen
 
-            Vector3 lightDirection = new Vector3(0.5f, 1, -0.5f); //a less dramatic direction
+            Vector3 lightDirection = new Vector3(0.3f, 0.2f, -1.0f); //a less dramatic direction
 
             MaterialLightCollection lights = new MaterialLightCollection();
-            lights.AmbientLightColour = Color.White.ToVector3() * 0.5f;
+            lights.AmbientLightColour = Color.White.ToVector3() * 0.2f;
             lights.CreateDirectionalLight(lightDirection, Color.White);
 
             material.LightCollection = lights;

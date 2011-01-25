@@ -19,13 +19,20 @@ using Microsoft.Xna.Framework.Media;
 
 using JigLibX.Math;
 using JigLibX.Physics;
-using JigLibX.Geometry;
+//using JigLibX.Geometry;
 using JigLibX.Collision;
 
 namespace rimmprojekt.States
 {
     class BattlingState : IGameState, IContentOwner
     {
+        private Int32 inventoryPointer;
+
+        private const float diskRadius = 30;
+        private IDraw lightSourceDrawer;
+        private LightsAndMaterials.GroundDisk ground;
+        private int TestDamage;
+
         private const String presledki = "                         ";
         private float PlayingTime;
         private float ActionTime;
@@ -34,6 +41,12 @@ namespace rimmprojekt.States
         private Boolean gameOver;
         private Boolean gameFinished;
 
+        #region Razredi.
+        private Razredi.Tezej tezej;
+        private Razredi.Minotaver minotaver;
+        private Razredi.Character tezejChar;
+        private Razredi.Character minotaverChar;
+        #endregion
 
         #region risanje
         public Boolean isCharSelected;
@@ -73,21 +86,23 @@ namespace rimmprojekt.States
         private TextElement MagicTxtElement;
         private TextElement ItemsTxtElement;
 
+        private TextElement winTxTelement;
+        private TextElement looseTxTelement;
+
         private TextElement debug;
         #endregion
         
         private Razredi.Mapa mapa;
+        private Razredi.Inventory inventory;
+
         private DrawTargetScreen drawToScreen;
         private IGameStateManager stateManager;
-        private Razredi.Tezej tezej;
-        private Razredi.Minotaver minotaver;
+        private MaterialLightCollection lights;
 
-        private Razredi.Character tezejChar;
-        private Razredi.Character minotaverChar;
-
-        public BattlingState(Razredi.Tezej theseus, Razredi.Minotaver minek,Application application)
+        public BattlingState(Razredi.Tezej theseus, Razredi.Minotaver minek,Razredi.Inventory invnt,Application application)
         {
             drawToScreen = new DrawTargetScreen(new Camera3D());
+            this.inventory = invnt;
             this.tezej = theseus;
             this.minotaver = minek;
         }
@@ -96,6 +111,7 @@ namespace rimmprojekt.States
         {
             this.stateManager = stateManager;
 
+            #region parameter inicialization
             gameFinished = false;
             gameOver = false;
             tempActionTime = 7.0f;
@@ -105,12 +121,60 @@ namespace rimmprojekt.States
             actionPointer = 3;
             barArray = new TexturedElement[3];
             emptybarArray = new TexturedElement[3];
+            #endregion
 
-            #region mapa tezej minotaver
+            #region xen lights
+
+            //create the light collection
+            lights = new MaterialLightCollection();
+            //set a dark blue ambient colour
+            lights.AmbientLightColour = new Color(40, 40, 80).ToVector3();
+
+            //positions for two lights
+            Vector3[] lightPositions = new Vector3[] 
+			{ 
+				new Vector3(65, 1, 70)//, new Vector3(1, 1, 20)
+			};
+
+            //geometry for a light (shared for each light)
+            IDraw lightGeometry = null;
+
+            for (int i = 0; i < lightPositions.Length; i++)
+            {
+                float intensity = 2;
+                Color lightColor = Color.LightYellow;
+                Color lightSpecularColour = Color.WhiteSmoke;
+
+                //interface to the light about to be created
+                IMaterialPointLight light = null;
+
+                //create the point light
+                light = lights.CreatePointLight(lightPositions[i], intensity, lightColor, lightSpecularColour);
+
+                //Adjusting this value controls how quickly the light falloff occurs.
+                //A larger value will produce a slower falloff, and result in a softer, brighter light.
+                //A smaller value will produce a darker, but sharper light source.
+                //Generally, if you reduce this value, increase the intensity to compensate.
+                light.SourceRadius = 34;
+
+                //create the light geometry (a sphere)
+                if (lightGeometry == null)
+                    lightGeometry = new Xen.Ex.Geometry.Sphere(new Vector3(2,2,2), 8, true, false, false);
+
+                //visually show the light with a light drawer
+                lightSourceDrawer = new LightsAndMaterials.LightSourceDrawer(lightPositions[i], lightGeometry, lightColor);
+            }
+
+            //create the ground disk
+            Point v = new Point(7, 10);
+            ground = new LightsAndMaterials.GroundDisk(stateManager.Application.Content, lights, v);
+            #endregion
+
+            #region tezej minotaver
             mapa = new Razredi.Mapa("../../../../rimmprojektContent/battleMap.txt", stateManager.Application.Content, stateManager.Application.UpdateManager);
 
-            tezejChar = new Razredi.Character(10.0f, 0.0f, 40.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, "tezej");
-            minotaverChar = new Razredi.Character(80.0f, 0.0f, 40.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, "minotaver");
+            tezejChar = new Razredi.Character(30.0f, 0.0f, 60.0f, lights, stateManager.Application.UpdateManager, stateManager.Application.Content, "tezej");
+            minotaverChar = new Razredi.Character(100.0f, 0.0f, 60.0f, lights, stateManager.Application.UpdateManager, stateManager.Application.Content, "minotaver");
             #endregion
 
             setFunctionalSettings();
@@ -119,28 +183,19 @@ namespace rimmprojekt.States
 
         public void DrawScreen(DrawState state)
         {
-            ///Vector3 target = new Vector3(tezej.polozaj.X, tezej.polozaj.Y - 35.0f, tezej.polozaj.Z - 35.0f);
-            if (tezejChar.isAttacking)
-            {
-                Vector3 target = new Vector3(tezejChar.polozaj.X, 0.0f, tezejChar.polozaj.Z);
-                Vector3 position = new Vector3(tezejChar.polozaj.X - 15.0f, tezejChar.polozaj.Y + 25.0f, tezejChar.polozaj.Z + 20.0f);
-                Camera3D camera = new Camera3D();
-                camera.LookAt(target, position, Vector3.UnitY);
-                state.Camera.SetCamera(camera);
-            }
-            else
-            {
-                Vector3 target = new Vector3(30.0f, 0.0f, 60.0f);
-                Vector3 position = new Vector3(20, 22.0f, 90.0f);
-                Camera3D camera = new Camera3D();
-                camera.LookAt(target, position, Vector3.UnitY);
-                state.Camera.SetCamera(camera);
-            }
+            //Vector3 target = new Vector3(tezej.polozaj.X, tezej.polozaj.Y - 35.0f, tezej.polozaj.Z - 35.0f);
+            Vector3 target = new Vector3(tezejChar.polozaj.X+13, tezejChar.polozaj.Y - 20.0f, tezejChar.polozaj.Z - 35.0f);
+            Vector3 position = new Vector3(25.0f, 22.0f, 90.0f);
+            Camera3D camera = new Camera3D();
+            camera.LookAt(target, position, Vector3.UnitY);
+            state.Camera.SetCamera(camera);
 
-            backgroundElement.Draw(state);
-            mapa.Draw(state);
+            //backgroundElement.Draw(state);
+            //mapa.Draw(state);
+            ground.Draw(state);
             minotaverChar.Draw(state);
             tezejChar.Draw(state);
+            lightSourceDrawer.Draw(state);
 
             leftBarElement.Draw(state);
             rightBarElement.Draw(state);
@@ -162,12 +217,17 @@ namespace rimmprojekt.States
             if (gameOver)
             {
                 GameOverElement.Draw(state);
+                looseTxTelement.Draw(state);
             }
 
             if (gameFinished)
             {
                 GameFinishedElement.Draw(state);
+                winTxTelement.Draw(state);
             }
+
+            inventory.Draw(state);
+            debug.Draw(state);
         }
 
         void IContentOwner.LoadContent(ContentState state)
@@ -190,6 +250,7 @@ namespace rimmprojekt.States
 
         public void Update(UpdateState state)
         {
+
             PlayingTime += state.DeltaTimeSeconds;
 
             if (tezejChar.isDead)
@@ -221,34 +282,42 @@ namespace rimmprojekt.States
                     if (Math.Round(PlayingTime) == tempActionTime || Math.Round(PlayingTime) > tempActionTime)
                     {
                         minotaverChar.goAttackEnemy(tezejChar.polozaj.X, 0);
-                        tezejChar.damage = getAttackDamage(minotaverChar.Strength, tezejChar.Strength);
-                        tezejChar.isTakingDamage = true;
+                        tezejChar.damage = getAttackDamage(minotaverChar, tezejChar);
+                        tezejChar.doDamageAnimation(1.3f);
                         tempActionTime = PlayingTime + 8.5f;
                     }
                     #endregion
 
                     #region notAI
-                    if (canDoAction)
+                    if (canDoAction && !inventory.isInBattle)
                     {
                         #region choose character
                         if (state.KeyboardState.KeyState.Enter.OnPressed || state.KeyboardState.KeyState.Space.OnPressed)
                         {
                             if (isCharSelected)
                             {
-                                isCharSelected = false;
-                                setActionBox(isCharSelected);
+
                                 if (actionSelected[actionPointer].Equals("Attack"))
                                 {
                                     tezejChar.goAttackEnemy(minotaverChar.polozaj.X, 0);
-                                    minotaverChar.damage = getAttackDamage(tezejChar.Strength, minotaverChar.Strength);
-                                    minotaverChar.isTakingDamage = true;
+                                    minotaverChar.damage = getAttackDamage(tezejChar, minotaverChar);
+                                    minotaverChar.doDamageAnimation(1.3f);
                                     actionDone(actionSelected[actionPointer]);
                                     tempActionTime += 1.9f;
+                                    isCharSelected = false;
+                                    setActionBox(isCharSelected);
                                 }
                                 else if (actionSelected[actionPointer].Equals("Block"))
                                 {
                                     tezejChar.goBlock();
                                     actionDone(actionSelected[actionPointer]);
+                                    isCharSelected = false;
+                                    setActionBox(isCharSelected);
+                                }
+                                else if (actionSelected[actionPointer].Equals("Items"))
+                                {
+                                    inventory.isInBattle = true;
+                                    //actionDone(actionSelected[actionPointer]);
                                 }
 
                             }
@@ -283,6 +352,22 @@ namespace rimmprojekt.States
                             #endregion
                         }
                     }
+                    else
+                    {
+                        if (state.KeyboardState.KeyState.A.OnPressed || state.KeyboardState.KeyState.Escape.OnPressed)
+                        {
+                            inventory.isInBattle = false;
+                        }
+
+                        if (inventory.isItemUsed)
+                        {
+                            actionDone(actionSelected[actionPointer]);
+                            isCharSelected = false;
+                            setActionBox(isCharSelected);
+                            inventory.isInBattle = false;
+                            inventory.isItemUsed = false;
+                        }
+                    }
                     #endregion
                 }
             }
@@ -291,7 +376,8 @@ namespace rimmprojekt.States
             changeStatusBars();
             HealthTxtElement.Text.SetText("HP:   " + tezejChar.Health + " / " + tezejChar.maxHealth);
             ManaTxtElement.Text.SetText("MP:   " + tezejChar.Mana + " / " + tezejChar.maxMana);
-            debug.Text.SetText(Int32.Parse(Math.Round(PlayingTime).ToString()) + "     HP: " + minotaverChar.Health.ToString());
+            debug.Text.SetText(Int32.Parse(Math.Round(PlayingTime).ToString()) + "     HP: " + minotaverChar.Health.ToString()+"\n"+TestDamage.ToString()
+                +"\n");
             #endregion
         }
 
@@ -368,6 +454,18 @@ namespace rimmprojekt.States
             ItemsTxtElement.Position = new Vector2(120, -100);
             #endregion
 
+
+            winTxTelement = new TextElement("You Win");
+            winTxTelement.Font = bigFont;
+            winTxTelement.Colour = Color.Yellow;
+            winTxTelement.Text.SetText("You Win!");
+            winTxTelement.Position = new Vector2(560, -180);
+
+            looseTxTelement = new TextElement("You Loose");
+            looseTxTelement.Font = bigFont;
+            looseTxTelement.Colour = Color.White;
+            looseTxTelement.Text.SetText("[Press SPACE to play game again!]");
+            looseTxTelement.Position = new Vector2(450, -600);
             #endregion
 
             #region health, mana and time bars
@@ -403,8 +501,9 @@ namespace rimmprojekt.States
             actionTable[3] = new TexturedElement(pointerSize);
             actionTable[3].Position = new Vector2( 130, 154);
 
-            backgroundElement = new TexturedElement(new Vector2(1280, 400));
-            backgroundElement.Position = new Vector2(0,400);
+
+            backgroundElement = new TexturedElement(new Vector2(1280, 720));
+            //backgroundElement.Position = new Vector2(0,400);
             backgroundElement.Texture = backgroundPicture;
 
             debug = new TextElement();
@@ -430,18 +529,20 @@ namespace rimmprojekt.States
 
             tezej.isInBattle = true;
             tezejChar.changeCharacterOrientation("down", "right");
-            tezejChar.Strength = tezej.strength+1000;
+            tezejChar.Strength = tezej.strength;
             tezejChar.Agility = tezej.agility;
             tezejChar.Intelligence = tezej.intelligence;
             tezejChar.Vitality = tezej.vitality;
             tezejChar.setStats();
 
             minotaverChar.changeCharacterOrientation("down", "left");
-            minotaverChar.Strength = 100000;
+            minotaverChar.Strength = 50;
             minotaverChar.Agility = 5;
             minotaverChar.Intelligence = 0;
             minotaverChar.Vitality = 20;
             minotaverChar.setStats();
+
+            inventory.setCharacter(tezejChar);
             
         }
 
@@ -501,16 +602,25 @@ namespace rimmprojekt.States
             canDoAction = false;
         }
 
-        private Int32 getAttackDamage(Int32 atkStr, Int32 defStr)
+        private Int32 getAttackDamage(Razredi.Character prviChar, Razredi.Character drugiChar)
         {
             Int32 result = 0;
+            int atk = prviChar.Strength;
+            int def = drugiChar.Strength;
+
+            if (drugiChar == tezejChar && tezejChar.isBlocking)
+            {
+                def = drugiChar.Strength * 5;
+            }
 
             Random random = new Random();
-            if(defStr>atkStr)
-                result = random.Next(atkStr, atkStr+atkStr);
-            else
-                result = random.Next(defStr, atkStr+100);
 
+            if(def>atk)
+                result = random.Next(10, 20);
+            else
+                result = random.Next(def, atk);
+
+            TestDamage = result;
             return result;
         }
     }
