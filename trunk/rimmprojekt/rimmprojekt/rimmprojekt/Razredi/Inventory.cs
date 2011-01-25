@@ -32,7 +32,6 @@ namespace rimmprojekt.Razredi
         private Texture2D inventoryTexture;
         private Texture2D hpPotionTexture;
         private Texture2D mpPotionTexture;
-        private Texture2D emptyTexture;
         
         private TexturedElement hpPoitionDisplay;
         private TexturedElement mpPoitionDisplay;

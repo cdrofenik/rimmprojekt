@@ -68,9 +68,9 @@ namespace rimmprojekt.Razredi
         #endregion
 
         //displaying properties
+        //private IShader shader;
         public Vector3 polozaj;
         private Matrix matrix;
-        private IShader shader;
         private ModelInstance model;
         private ModelInstance sword;
 
