@@ -50,6 +50,7 @@ namespace rimmprojekt.Razredi
         private Boolean checker;
         private Boolean firstTimeAnimationSet;
         private Boolean thisModelIsTezej;
+        private Boolean thisModelIsGoblin;
         public Boolean isAttacking;
         public Boolean isBlocking;
         
@@ -68,13 +69,13 @@ namespace rimmprojekt.Razredi
         #endregion
 
         //displaying properties
-        //private IShader shader;
+        private IShader shader;
         public Vector3 polozaj;
         private Matrix matrix;
         private ModelInstance model;
         private ModelInstance sword;
 
-        public Character(float x, float y, float z, MaterialLightCollection light, UpdateManager manager, ContentRegister content, String character)
+        public Character(float x, float y, float z, UpdateManager manager, ContentRegister content, String character)
         {
             model = new ModelInstance();
             sword = new ModelInstance();
@@ -88,10 +89,15 @@ namespace rimmprojekt.Razredi
                 thisModelIsTezej = true;
                 isAI = false;
             }
+            else if (character.Equals("goblin"))
+            {
+                isAI = true;
+                thisModelIsGoblin = true;
+            }
             else
             {
                 isAI = true;
-            }   
+            }
 
             manager.Add(this);
             content.Add(this);
@@ -116,7 +122,16 @@ namespace rimmprojekt.Razredi
             polozaj = new Vector3(x, y, z);
             matrix = Matrix.CreateTranslation(polozaj);
 
-            model.LightCollection = light;
+            MaterialShader material = new MaterialShader();
+            material.SpecularColour = Color.LightYellow.ToVector3();//with a nice sheen
+
+            Vector3 lightDirection = new Vector3(0.5f, 1, -0.5f); //a less dramatic direction
+
+            MaterialLightCollection lights = new MaterialLightCollection();
+            lights.AmbientLightColour = Color.White.ToVector3() * 0.5f;
+            //lights.CreateDirectionalLight(lightDirection, Color.Red);
+            material.LightCollection = lights;
+            shader = material;
             //MaterialShader material = new MaterialShader();
             //material.SpecularColour = Color.LightYellow.ToVector3();//with a nice sheen
             //Vector3 lightDirection = new Vector3(0.5f, 1, -0.5f); //a less dramatic direction
@@ -147,6 +162,8 @@ namespace rimmprojekt.Razredi
         {
             if(thisModelIsTezej)
                 model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/player");
+            else if(thisModelIsGoblin)
+                model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/goblin");
             else
                 model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/minotaur");
         }
@@ -321,7 +338,7 @@ namespace rimmprojekt.Razredi
         {
             if (isHitting)
             {
-                actionTime = PlayingTime + 0.6f;
+                actionTime = PlayingTime + 0.45f;
                 animation.StopAnimation();
                 animation = animationController.PlayAnimation(4);
                 isHitting = false;

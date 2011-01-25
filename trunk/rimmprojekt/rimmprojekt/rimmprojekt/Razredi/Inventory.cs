@@ -12,6 +12,7 @@ using Xen.Ex.Graphics2D;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Audio;
 
 namespace rimmprojekt.Razredi
 {
@@ -19,6 +20,8 @@ namespace rimmprojekt.Razredi
     {
         #region parameters
         //parameters
+
+        SoundEffect selectSoundEffect;
 
         public Boolean isItemUsed;
         private Int32 inventoryPointer;
@@ -37,7 +40,8 @@ namespace rimmprojekt.Razredi
         private TexturedElement mpPoitionDisplay;
         private TexturedElement element;
 
-        private TextElementRect textBox;
+        private TextElementRect hpTextBox;
+        private TextElementRect mpTextBox;
         private TextElement hpValue;
         private TextElement mpValue;
 
@@ -77,11 +81,37 @@ namespace rimmprojekt.Razredi
                     {
                         element.Position = new Vector2(state.Application.WindowWidth - 1000, state.Application.WindowHeight - 700);
                         element.Draw(state);
-                        hpPoitionDisplay.Draw(state);
-                        mpPoitionDisplay.Draw(state);
-                        textBox.Draw(state);
-                        inventoryTable[inventoryPointer].Texture = pointer;
-                        inventoryTable[inventoryPointer].Draw(state);
+
+                        #region razlicne situacije stevila hp in mp potionov
+                        if (hpPotionList.Count != 0)
+                        {
+                            hpPoitionDisplay.Draw(state);
+                            hpTextBox.Draw(state);
+                        }
+
+                        if(mpPotionList.Count != 0)
+                        {
+                            mpPoitionDisplay.Draw(state);
+                            mpTextBox.Draw(state);
+                        }
+
+                        if (mpPotionList.Count != 0 && hpPotionList.Count != 0)
+                        {
+                            inventoryTable[inventoryPointer].Texture = pointer;
+                            inventoryTable[inventoryPointer].Draw(state);
+                        }
+                        else if (mpPotionList.Count != 0)
+                        {
+                            inventoryTable[0].Texture = pointer;
+                            inventoryTable[0].Draw(state);
+                        }
+                        else if (hpPotionList.Count != 0)
+                        {
+                            inventoryTable[1].Texture = pointer;
+                            inventoryTable[1].Draw(state);
+                        }
+                        #endregion
+
                     }
                 }
             }
@@ -104,6 +134,7 @@ namespace rimmprojekt.Razredi
                 mpValue.Text.SetText(mpPotionList.Count);
                 if (state.KeyboardState.KeyState.W.OnPressed)
                 {
+                    selectSoundEffect.Play();
                     if (inventoryPointer == 1)
                         inventoryPointer = 0;
                     else
@@ -112,6 +143,7 @@ namespace rimmprojekt.Razredi
 
                 if (state.KeyboardState.KeyState.S.OnPressed)
                 {
+                    selectSoundEffect.Play();
                     if (inventoryPointer == 0)
                         inventoryPointer = 1;
                     else
@@ -135,6 +167,7 @@ namespace rimmprojekt.Razredi
         public void LoadContent(ContentState state)
         {
             pointer = state.Load<Texture2D>(@"Battle/pointer");
+            selectSoundEffect = state.Load<SoundEffect>(@"Battle/battle_select_sound");
             inventoryTexture = state.Load<Texture2D>(@"Battle/rightBar");
             hpPotionTexture = state.Load<Texture2D>(@"Inventory/potionHp");
             mpPotionTexture = state.Load<Texture2D>(@"Inventory/potionMp");
@@ -175,32 +208,43 @@ namespace rimmprojekt.Razredi
             mpPoitionDisplay.Texture = mpPotionTexture;
             mpPoitionDisplay.Position = new Vector2(350, 100);
 
-            textBox = new TextElementRect(new Vector2(400, 50));
-            textBox.Font = bigFont;
-            textBox.AlphaBlendState = Xen.Graphics.AlphaBlendState.Alpha;
-            textBox.VerticalAlignment = VerticalAlignment.Bottom;
-            textBox.HorizontalAlignment = HorizontalAlignment.Left;
-            textBox.TextHorizontalAlignment = TextHorizontalAlignment.Left;
-            textBox.Colour = Color.White;
-            textBox.Position = new Vector2(395, 140);
-            textBox.Text.AppendLine("Health potions x");
-            textBox.Text.AppendLine();
-            textBox.Text.AppendLine("Mana potions x");
+            #region Health Potions x, Mana Potions x
+            hpTextBox = new TextElementRect(new Vector2(400, 20));
+            hpTextBox.Font = bigFont;
+            hpTextBox.AlphaBlendState = Xen.Graphics.AlphaBlendState.Alpha;
+            hpTextBox.VerticalAlignment = VerticalAlignment.Bottom;
+            hpTextBox.HorizontalAlignment = HorizontalAlignment.Left;
+            hpTextBox.TextHorizontalAlignment = TextHorizontalAlignment.Left;
+            hpTextBox.Colour = Color.White;
+            hpTextBox.Position = new Vector2(395, 170);
+            hpTextBox.Text.AppendLine("Health potions x");
+
+            mpTextBox = new TextElementRect(new Vector2(400, 20));
+            mpTextBox.Font = bigFont;
+            mpTextBox.AlphaBlendState = Xen.Graphics.AlphaBlendState.Alpha;
+            mpTextBox.VerticalAlignment = VerticalAlignment.Bottom;
+            mpTextBox.HorizontalAlignment = HorizontalAlignment.Left;
+            mpTextBox.TextHorizontalAlignment = TextHorizontalAlignment.Left;
+            mpTextBox.Colour = Color.White;
+            mpTextBox.Position = new Vector2(395, 115);
+            mpTextBox.Text.AppendLine("Mana potions x");
 
             hpValue = new TextElement("hpValue");
             hpValue.Font = bigFont;
             hpValue.Colour = Color.Yellow;
-            hpValue.Position = new Vector2(180, 0);
+            hpValue.Position = new Vector2(180, -2);
             hpValue.Text.SetText("VALUE");
+
 
             mpValue = new TextElement("mpValue");
             mpValue.Font = bigFont;
             mpValue.Colour = Color.Yellow;
-            mpValue.Position = new Vector2(180, -57);
+            mpValue.Position = new Vector2(180, -2);
             mpValue.Text.SetText("VALUE");
 
-            textBox.Add(hpValue);
-            textBox.Add(mpValue);
+            hpTextBox.Add(hpValue);
+            mpTextBox.Add(mpValue);
+            #endregion
 
             Vector2 pointerSize = new Vector2(20, 20);
             inventoryTable[0] = new TexturedElement(pointerSize);

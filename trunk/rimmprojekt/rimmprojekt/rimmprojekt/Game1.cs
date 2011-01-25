@@ -42,12 +42,12 @@ namespace rimmprojekt
 
             //Set the screen clear colour to blue
             //(Draw targets have a built in ClearBuffer object)
-            drawToScreen.ClearBuffer.ClearColour = Color.Black;
+            drawToScreen.ClearBuffer.ClearColour = new Color(20, 20, 40);
             Window.Title = "RIMM";
             Window.AllowUserResizing = true;
 
             drawToTexture = new DrawTargetTexture2D(new Camera3D(), drawToScreen.Width, drawToScreen.Height, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
-            drawToTexture.ClearBuffer.ClearColour = Color.Black;
+            drawToTexture.ClearBuffer.ClearColour = new Color(20, 20, 40);
 
             States.GameStateManager manager = new States.GameStateManager(this);
             this.drawToTexture.Add(manager);
