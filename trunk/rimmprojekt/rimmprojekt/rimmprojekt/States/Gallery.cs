@@ -41,6 +41,8 @@ namespace rimmprojekt.States
         private List<String> fileNameList;
         private List<Texture2D> textureScreenShotov;
         private List<TexturedElement> seznamElementov;
+
+        private bool IsActive;
         #endregion
 
         public Gallery(Application application)
@@ -59,6 +61,12 @@ namespace rimmprojekt.States
             fileNameList = new List<String>();
 
             stateManager.Application.Content.Add(this);
+        }
+
+        bool IGameState.isActive
+        {
+            get { return IsActive; }
+            set { IsActive = value; }
         }
 
         public void DrawScreen(DrawState state)
@@ -89,6 +97,7 @@ namespace rimmprojekt.States
                 FileStream fs = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate);
                 textureScreenShotov.Add(Texture2D.FromStream(graphics, fs));
                 fileNameList.Add(path);
+                fs.Dispose();
             }
             setFrames();
         }
@@ -97,7 +106,8 @@ namespace rimmprojekt.States
         {
             if (state.KeyboardState.KeyState.Escape.OnReleased)
             {
-                stateManager.SetState(new MenuState());
+                stateManager.SetPreviousState();
+                //stateManager.SetState(new MenuState());
                 return;
             }
 
