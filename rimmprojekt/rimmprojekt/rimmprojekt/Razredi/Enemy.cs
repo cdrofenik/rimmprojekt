@@ -53,7 +53,7 @@ namespace rimmprojekt.Razredi
         #endregion
 
         private Boolean skinGoblin;
-        public String skinName;
+        public String goblin_string;
         public Boolean hasHitTezej;
 
         //displaying properties
@@ -73,9 +73,12 @@ namespace rimmprojekt.Razredi
         public Enemy(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies, String skinChosen)
         {
             skinGoblin = true;
-            skinName = "";
-            if (skinChosen.Equals(skinName))
+            goblin_string = "";
+
+            if (skinChosen.Equals(goblin_string))
                 skinGoblin = false;
+
+            setStatsAs(skinChosen);
 
             manager.Add(this);
 
@@ -87,6 +90,7 @@ namespace rimmprojekt.Razredi
             #region animacije
             isInBattle = false;
             isIdle = true;
+            hasHitTezej = false;
 
             animation = animationController.PlayLoopingAnimation(3);
 
@@ -94,17 +98,12 @@ namespace rimmprojekt.Razredi
 
             #region zacetni statsi
 
-            strength = 15;
-            agility = 12;
-            intelligence = 13;
-            vitality = 10;
-
             maxHealthPoints = 20 * vitality;
             healthPoints = maxHealthPoints;
 
             maxManaPoints = 10 * intelligence;
             manaPoints = maxManaPoints;
-            expPoints = 0;
+
             #endregion
 
             #region collision
@@ -158,7 +157,8 @@ namespace rimmprojekt.Razredi
                 {
                     using (state.Shader.Push(shader))
                     {
-                        model.Draw(state);
+                        if(!hasHitTezej)
+                            model.Draw(state);
                     }
                 }
             }
@@ -188,9 +188,14 @@ namespace rimmprojekt.Razredi
 
             polozaj += premik;
             body.MoveTo(polozaj + new Vector3(7.5f, 7.5f, 7.5f), Matrix.Identity);
-            collisionSystem.DetectCollisions(body, collisionFunctor, null, 0.05f);
+            if(!hasHitTezej)
+                collisionSystem.DetectCollisions(body, collisionFunctor, null, 0.05f);
+
             if (collisions.Count > 0)
+            {
                 polozaj -= premik;
+                hasHitTezej = true;
+            }
             //matrix = Matrix.CreateTranslation(polozaj);
             //collisionSystem.DetectAllCollisions(this.bodies, collisionFunctor, null, 0.05f);
             //matrix=Matrix.CreateScale(0.04f,0.04f,0.04f) *
@@ -233,6 +238,24 @@ namespace rimmprojekt.Razredi
                 animation.StopAnimation();
                 animation = animationController.PlayLoopingAnimation(3);
                 isIdle = true;
+            }
+        }
+
+        private void setStatsAs(String enemy)
+        {
+            if (enemy.Equals(goblin_string))
+            {
+                strength = 40;
+                agility = 12;
+                intelligence = 0;
+                vitality = 20;
+            }
+            else
+            {
+                strength = 14;
+                agility = 12;
+                intelligence = 1;
+                vitality = 6;
             }
         }
     }
