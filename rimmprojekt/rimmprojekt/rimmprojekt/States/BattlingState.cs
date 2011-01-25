@@ -134,8 +134,8 @@ namespace rimmprojekt.States
             #region tezej minotaver
             mapa = new Razredi.Mapa("../../../../rimmprojektContent/battleMap.txt", stateManager.Application.Content, stateManager.Application.UpdateManager);
 
-            tezejChar = new Razredi.Character(50.0f, 0.0f, 60.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, "tezej");
-            enemyChar = new Razredi.Character(120.0f, 0.0f, 60.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, enemy.goblin_string);
+            tezejChar = new Razredi.Character(40.0f, 0.0f, 60.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, "tezej");
+            enemyChar = new Razredi.Character(110.0f, 0.0f, 60.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, enemy.goblin_string);
             #endregion
 
             setFunctionalSettings();
@@ -152,7 +152,7 @@ namespace rimmprojekt.States
         {
             //Vector3 target = new Vector3(tezej.polozaj.X, tezej.polozaj.Y - 35.0f, tezej.polozaj.Z - 35.0f);
             Vector3 target = new Vector3();
-            Vector3 position = position = new Vector3(35.0f, 0.0f, 90.0f);
+            Vector3 position = position = new Vector3(30.0f, 0.0f, 90.0f);
 
             if (intro)
             {
