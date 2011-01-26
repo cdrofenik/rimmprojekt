@@ -122,17 +122,8 @@ namespace rimmprojekt.States
             if (drawAnimationForBattle)
                 battleAnimCounter += 10.0f;
 
-
-            if (battleStart)
-            {
-                battleStartTimer = PlayingTime + 1.7f;
-                battleStart = false;
-            }
-
             if (PlayingTime > battleStartTimer)
             {
-                //BattlingState bs = new BattlingState(gameData.Tezej, gameData.Sovrazniki.ElementAt<Razredi.Enemy>(2), gameData.Inventory, this.stateManager.Application);
-                //this.stateManager.SetState(bs);
                 this.stateManager.SetState(new BattlingState(gameData));
             }
             #endregion
@@ -156,9 +147,13 @@ namespace rimmprojekt.States
             {
                 if ((Math.Abs(gameData.Tezej.polozaj.X - e.polozaj.X) + Math.Abs(gameData.Tezej.polozaj.Z - e.polozaj.Z)) < 10f)
                 {
-                    //battleStart = true;
-                    //drawAnimationForBattle = true;
-                    this.stateManager.SetState(new BattlingState(gameData));
+                    if (!battleStart)
+                    {
+                        battleStartTimer = PlayingTime + 1.7f;
+                        drawAnimationForBattle = true;
+                        battleStart = true;
+                    }
+                    //this.stateManager.SetState(new BattlingState(gameData));
                     break;
                 }
             }
@@ -175,9 +170,8 @@ namespace rimmprojekt.States
         {
             this.debugText.Font = state.Load<SpriteFont>("Arial");
             backgroundSong = state.Load<Song>(@"backgroundSong");
-            MediaPlayer.IsRepeating = true;
-
             backgroundPicture.Texture = state.Load<Texture2D>("Textures/tla2");
+            MediaPlayer.IsRepeating = true;
         }
     }
 }
