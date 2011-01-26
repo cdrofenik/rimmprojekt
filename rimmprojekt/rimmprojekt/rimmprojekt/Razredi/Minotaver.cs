@@ -24,7 +24,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace rimmprojekt.Razredi
 {
-    class Minotaver : IDraw, IContentOwner, IUpdate
+    class Minotaver : IDraw, IContentOwner
     {
         public Int32 healthPoints;
         public Int32 damage;
@@ -51,12 +51,11 @@ namespace rimmprojekt.Razredi
         private Boolean isIdle;
         #endregion
 
-        public Minotaver(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies)
+        public Minotaver(float x, float y, float z, ContentRegister content, List<Body> bodies)
         {
             isRunning = false;
             isIdle = true;
             orientiranModel = "down";
-            manager.Add(this);
             model = new ModelInstance();
             animationController = model.GetAnimationController();
 
@@ -135,7 +134,7 @@ namespace rimmprojekt.Razredi
             model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/minotaur");
         }
 
-        public UpdateFrequency Update(UpdateState state)
+        public void Update(UpdateState state)
         {
             collisions.Clear();
 
@@ -177,7 +176,6 @@ namespace rimmprojekt.Razredi
             //    skin.GetPrimitiveLocal(0).Transform.Orientation *
             //    body.Orientation *
             //    Matrix.CreateTranslation(body.Position);
-            return UpdateFrequency.FullUpdate60hz;
         }
 
         public void changeAngele(string prvotnaSmer, string zeljenaSmer)

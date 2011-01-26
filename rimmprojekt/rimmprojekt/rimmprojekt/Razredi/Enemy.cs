@@ -24,7 +24,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace rimmprojekt.Razredi
 {
-    class Enemy : IDraw, IContentOwner, IUpdate
+    class Enemy : IDraw, IContentOwner
     {
         public Boolean isInBattle;
 
@@ -70,7 +70,15 @@ namespace rimmprojekt.Razredi
 
         #endregion
 
-        public Enemy(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies, String skinChosen)
+        #region get/set metode
+        public Body Body
+        {
+            get { return body; }
+            set { body = value; }
+        }
+        #endregion
+
+        public Enemy(float x, float y, float z, ContentRegister content, String skinChosen)
         {
             skinGoblin = true;
             goblin_string = "";
@@ -79,8 +87,6 @@ namespace rimmprojekt.Razredi
                 skinGoblin = false;
 
             setStatsAs(skinChosen);
-
-            manager.Add(this);
 
             model = new ModelInstance();
             animationController = model.GetAnimationController();
@@ -119,31 +125,6 @@ namespace rimmprojekt.Razredi
             //lights.CreateDirectionalLight(lightDirection, Color.Red);
             material.LightCollection = lights;
             shader = material;
-
-            collisionSystem = new CollisionSystemSAP();
-            collisionSystem.UseSweepTests = false;
-
-            collisions = new List<CollisionInfo>();
-            collisionFunctor = new BasicCollisionFunctor(collisions);
-
-            this.bodies = new List<Body>(bodies);
-            foreach (Body b in bodies)
-                collisionSystem.AddCollisionSkin(b.CollisionSkin);
-
-            body = new Body();
-            skin = new CollisionSkin(body);
-            body.CollisionSkin = skin;
-
-            Box box = new Box(Vector3.Zero, Matrix.Identity, new Vector3(5.0f, 5.0f, 5.0f));
-            skin.AddPrimitive(box, new MaterialProperties(0.5f, 0.5f, 0.5f));
-
-            body.MoveTo(polozaj + new Vector3(15.5f, 15.5f, 15.5f), Matrix.Identity);
-            //skin.ApplyLocalTransform(new JigLibX.Math.Transform(polozaj, Matrix.Identity));
-            body.EnableBody();
-
-            bodies.Add(body);
-            collisionSystem.AddCollisionSkin(body.CollisionSkin);
-
             #endregion
 
             content.Add(this);
@@ -178,31 +159,30 @@ namespace rimmprojekt.Razredi
                 model.ModelData = state.Load<Xen.Ex.Graphics.Content.ModelData>(@"Models/minotaur");
         }
 
-        public UpdateFrequency Update(UpdateState state)
+        public void Update(UpdateState state)
         {
-            collisions.Clear();
+            //collisions.Clear();
 
             Vector3 premik = new Vector3(0f, 0f, 0f);
 
             isHeIdle();
 
-            polozaj += premik;
-            body.MoveTo(polozaj + new Vector3(7.5f, 7.5f, 7.5f), Matrix.Identity);
-            if(!hasHitTezej)
-                collisionSystem.DetectCollisions(body, collisionFunctor, null, 0.05f);
+            //polozaj += premik;
+            //body.MoveTo(polozaj + new Vector3(7.5f, 7.5f, 7.5f), Matrix.Identity);
+            //if (!hasHitTezej)
+            //    collisionSystem.DetectCollisions(body, collisionFunctor, null, 0.05f);
 
-            if (collisions.Count > 0)
-            {
-                polozaj -= premik;
-                hasHitTezej = true;
-            }
+            //if (collisions.Count > 0)
+            //{
+            //    polozaj -= premik;
+            //    hasHitTezej = true;
+            //}
             //matrix = Matrix.CreateTranslation(polozaj);
             //collisionSystem.DetectAllCollisions(this.bodies, collisionFunctor, null, 0.05f);
             //matrix=Matrix.CreateScale(0.04f,0.04f,0.04f) *
             //    skin.GetPrimitiveLocal(0).Transform.Orientation *
             //    body.Orientation *
             //    Matrix.CreateTranslation(body.Position);
-            return UpdateFrequency.FullUpdate60hz;
         }
 
         public void changeAngele(string prvotnaSmer, string zeljenaSmer)

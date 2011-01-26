@@ -41,7 +41,7 @@ namespace rimmprojekt.LightsAndMaterials
                     for (int j = 0; j < velikost.Y; j++)
                     {
                         if (sr.Read() - 48 == 0)
-                            zidovi.Add(new Razredi.Kocka((float)j * 20.0f, 0.0f, (float)i * 20.0f, content, manager));
+                            zidovi.Add(new Razredi.Kocka((float)j * 20.0f, 0.0f, (float)i * 20.0f, content));
                     }
                     sr.Read();
                     sr.Read();

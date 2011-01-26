@@ -46,10 +46,10 @@ namespace rimmprojekt.States
         private Boolean canDoAction;
         private Boolean gameOver;
         private Boolean gameFinished;
-        private bool IsActive;
 
-        #region Razredi.
-        private Razredi.Tezej tezej;
+        private Razredi.GameData gameData;
+
+        #region Razredi
         private Razredi.Enemy enemy;
         private Razredi.Character tezejChar;
         private Razredi.Character enemyChar;
@@ -101,17 +101,23 @@ namespace rimmprojekt.States
         #endregion
 
         private Razredi.Mapa mapa;
-        private Razredi.Inventory inventory;
+        //private Razredi.Inventory inventory;
 
-        private DrawTargetScreen drawToScreen;
         private IGameStateManager stateManager;
 
-        public BattlingState(Razredi.Tezej theseus, Razredi.Enemy minot,Razredi.Inventory invnt,Application application)
+
+        public BattlingState(Razredi.GameData gameData)
         {
-            drawToScreen = new DrawTargetScreen(new Camera3D());
-            this.inventory = invnt;
-            this.tezej = theseus;
-            this.enemy = minot;
+            this.gameData = gameData;
+            //this.inventory = gameData.Inventory;
+            foreach (Razredi.Enemy e in this.gameData.Sovrazniki)
+            {
+                if ((Math.Abs(this.gameData.Tezej.polozaj.X - e.polozaj.X) + Math.Abs(this.gameData.Tezej.polozaj.Z - e.polozaj.Z)) < 15f)
+                {
+                    this.enemy = e;
+                    break;
+                }
+            }
         }
 
         public void Initalise(IGameStateManager stateManager)
@@ -131,8 +137,8 @@ namespace rimmprojekt.States
             emptybarArray = new TexturedElement[3];
             #endregion
 
-            #region tezej minotaver
-            mapa = new Razredi.Mapa("../../../../rimmprojektContent/battleMap.txt", stateManager.Application.Content, stateManager.Application.UpdateManager);
+            #region gameData.Tezej minotaver
+            mapa = new Razredi.Mapa("../../../../rimmprojektContent/battleMap.txt", stateManager.Application.Content);
 
             tezejChar = new Razredi.Character(40.0f, 0.0f, 60.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, "tezej");
             enemyChar = new Razredi.Character(110.0f, 0.0f, 60.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, enemy.goblin_string);
@@ -142,17 +148,11 @@ namespace rimmprojekt.States
             stateManager.Application.Content.Add(this);
         }
 
-        bool IGameState.isActive
-        {
-            get { return IsActive; }
-            set { IsActive = value; }
-        }
-
         public void DrawScreen(DrawState state)
         {
-            //Vector3 target = new Vector3(tezej.polozaj.X, tezej.polozaj.Y - 35.0f, tezej.polozaj.Z - 35.0f);
+            //Vector3 target = new Vector3(gameData.Tezej.polozaj.X, gameData.Tezej.polozaj.Y - 35.0f, gameData.Tezej.polozaj.Z - 35.0f);
             Vector3 target = new Vector3();
-            Vector3 position = position = new Vector3(30.0f, 0.0f, 90.0f);
+            Vector3 position = new Vector3(30.0f, 0.0f, 90.0f);
 
             if (intro)
             {
@@ -162,7 +162,7 @@ namespace rimmprojekt.States
             {
                 target = new Vector3(tezejChar.polozaj.X + 30, tezejChar.polozaj.Y + 6, tezejChar.polozaj.Z - 35.0f);
             }
-            
+
             Camera3D camera = new Camera3D();
             camera.LookAt(target, position, Vector3.UnitY);
             state.Camera.SetCamera(camera);
@@ -205,7 +205,7 @@ namespace rimmprojekt.States
                 winTxTelement.Draw(state);
             }
 
-            inventory.Draw(state);
+            gameData.Inventory.Draw(state);
             debug.Draw(state);
         }
 
@@ -267,7 +267,8 @@ namespace rimmprojekt.States
                     gameFinished = true;
                     if (state.KeyboardState.KeyState.Space.OnPressed)
                     {
-                        //change state to playingstate
+                        gameData.Sovrazniki.Remove(enemy);
+                        stateManager.SetState(new PlayingState(gameData));
                     }
                 }
 
@@ -289,7 +290,7 @@ namespace rimmprojekt.States
                         #endregion
 
                         #region notAI
-                        if (canDoAction && !inventory.isInBattle)
+                        if (canDoAction && !gameData.Inventory.isInBattle)
                         {
                             #region choose character
                             if (state.KeyboardState.KeyState.Enter.OnPressed || state.KeyboardState.KeyState.Space.OnPressed)
@@ -316,7 +317,7 @@ namespace rimmprojekt.States
                                     }
                                     else if (actionSelected[actionPointer].Equals("Items"))
                                     {
-                                        inventory.isInBattle = true;
+                                        gameData.Inventory.isInBattle = true;
                                         //actionDone(actionSelected[actionPointer]);
                                     }
 
@@ -358,16 +359,16 @@ namespace rimmprojekt.States
                         {
                             if (state.KeyboardState.KeyState.A.OnPressed || state.KeyboardState.KeyState.Escape.OnPressed)
                             {
-                                inventory.isInBattle = false;
+                                gameData.Inventory.isInBattle = false;
                             }
 
-                            if (inventory.isItemUsed)
+                            if (gameData.Inventory.isItemUsed)
                             {
                                 actionDone(actionSelected[actionPointer]);
                                 isCharSelected = false;
                                 setActionBox(isCharSelected);
-                                inventory.isInBattle = false;
-                                inventory.isItemUsed = false;
+                                gameData.Inventory.isInBattle = false;
+                                gameData.Inventory.isItemUsed = false;
                             }
                         }
                         #endregion
@@ -408,7 +409,7 @@ namespace rimmprojekt.States
             txtEleRectLeftBar.TextHorizontalAlignment = TextHorizontalAlignment.Left;
             txtEleRectLeftBar.Colour = Color.White;
             txtEleRectLeftBar.Position = new Vector2(40, 110);
-            txtEleRectLeftBar.Text.SetText("Tezej");
+            txtEleRectLeftBar.Text.SetText("gameData.Tezej");
 
             HealthTxtElement = new TextElement("HP: ");
             HealthTxtElement.Font = mediumfonT;
@@ -516,12 +517,13 @@ namespace rimmprojekt.States
             actionSelected[1] = "Magic";
             actionSelected[0] = "Items";
 
-            tezej.isInBattle = true;
+            //gameData.Tezej.isInBattle = true;
+            gameData.Tezej.isInBattle = true;
             tezejChar.changeCharacterOrientation("down", "right");
-            tezejChar.Strength = tezej.strength;
-            tezejChar.Agility = tezej.agility;
-            tezejChar.Intelligence = tezej.intelligence;
-            tezejChar.Vitality = tezej.vitality;
+            tezejChar.Strength = gameData.Tezej.strength;
+            tezejChar.Agility = gameData.Tezej.agility;
+            tezejChar.Intelligence = gameData.Tezej.intelligence;
+            tezejChar.Vitality = gameData.Tezej.vitality;
             tezejChar.setStats();
 
             enemyChar.changeCharacterOrientation("down", "left");
@@ -531,7 +533,7 @@ namespace rimmprojekt.States
             enemyChar.Vitality = enemy.vitality;
             enemyChar.setStats();
 
-            inventory.setCharacter(tezejChar);
+            gameData.Inventory.setCharacter(tezejChar);
             
         }
 

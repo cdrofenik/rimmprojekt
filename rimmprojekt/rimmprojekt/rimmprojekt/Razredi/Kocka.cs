@@ -29,12 +29,12 @@ namespace rimmprojekt.Razredi
         public Body body;
         private CollisionSkin skin;
 
-        public Kocka(float x, float y, float z, ContentRegister content, UpdateManager manager)
+        public Kocka(float x, float y, float z, ContentRegister content)
         {
             polozaj = new Vector3(x, y, z);
             matrix = Matrix.CreateTranslation(polozaj);
 
-            manager.Add(this);
+            //manager.Add(this);
 
             Vector2 topLeft = new Vector2(0.0f, 0.0f);
             Vector2 topRight = new Vector2(1.0f, 0.0f);

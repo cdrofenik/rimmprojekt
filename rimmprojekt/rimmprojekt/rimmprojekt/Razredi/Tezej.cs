@@ -25,7 +25,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace rimmprojekt.Razredi
 {
-    class Tezej : IDraw, IContentOwner, IUpdate
+    class Tezej : IDraw, IContentOwner
     {
         #region animacije za sablo
         //private Quaternion itemRotateAnim;
@@ -102,12 +102,19 @@ namespace rimmprojekt.Razredi
 
         #endregion
 
+        #region get/set metode
+        public CollisionSystem CollisionSystem
+        {
+            get { return collisionSystem; }
+            set { collisionSystem = value; }
+        }
+        #endregion
+
         public Tezej(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies)
         {
             model = new ModelInstance();
             sword = new ModelInstance();
 
-            manager.Add(this);
             content.Add(this);
 
             #region animacije
@@ -283,7 +290,7 @@ namespace rimmprojekt.Razredi
             trueFont = state.Load<SpriteFont>("Arial");
         }
 
-        public UpdateFrequency Update(UpdateState state)
+        public void Update(UpdateState state)
         {
             collisions.Clear();
             
@@ -392,7 +399,6 @@ namespace rimmprojekt.Razredi
 
             debug.Text.SetText(polozaj.X + " , " + polozaj.Y + " , " + polozaj.Z + "\n"+body.Orientation.ToString());
             //helperMatrix = Matrix.CreateTranslation(polozaj);
-            return UpdateFrequency.FullUpdate60hz;
         }
 
         private void setCharacterStatusValuseOnLevelUp()
