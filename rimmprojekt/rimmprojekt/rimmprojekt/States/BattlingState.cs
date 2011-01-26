@@ -167,7 +167,6 @@ namespace rimmprojekt.States
             camera.LookAt(target, position, Vector3.UnitY);
             state.Camera.SetCamera(camera);
 
-            //backgroundElement.Draw(state);
             mapa.Draw(state);
             enemyChar.Draw(state);
             tezejChar.Draw(state);
@@ -220,7 +219,6 @@ namespace rimmprojekt.States
             mediumfonT = state.Load<SpriteFont>("ArialMedium");
             leftBar = state.Load<Texture2D>(@"Battle/leftBar");
             rightBar = state.Load<Texture2D>(@"Battle/rightBar");
-            backgroundPicture = state.Load<Texture2D>(@"Battle/backBattle");
             hpBar = state.Load<Texture2D>(@"Tezej/hpbar");
             mpBar = state.Load<Texture2D>(@"Tezej/manabar");
             timeBar = state.Load<Texture2D>(@"Tezej/timebar");
@@ -496,11 +494,6 @@ namespace rimmprojekt.States
             actionTable[2].Position = new Vector2( 130, 114);
             actionTable[3] = new TexturedElement(pointerSize);
             actionTable[3].Position = new Vector2( 130, 154);
-
-
-            backgroundElement = new TexturedElement(new Vector2(1280, 720));
-            //backgroundElement.Position = new Vector2(0,400);
-            backgroundElement.Texture = backgroundPicture;
 
             debug = new TextElement();
             debug.Font = smallFont;
