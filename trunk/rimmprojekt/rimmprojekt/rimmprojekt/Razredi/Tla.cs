@@ -20,7 +20,7 @@ using JigLibX.Collision;
 
 namespace rimmprojekt.Razredi
 {
-    class Tla : IDraw, IContentOwner, IUpdate
+    class Tla : IDraw, IContentOwner
     {
         private Point velikost;
         private IVertices tla;
@@ -90,12 +90,6 @@ namespace rimmprojekt.Razredi
         void IContentOwner.LoadContent(ContentState state)
         {
             material.Textures.TextureMap = state.Load<Texture2D>(@"Textures/tla2");
-        }
-
-        public UpdateFrequency Update(UpdateState state)
-        {
-            //polozaj = body.Position;
-            return UpdateFrequency.FullUpdate60hz;
         }
     }
 }

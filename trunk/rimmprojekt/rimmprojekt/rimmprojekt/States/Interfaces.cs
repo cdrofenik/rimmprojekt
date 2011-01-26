@@ -25,14 +25,12 @@ namespace rimmprojekt.States
 
         //change to a different state
         void SetState(IGameState state);
-        void SetPreviousState();
     }
 
     interface IGameState
     {
         void Initalise(IGameStateManager stateManager);
 
-        bool isActive { get; set; }
         //simplified IDraw/IUpdate
         //NOTE:
         //For simplicity this only provides drawing directly to the screen.

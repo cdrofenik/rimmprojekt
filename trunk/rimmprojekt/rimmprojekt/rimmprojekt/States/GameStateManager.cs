@@ -25,7 +25,6 @@ namespace rimmprojekt.States
 
         //the current state object
         public IGameState currentGameState;
-        public IGameState previousGameState;
 
         public GameStateManager(Application application)
         {
@@ -50,24 +49,14 @@ namespace rimmprojekt.States
         public void SetState(IGameState state)
         {
             //dispose the old state first (otherwise it's resources might stick around!)
-            //if (this.currentGameState is IDisposable)
-            //    (this.currentGameState as IDisposable).Dispose();
-            this.previousGameState = this.currentGameState;
+            this.application.Content.Remove(currentGameState as IContentOwner);
+            if (this.currentGameState is IDisposable)
+                (this.currentGameState as IDisposable).Dispose();
+
             this.currentGameState = state;
-            this.currentGameState.isActive = true;
-            if (this.previousGameState != null)
-                this.previousGameState.isActive = false;
 
             //call Initalise() on the new state
             state.Initalise(this);
-        }
-
-        public void SetPreviousState()
-        {
-            this.currentGameState = this.previousGameState;
-            this.currentGameState.isActive = true;
-            if (this.previousGameState is IDisposable)
-                (this.previousGameState as IDisposable).Dispose();
         }
 
         public void Draw(DrawState state)

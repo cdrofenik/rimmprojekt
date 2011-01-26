@@ -25,7 +25,7 @@ namespace rimmprojekt.Razredi
         public ArrayList zidovi;
         private Tla tla;
 
-        public Mapa(string pot, ContentRegister content, UpdateManager manager)
+        public Mapa(string pot, ContentRegister content)
         {
             using (StreamReader sr = new StreamReader(pot))
             {
@@ -33,7 +33,6 @@ namespace rimmprojekt.Razredi
                 velikost.X = Int32.Parse(sr.ReadLine());
                 velikost.Y = Int32.Parse(sr.ReadLine());
                 tla = new Tla(velikost, content);
-                manager.Add(tla);
 
                 zidovi = new ArrayList();
                 for (int i = 0; i < velikost.X; i++)
@@ -41,7 +40,7 @@ namespace rimmprojekt.Razredi
                     for (int j = 0; j < velikost.Y; j++)
                     {
                         if (sr.Read() - 48 == 0)
-                            zidovi.Add(new Kocka((float)j * 20.0f, 0.0f, (float)i * 20.0f, content, manager));
+                            zidovi.Add(new Kocka((float)j * 20.0f, 0.0f, (float)i * 20.0f, content));
                     }
                     sr.Read();
                     sr.Read();
