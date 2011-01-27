@@ -59,6 +59,7 @@ namespace rimmprojekt.States
 
             #region background and loading
             loadingElement = new TexturedElement(new Vector2(718, 69));
+            loadingElement.AlphaBlendState = AlphaBlendState.Additive;
             loadingElement.VerticalAlignment = VerticalAlignment.Bottom;
             loadingElement.HorizontalAlignment = HorizontalAlignment.Centre;
             background = new TexturedElement(new Vector2(1280, 720));
