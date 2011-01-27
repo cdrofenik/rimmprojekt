@@ -52,8 +52,15 @@ namespace rimmprojekt.Razredi
         private BasicCollisionFunctor collisionFunctor;
         #endregion
 
+        #region AI
+        private String orientiranModel = "down";
+        private Boolean moveUpDown;
+        private Boolean moveLeftRight;
+        private Int32 movementCounter;
+        #endregion
+
         private Boolean skinGoblin;
-        public String goblin_string;
+        public String skin_value;
         public Boolean hasHitTezej;
 
         //displaying properties
@@ -81,9 +88,9 @@ namespace rimmprojekt.Razredi
         public Enemy(float x, float y, float z, ContentRegister content, String skinChosen)
         {
             skinGoblin = true;
-            goblin_string = "";
+            skin_value = "";
 
-            if (skinChosen.Equals(goblin_string))
+            if (skinChosen.Equals(skin_value))
                 skinGoblin = false;
 
             setStatsAs(skinChosen);
@@ -223,7 +230,7 @@ namespace rimmprojekt.Razredi
 
         private void setStatsAs(String enemy)
         {
-            if (enemy.Equals(goblin_string))
+            if (enemy.Equals(skin_value))
             {
                 strength = 40;
                 agility = 12;
@@ -232,7 +239,7 @@ namespace rimmprojekt.Razredi
             }
             else
             {
-                strength = 14;
+                strength = 13;
                 agility = 12;
                 intelligence = 1;
                 vitality = 6;

@@ -22,6 +22,8 @@ namespace rimmprojekt.States
     {
         private List<TextElementRect> menuText = new List<TextElementRect>();
         private IGameStateManager stateManager;
+        private Texture2D alistarLol;
+        private TexturedElement background;
 
         public void Initalise(IGameStateManager stateManager)
         {
@@ -46,12 +48,14 @@ namespace rimmprojekt.States
             this.menuText[2].HorizontalAlignment = HorizontalAlignment.Left;
             this.menuText[2].TextHorizontalAlignment = TextHorizontalAlignment.Left;
 
+            background = new TexturedElement(new Vector2(1280, 720));
             //set the text font (using global content)
             stateManager.Application.Content.Add(this);
         }
 
         public void DrawScreen(DrawState state)
         {
+            background.Draw(state);
             //display the 'menu' :-)
             menuText[0].Draw(state);
             menuText[1].Draw(state);
@@ -100,6 +104,8 @@ namespace rimmprojekt.States
             this.menuText[0].Font = state.Load<SpriteFont>("MenuFont");
             this.menuText[1].Font = state.Load<SpriteFont>("MenuFont");
             this.menuText[2].Font = state.Load<SpriteFont>("MenuFont");
+            alistarLol = state.Load<Texture2D>("Textures/Lol_Alistar");
+            background.Texture = alistarLol;
         }
     }
 }

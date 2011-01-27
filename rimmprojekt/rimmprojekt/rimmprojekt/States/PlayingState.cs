@@ -91,8 +91,10 @@ namespace rimmprojekt.States
         public void DrawScreen(DrawState state)
         {
             //Vector3 target = new Vector3(gameData.Tezej.polozaj.X, gameData.Tezej.polozaj.Y - 35.0f, gameData.Tezej.polozaj.Z - 10.0f);
+
             Vector3 target = new Vector3(gameData.Tezej.polozaj.X, gameData.Tezej.polozaj.Y - 35.0f, gameData.Tezej.polozaj.Z - 13.0f);
             Vector3 position = new Vector3(gameData.Tezej.polozaj.X, gameData.Tezej.polozaj.Y + 28.0f, gameData.Tezej.polozaj.Z + 30.0f);
+
             Vector3 position2 = new Vector3(gameData.Tezej.polozaj.X, 35.0f, 35.0f);
             Camera3D camera = new Camera3D();
             camera.LookAt(target, position, Vector3.UnitY);
@@ -124,13 +126,14 @@ namespace rimmprojekt.States
 
             if (PlayingTime > battleStartTimer)
             {
+                MediaPlayer.Stop();
                 this.stateManager.SetState(new BattlingState(gameData));
             }
             #endregion
 
             if (!backgroundSongStart)
             {
-                //MediaPlayer.Play(backgroundSong);
+                MediaPlayer.Play(backgroundSong);
                 MediaPlayer.Volume = 0.6f;
                 backgroundSongStart = true;
             }
@@ -152,6 +155,7 @@ namespace rimmprojekt.States
                         battleStartTimer = PlayingTime + 1.7f;
                         drawAnimationForBattle = true;
                         battleStart = true;
+                        
                     }
                     //this.stateManager.SetState(new BattlingState(gameData));
                     break;
