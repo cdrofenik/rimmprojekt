@@ -22,8 +22,17 @@ namespace rimmprojekt.States
     {
         private List<TextElementRect> menuText = new List<TextElementRect>();
         private IGameStateManager stateManager;
+
+        #region loading and background pic.
+        private Boolean isLoadingElement;
+        private float PlayTime;
+        private float ActionTime;
+        private Texture2D loadingTex;
+        private TexturedElement loadingElement;
         private Texture2D alistarLol;
+        private SolidColourElement solidColElement;
         private TexturedElement background;
+        #endregion
 
         public void Initalise(IGameStateManager stateManager)
         {
@@ -48,7 +57,17 @@ namespace rimmprojekt.States
             this.menuText[2].HorizontalAlignment = HorizontalAlignment.Left;
             this.menuText[2].TextHorizontalAlignment = TextHorizontalAlignment.Left;
 
+            #region background and loading
+            loadingElement = new TexturedElement(new Vector2(718, 69));
+            loadingElement.VerticalAlignment = VerticalAlignment.Bottom;
+            loadingElement.HorizontalAlignment = HorizontalAlignment.Centre;
             background = new TexturedElement(new Vector2(1280, 720));
+            solidColElement = new SolidColourElement(Color.Yellow, new Vector2(2, 2));
+            isLoadingElement = false;
+            PlayTime = 0.0f;
+            ActionTime = 0.0f;
+            #endregion
+
             //set the text font (using global content)
             stateManager.Application.Content.Add(this);
         }
@@ -57,26 +76,41 @@ namespace rimmprojekt.States
         {
             background.Draw(state);
             //display the 'menu' :-)
-            menuText[0].Draw(state);
-            menuText[1].Draw(state);
-            menuText[2].Draw(state);
+            if (isLoadingElement)
+            {
+                loadingElement.Draw(state);
+                solidColElement.Draw(state);
+            }
+            else
+            {
+                menuText[0].Draw(state);
+                menuText[1].Draw(state);
+                menuText[2].Draw(state);
+            }
         }
 
         public void Update(UpdateState state)
         {
-            //when a button is pressed, load the game..
-            //Note the player index selected in the startup screen is used here...
+            PlayTime += state.DeltaTimeSeconds;
+
+            #region loading
+            if (isLoadingElement)
+            {
+                ActionTime++;
+                drawLoadingBar();
+                if (Math.Round(ActionTime) == 339)
+                {
+                    PlayingState gameState = new PlayingState(this.stateManager.Application);
+                    this.stateManager.SetState(gameState);
+                }
+            }
+            #endregion
+
             Xen.Input.State.InputState input = state.PlayerInput[this.stateManager.PlayerIndex].InputState;
 
             if (state.KeyboardState.KeyState.Enter.OnReleased)
             {
-                //we want to start playing the game!
-
-                //create a new game to play.
-                PlayingState gameState = new PlayingState(this.stateManager.Application);
-
-                //go to the loading state.
-                this.stateManager.SetState(gameState);
+                isLoadingElement = true;
                 return;
             }
 
@@ -105,7 +139,16 @@ namespace rimmprojekt.States
             this.menuText[1].Font = state.Load<SpriteFont>("MenuFont");
             this.menuText[2].Font = state.Load<SpriteFont>("MenuFont");
             alistarLol = state.Load<Texture2D>("Textures/Lol_Alistar");
+            loadingTex = state.Load<Texture2D>("Textures/Loading");
             background.Texture = alistarLol;
+            loadingElement.Texture = loadingTex;
+        }
+
+        private void drawLoadingBar()
+        {
+            int timeSize = Int32.Parse(Math.Round((ActionTime/10 * 100) / 5).ToString());
+            solidColElement= new SolidColourElement(Color.Yellow,new Vector2(timeSize, 10));
+            solidColElement.Position = new Vector2(296, 42);
         }
     }
 }
