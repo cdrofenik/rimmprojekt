@@ -39,7 +39,11 @@ namespace rimmprojekt.States
 
         private int TestDamage;
 
-        private const String presledki = "                         ";
+        private TextElementRect awardText;
+        private Int32 expGained;
+        private Int32 hpPotionsGained;
+        private Int32 mpPotionsGained;
+        private const String presledki = "                                  ";
         private float PlayingTime;
         private float ActionTime;
         private float tempActionTime;
@@ -141,7 +145,7 @@ namespace rimmprojekt.States
             mapa = new Razredi.Mapa("../../../../rimmprojektContent/battleMap.txt", stateManager.Application.Content);
 
             tezejChar = new Razredi.Character(40.0f, 0.0f, 60.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, "tezej");
-            enemyChar = new Razredi.Character(110.0f, 0.0f, 60.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, enemy.goblin_string);
+            enemyChar = new Razredi.Character(110.0f, 0.0f, 60.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, enemy.skin_value);
             #endregion
 
             setFunctionalSettings();
@@ -152,7 +156,7 @@ namespace rimmprojekt.States
         {
             //Vector3 target = new Vector3(gameData.Tezej.polozaj.X, gameData.Tezej.polozaj.Y - 35.0f, gameData.Tezej.polozaj.Z - 35.0f);
             Vector3 target = new Vector3();
-            Vector3 position = new Vector3(30.0f, 0.0f, 90.0f);
+            Vector3 position = new Vector3(30.0f, 9.0f, 90.0f);
 
             if (intro)
             {
@@ -160,7 +164,7 @@ namespace rimmprojekt.States
             }
             else
             {
-                target = new Vector3(tezejChar.polozaj.X + 30, tezejChar.polozaj.Y + 6, tezejChar.polozaj.Z - 35.0f);
+                target = new Vector3(tezejChar.polozaj.X + 30, tezejChar.polozaj.Y + 2, tezejChar.polozaj.Z - 35.0f);
             }
 
             Camera3D camera = new Camera3D();
@@ -203,6 +207,7 @@ namespace rimmprojekt.States
             {
                 GameFinishedElement.Draw(state);
                 winTxTelement.Draw(state);
+                awardText.Draw(state);
             }
 
             gameData.Inventory.Draw(state);
@@ -242,7 +247,7 @@ namespace rimmprojekt.States
             if (intro)
             {
                 StartBattleTimer += state.DeltaTimeSeconds;
-                cameraTargetcounter -= 0.4f;
+                cameraTargetcounter -= 0.41f;
             }
 
             if (Math.Round(StartBattleTimer) == 6.0f)
@@ -258,15 +263,18 @@ namespace rimmprojekt.States
                     gameOver = true;
                     if (state.KeyboardState.KeyState.Space.OnPressed)
                     {
+                        MediaPlayer.Stop();
                         stateManager.SetState(new MenuState());
                     }
                 }
 
                 if (enemyChar.isDead)
                 {
+                    awardGenerator();
                     gameFinished = true;
                     if (state.KeyboardState.KeyState.Space.OnPressed)
                     {
+                        MediaPlayer.Stop();
                         gameData.Sovrazniki.Remove(enemy);
                         stateManager.SetState(new PlayingState(gameData));
                     }
@@ -377,8 +385,8 @@ namespace rimmprojekt.States
 
                 #region text output (hp and mana)
                 changeStatusBars();
-                HealthTxtElement.Text.SetText("HP:   " + tezejChar.Health + " / " + tezejChar.maxHealth);
-                ManaTxtElement.Text.SetText("MP:   " + tezejChar.Mana + " / " + tezejChar.maxMana);
+                HealthTxtElement.Text.SetText("    HP:   " + tezejChar.Health + " / " + tezejChar.maxHealth);
+                ManaTxtElement.Text.SetText("    MP:   " + tezejChar.Mana + " / " + tezejChar.maxMana);
                 debug.Text.SetText(Int32.Parse(Math.Round(PlayingTime).ToString()) + "     HP: " + enemyChar.Health.ToString() + "\n" + TestDamage.ToString()
                     + "\n");
                 #endregion
@@ -398,7 +406,7 @@ namespace rimmprojekt.States
             #endregion
 
             actionBarElement = new TexturedElement(leftBar, new Vector2(190, 190));
-            actionBarElement.Position = new Vector2(110, 14);
+            actionBarElement.Position = new Vector2(120, 14);
 
             #region Text on bars
             txtEleRectLeftBar = new TextElementRect(new Vector2(700, 50));
@@ -408,12 +416,12 @@ namespace rimmprojekt.States
             txtEleRectLeftBar.HorizontalAlignment = HorizontalAlignment.Left;
             txtEleRectLeftBar.TextHorizontalAlignment = TextHorizontalAlignment.Left;
             txtEleRectLeftBar.Colour = Color.White;
-            txtEleRectLeftBar.Position = new Vector2(40, 110);
-            txtEleRectLeftBar.Text.SetText("gameData.Tezej");
+            txtEleRectLeftBar.Position = new Vector2(25, 110);
+            txtEleRectLeftBar.Text.SetText("Theseus");
 
             HealthTxtElement = new TextElement("HP: ");
             HealthTxtElement.Font = mediumfonT;
-            HealthTxtElement.Text.SetText("HP: ");
+            HealthTxtElement.Text.SetText("  HP: ");
             HealthTxtElement.Colour = Color.White;
             HealthTxtElement.Position = new Vector2(280, 4);
 
@@ -438,25 +446,25 @@ namespace rimmprojekt.States
             AttackTxtElement.Font = bigFont;
             AttackTxtElement.Text.SetText("Attack");
             AttackTxtElement.Colour = Color.White;
-            AttackTxtElement.Position = new Vector2(120, 20);
+            AttackTxtElement.Position = new Vector2(150, 20);
 
             BlockTxtElement = new TextElement("Block");
             BlockTxtElement.Font = bigFont;
             BlockTxtElement.Text.SetText("Block");
             BlockTxtElement.Colour = Color.White;
-            BlockTxtElement.Position = new Vector2(120, -20);
+            BlockTxtElement.Position = new Vector2(150, -20);
 
             MagicTxtElement = new TextElement("Magic");
             MagicTxtElement.Font = bigFont;
             MagicTxtElement.Text.SetText("Magic");
             MagicTxtElement.Colour = Color.White;
-            MagicTxtElement.Position = new Vector2(120, -60);
+            MagicTxtElement.Position = new Vector2(150, -60);
 
             ItemsTxtElement = new TextElement("Items");
             ItemsTxtElement.Font = bigFont;
             ItemsTxtElement.Text.SetText("Items");
             ItemsTxtElement.Colour = Color.White;
-            ItemsTxtElement.Position = new Vector2(120, -100);
+            ItemsTxtElement.Position = new Vector2(150, -100);
             #endregion
 
 
@@ -464,7 +472,7 @@ namespace rimmprojekt.States
             winTxTelement.Font = bigFont;
             winTxTelement.Colour = Color.Yellow;
             winTxTelement.Text.SetText("You Win!");
-            winTxTelement.Position = new Vector2(560, -180);
+            winTxTelement.Position = new Vector2(600, -180);
 
             looseTxTelement = new TextElement("You Loose");
             looseTxTelement.Font = bigFont;
@@ -488,13 +496,13 @@ namespace rimmprojekt.States
 
             Vector2 pointerSize = new Vector2(20, 20);
             actionTable[0] = new TexturedElement(pointerSize);
-            actionTable[0].Position = new Vector2( 130, 34);
+            actionTable[0].Position = new Vector2( 143, 34);
             actionTable[1] = new TexturedElement(pointerSize);
-            actionTable[1].Position = new Vector2( 130, 74);
+            actionTable[1].Position = new Vector2( 143, 74);
             actionTable[2] = new TexturedElement(pointerSize);
-            actionTable[2].Position = new Vector2( 130, 114);
+            actionTable[2].Position = new Vector2( 143, 114);
             actionTable[3] = new TexturedElement(pointerSize);
-            actionTable[3].Position = new Vector2( 130, 154);
+            actionTable[3].Position = new Vector2( 143, 154);
 
             debug = new TextElement();
             debug.Font = smallFont;
@@ -505,9 +513,19 @@ namespace rimmprojekt.States
             GameOverElement = new TexturedElement(new Vector2(1280, 720));
             GameOverElement.Texture = gameOverTexture;
 
-            GameFinishedElement = new TexturedElement(new Vector2(700, 502));
-            GameFinishedElement.Position = new Vector2(260, 140);
+            GameFinishedElement = new TexturedElement(new Vector2(505, 503));
+            GameFinishedElement.Position = new Vector2(390, 140);
             GameFinishedElement.Texture = winForeground;
+
+            //awardText
+            awardText = new TextElementRect(new Vector2(700, 80));
+            awardText.Font = mediumfonT;
+            awardText.AlphaBlendState = Xen.Graphics.AlphaBlendState.Alpha;
+            awardText.VerticalAlignment = VerticalAlignment.Centre;
+            awardText.HorizontalAlignment = HorizontalAlignment.Left;
+            awardText.TextHorizontalAlignment = TextHorizontalAlignment.Centre;
+            awardText.Colour = Color.White;
+            awardText.Position = new Vector2(270, 20);
         }
 
         private void setFunctionalSettings()
@@ -520,7 +538,7 @@ namespace rimmprojekt.States
             //gameData.Tezej.isInBattle = true;
             gameData.Tezej.isInBattle = true;
             tezejChar.changeCharacterOrientation("down", "right");
-            tezejChar.Strength = gameData.Tezej.strength;
+            tezejChar.Strength = gameData.Tezej.strength+1200;
             tezejChar.Agility = gameData.Tezej.agility;
             tezejChar.Intelligence = gameData.Tezej.intelligence;
             tezejChar.Vitality = gameData.Tezej.vitality;
@@ -613,6 +631,38 @@ namespace rimmprojekt.States
 
             TestDamage = result;
             return result;
+        }
+
+        private void awardGenerator()
+        {
+            if (expGained == 0)
+            {
+                Random rndm = new Random();
+                String addText = "";
+
+                expGained = rndm.Next(250, 450);
+                gameData.Tezej.expPoints += expGained;
+
+                hpPotionsGained = rndm.Next(0, 2);
+                for (int i = 0; i < hpPotionsGained; i++)
+                {
+                    addText += hpPotionsGained.ToString()+"x Health potions gained\n";
+                    gameData.Inventory.addPotion("hp", 20);
+                }
+
+                mpPotionsGained = rndm.Next(0, 2);
+                for (int i = 0; i < mpPotionsGained; i++)
+                {
+                    addText += mpPotionsGained+"x Mana potions gained\n";
+                    gameData.Inventory.addPotion("mp", 20);
+                }
+
+                gameData.Tezej.healthPoints = tezejChar.Health;
+                gameData.Tezej.manaPoints = tezejChar.Mana;
+
+                awardText.Text.AppendLine("Experience gained : " + expGained.ToString());
+                awardText.Text.AppendLine("\n"+addText);
+            }
         }
     }
 }

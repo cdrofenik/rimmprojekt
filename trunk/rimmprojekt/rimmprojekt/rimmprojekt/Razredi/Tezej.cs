@@ -46,7 +46,7 @@ namespace rimmprojekt.Razredi
         private Int32 pointsCounter = 0;        //stevec razporejenih tock
         public Int32 maxHealthPoints;     //zacetni maksimalni hp
         public Int32 maxManaPoints;       //zacetni maksimalni mp
-        private Int32 maxExp = 404;             //meja za napredovanje levela
+        private Int32 maxExp = 400;             //meja za napredovanje levela
 
 
         public Int32 healthPoints;
@@ -375,12 +375,6 @@ namespace rimmprojekt.Razredi
 
                 checkKeysPressed(state);
 
-                if (state.KeyboardState.KeyState.D1.IsDown)
-                    healthPoints -= 20;
-                if (state.KeyboardState.KeyState.D2.IsDown)
-                    manaPoints -= 20;
-                if (state.KeyboardState.KeyState.E.IsDown)
-                    expPoints += 20;
                 if ((expPoints == maxExp) || (expPoints > maxExp))
                     hasLeveledUp = true;
 

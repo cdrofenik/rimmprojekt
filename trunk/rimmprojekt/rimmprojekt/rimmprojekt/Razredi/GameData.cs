@@ -73,9 +73,9 @@ namespace rimmprojekt.Razredi
                 bodies.Add(k.body);
 
             sovrazniki = generateEnemys(stateManager.Application.UpdateManager, stateManager.Application.Content, 7);
-            minotaver = new Razredi.Enemy(20.0f, 0.0f, 20.0f, stateManager.Application.Content, "");
+            minotaver = new Razredi.Enemy(71.0f, 0.0f, 80.0f, stateManager.Application.Content, "");
 
-            tezej = new Razredi.Tezej(0.0f, 0.0f, 20.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
+            tezej = new Razredi.Tezej(69.0f, 0.0f, 80.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
             inventory = new Razredi.Inventory(stateManager.Application.UpdateManager, stateManager.Application.Content, tezej);
         }
 
@@ -128,7 +128,7 @@ namespace rimmprojekt.Razredi
             {
                 Vector3 pozition = getEnemyPosition(i);
                 Razredi.Enemy goblin = new Razredi.Enemy(pozition.X, pozition.Y, pozition.Z, contntrg, skin_);
-                goblin.goblin_string = "goblin";
+                goblin.skin_value = "goblin";
                 result.Add(goblin);
             }
 
