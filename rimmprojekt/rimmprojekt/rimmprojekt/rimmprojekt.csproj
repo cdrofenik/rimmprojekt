@@ -120,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Razredi\Character.cs" />
+    <Compile Include="Razredi\EndGame.cs" />
     <Compile Include="Razredi\Enemy.cs" />
     <Compile Include="Razredi\GameData.cs" />
     <Compile Include="Razredi\Minotaver.cs" />
