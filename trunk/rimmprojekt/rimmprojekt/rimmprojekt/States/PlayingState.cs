@@ -36,7 +36,7 @@ namespace rimmprojekt.States
         #endregion
 
         private float PlayingTime;
-
+        private Boolean endGame;
         Song backgroundSong;
         Boolean backgroundSongStart = false;
         private TextElementRect debugText;
@@ -45,6 +45,7 @@ namespace rimmprojekt.States
         private DrawTargetScreen drawToScreen;
         private IGameStateManager stateManager;
 
+        private Razredi.EndGame endGameClass;
         private Razredi.GameData gameData;
 
         public PlayingState(Application application)
@@ -67,13 +68,15 @@ namespace rimmprojekt.States
             else
                 gameData = new Razredi.GameData(stateManager);
 
+            endGame = false;
             battleStart = false;
             drawAnimationForBattle = false;
             battleStartTimer = 9999.0f;
             PlayingTime = 0.0f;
             battleAnimElement = new SolidColourElement[4];
-            backgroundPicture = new TexturedElement(new Vector2(1280, 720));          
+            backgroundPicture = new TexturedElement(new Vector2(1280, 720));
 
+            this.endGameClass = new Razredi.EndGame(stateManager.Application.UpdateManager,stateManager.Application.Content);
             this.debugText = new TextElementRect(new Vector2(400, 100));
             this.debugText.Position = new Vector2(340, 240);
             this.debugText.Colour = Color.Pink;
@@ -114,11 +117,22 @@ namespace rimmprojekt.States
                     battleAnimElement[i].Draw(state);
                 }
             }
+
+            if (endGame)
+            {
+                endGameClass.Draw(state);
+            }
+
         }
 
         public void Update(UpdateState state)
         {
             PlayingTime += state.DeltaTimeSeconds;
+
+            //endgame
+            //if(minotaver.isDead) {
+            //  endGame=true;
+            //}
 
             #region draw battle animation
             if (drawAnimationForBattle)
@@ -164,7 +178,7 @@ namespace rimmprojekt.States
 
             if (state.KeyboardState.KeyState.F.OnPressed)
             {
-                gameData.Inventory.addPotion("hp", 20);
+                endGame = true;
             }
 
             debugText.Text.SetText(gameData.Tezej.polozaj.ToString() + " " + gameData.Tezej.collisions.Count.ToString());
