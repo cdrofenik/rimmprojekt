@@ -436,7 +436,7 @@ namespace rimmprojekt.States
 
             TimeTxtElement = new TextElement("TIME: ");
             TimeTxtElement.Font = mediumfonT;
-            TimeTxtElement.Text.SetText("TIME: ");
+            TimeTxtElement.Text.SetText("   TIME: ");
             TimeTxtElement.Colour = Color.White;
             TimeTxtElement.Position = new Vector2(568, 0);
 
