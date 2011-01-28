@@ -258,6 +258,7 @@ namespace rimmprojekt.States
             {
                 PlayingTime += state.DeltaTimeSeconds;
 
+                #region tezej dies
                 if (tezejChar.isDead)
                 {
                     gameOver = true;
@@ -267,7 +268,9 @@ namespace rimmprojekt.States
                         stateManager.SetState(new MenuState());
                     }
                 }
+                #endregion
 
+                #region enemy dies
                 if (enemyChar.isDead)
                 {
                     awardGenerator();
@@ -279,6 +282,7 @@ namespace rimmprojekt.States
                         stateManager.SetState(new PlayingState(gameData));
                     }
                 }
+                #endregion
 
                 if (!canDoAction)
                     ActionTime += state.DeltaTimeSeconds;
@@ -290,10 +294,13 @@ namespace rimmprojekt.States
                         #region AI
                         if (Math.Round(PlayingTime) == tempActionTime || Math.Round(PlayingTime) > tempActionTime)
                         {
-                            enemyChar.goAttackEnemy(tezejChar.polozaj.X, 0);
-                            tezejChar.damage = getAttackDamage(enemyChar, tezejChar);
-                            tezejChar.doDamageAnimation(1.3f);
-                            tempActionTime = PlayingTime + 8.5f;
+                            if(checkIfcanAttack(PlayingTime,ActionTime))
+                            {
+                                enemyChar.goAttackEnemy(tezejChar.polozaj.X, 0);
+                                tezejChar.damage = getAttackDamage(enemyChar, tezejChar);
+                                tezejChar.doDamageAnimation(1.3f);
+                                tempActionTime = PlayingTime + 7.0f;
+                            }
                         }
                         #endregion
 
@@ -305,35 +312,31 @@ namespace rimmprojekt.States
                             {
                                 if (isCharSelected)
                                 {
-
-                                    if (actionSelected[actionPointer].Equals("Attack"))
+                                    if(checkIfcanAttack(PlayingTime,tempActionTime))
                                     {
-                                        tezejChar.goAttackEnemy(enemyChar.polozaj.X, 0);
-                                        enemyChar.damage = getAttackDamage(tezejChar, enemyChar);
-                                        enemyChar.doDamageAnimation(1.3f);
-                                        actionDone(actionSelected[actionPointer]);
-                                        tempActionTime += 1.9f;
-                                        isCharSelected = false;
-                                        setActionBox(isCharSelected);
+                                        if (actionSelected[actionPointer].Equals("Attack"))
+                                        {
+                                            tezejChar.goAttackEnemy(enemyChar.polozaj.X, 0);
+                                            enemyChar.damage = getAttackDamage(tezejChar, enemyChar);
+                                            enemyChar.doDamageAnimation(1.3f);
+                                            actionDone(actionSelected[actionPointer]);
+                                            tempActionTime += 1.9f;
+                                            isCharSelected = false;
+                                            setActionBox(isCharSelected);
+                                        }
+                                        else if (actionSelected[actionPointer].Equals("Block"))
+                                        {
+                                            tezejChar.goBlock();
+                                            actionDone(actionSelected[actionPointer]);
+                                            isCharSelected = false;
+                                            setActionBox(isCharSelected);
+                                        }
+                                        else if (actionSelected[actionPointer].Equals("Items"))
+                                        {
+                                            gameData.Inventory.isInBattle = true;
+                                            //actionDone(actionSelected[actionPointer]);
+                                        }
                                     }
-                                    else if (actionSelected[actionPointer].Equals("Block"))
-                                    {
-                                        tezejChar.goBlock();
-                                        actionDone(actionSelected[actionPointer]);
-                                        isCharSelected = false;
-                                        setActionBox(isCharSelected);
-                                    }
-                                    else if (actionSelected[actionPointer].Equals("Items"))
-                                    {
-                                        gameData.Inventory.isInBattle = true;
-                                        //actionDone(actionSelected[actionPointer]);
-                                    }
-
-                                }
-                                else
-                                {
-                                    isCharSelected = true;
-                                    setActionBox(isCharSelected);
                                 }
                             }
                             #endregion
@@ -538,7 +541,7 @@ namespace rimmprojekt.States
             //gameData.Tezej.isInBattle = true;
             gameData.Tezej.isInBattle = true;
             tezejChar.changeCharacterOrientation("down", "right");
-            tezejChar.Strength = gameData.Tezej.strength+1200;
+            tezejChar.Strength = gameData.Tezej.strength;
             tezejChar.Agility = gameData.Tezej.agility;
             tezejChar.Intelligence = gameData.Tezej.intelligence;
             tezejChar.Vitality = gameData.Tezej.vitality;
@@ -601,6 +604,8 @@ namespace rimmprojekt.States
 
             if (timeSize == 100 || timeSize > 100)
             {
+                isCharSelected = true;
+                setActionBox(true);
                 canDoAction = true;
             }
         }
@@ -663,6 +668,18 @@ namespace rimmprojekt.States
                 awardText.Text.AppendLine("Experience gained : " + expGained.ToString());
                 awardText.Text.AppendLine("\n"+addText);
             }
+        }
+
+        private Boolean checkIfcanAttack(float time, float action_Time)
+        {
+            Boolean result = false;
+
+            if (Math.Round(time) > action_Time - 3.0f || Math.Round(time) > action_Time - 4.0f || Math.Round(time) > action_Time - 5.0f)
+            {
+                result = true;
+            }
+
+            return result;
         }
     }
 }

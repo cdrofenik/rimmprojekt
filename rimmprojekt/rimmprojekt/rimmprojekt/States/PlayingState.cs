@@ -164,6 +164,8 @@ namespace rimmprojekt.States
             {
                 if ((Math.Abs(gameData.Tezej.polozaj.X - e.polozaj.X) + Math.Abs(gameData.Tezej.polozaj.Z - e.polozaj.Z)) < 10f)
                 {
+                    gameData.Tezej.isInBattle = true;
+
                     if (!battleStart)
                     {
                         battleStartTimer = PlayingTime + 1.7f;
