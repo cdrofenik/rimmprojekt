@@ -133,10 +133,10 @@ namespace rimmprojekt.States
             gameFinished = false;
             gameOver = false;
             tempActionTime = 7.0f;
-            actionTable = new TexturedElement[4];
-            actionSelected = new String[4];
+            actionTable = new TexturedElement[3];
+            actionSelected = new String[3];
             isCharSelected = false;
-            actionPointer = 3;
+            actionPointer = 2;
             barArray = new TexturedElement[3];
             emptybarArray = new TexturedElement[3];
             #endregion
@@ -348,7 +348,7 @@ namespace rimmprojekt.States
                                     || state.KeyboardState.KeyState.Right.OnPressed)
                                 {
                                     selectSoundEffect.Play();
-                                    if (actionPointer == 3)
+                                    if (actionPointer == 2)
                                         actionPointer = 0;
                                     else
                                         actionPointer++;
@@ -359,7 +359,7 @@ namespace rimmprojekt.States
                                 {
                                     selectSoundEffect.Play();
                                     if (actionPointer == 0)
-                                        actionPointer = 3;
+                                        actionPointer = 2;
                                     else
                                         actionPointer--;
                                 }
@@ -390,8 +390,8 @@ namespace rimmprojekt.States
                 changeStatusBars();
                 HealthTxtElement.Text.SetText("    HP:   " + tezejChar.Health + " / " + tezejChar.maxHealth);
                 ManaTxtElement.Text.SetText("    MP:   " + tezejChar.Mana + " / " + tezejChar.maxMana);
-                debug.Text.SetText(Int32.Parse(Math.Round(PlayingTime).ToString()) + "     HP: " + enemyChar.Health.ToString() + "\n" + TestDamage.ToString()
-                    + "\n");
+                //debug.Text.SetText(Int32.Parse(Math.Round(PlayingTime).ToString()) + "     HP: " + enemyChar.Health.ToString() + "\n" + TestDamage.ToString()
+                //    + "\n");
                 #endregion
             }
             #endregion
@@ -457,17 +457,17 @@ namespace rimmprojekt.States
             BlockTxtElement.Colour = Color.White;
             BlockTxtElement.Position = new Vector2(150, -20);
 
-            MagicTxtElement = new TextElement("Magic");
-            MagicTxtElement.Font = bigFont;
-            MagicTxtElement.Text.SetText("Magic");
-            MagicTxtElement.Colour = Color.White;
-            MagicTxtElement.Position = new Vector2(150, -60);
+            //MagicTxtElement = new TextElement("Magic");
+            //MagicTxtElement.Font = bigFont;
+            //MagicTxtElement.Text.SetText("Magic");
+            //MagicTxtElement.Colour = Color.White;
+            //MagicTxtElement.Position = new Vector2(150, -60);
 
             ItemsTxtElement = new TextElement("Items");
             ItemsTxtElement.Font = bigFont;
             ItemsTxtElement.Text.SetText("Items");
             ItemsTxtElement.Colour = Color.White;
-            ItemsTxtElement.Position = new Vector2(150, -100);
+            ItemsTxtElement.Position = new Vector2(150, -60);
             #endregion
 
 
@@ -498,14 +498,14 @@ namespace rimmprojekt.States
 
 
             Vector2 pointerSize = new Vector2(20, 20);
+            //actionTable[0] = new TexturedElement(pointerSize);
+            //actionTable[0].Position = new Vector2( 143, 34);
             actionTable[0] = new TexturedElement(pointerSize);
-            actionTable[0].Position = new Vector2( 143, 34);
+            actionTable[0].Position = new Vector2( 143, 74);
             actionTable[1] = new TexturedElement(pointerSize);
-            actionTable[1].Position = new Vector2( 143, 74);
+            actionTable[1].Position = new Vector2( 143, 114);
             actionTable[2] = new TexturedElement(pointerSize);
-            actionTable[2].Position = new Vector2( 143, 114);
-            actionTable[3] = new TexturedElement(pointerSize);
-            actionTable[3].Position = new Vector2( 143, 154);
+            actionTable[2].Position = new Vector2(143, 154);
 
             debug = new TextElement();
             debug.Font = smallFont;
@@ -533,9 +533,9 @@ namespace rimmprojekt.States
 
         private void setFunctionalSettings()
         {
-            actionSelected[3] = "Attack";
-            actionSelected[2] = "Block";
-            actionSelected[1] = "Magic";
+            //actionSelected[3] = "Attack";
+            actionSelected[2] = "Attack";
+            actionSelected[1] = "Block";
             actionSelected[0] = "Items";
 
             //gameData.Tezej.isInBattle = true;
@@ -568,14 +568,14 @@ namespace rimmprojekt.States
 
                 txtEleRectLeftBar.Add(AttackTxtElement);
                 txtEleRectLeftBar.Add(BlockTxtElement);
-                txtEleRectLeftBar.Add(MagicTxtElement);
+                //txtEleRectLeftBar.Add(MagicTxtElement);
                 txtEleRectLeftBar.Add(ItemsTxtElement);
             }
             else
             {
                 txtEleRectLeftBar.Remove(AttackTxtElement);
                 txtEleRectLeftBar.Remove(BlockTxtElement);
-                txtEleRectLeftBar.Remove(MagicTxtElement);
+                //txtEleRectLeftBar.Remove(MagicTxtElement);
                 txtEleRectLeftBar.Remove(ItemsTxtElement);
             }
         }
