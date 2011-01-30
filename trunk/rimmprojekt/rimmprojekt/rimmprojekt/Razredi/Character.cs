@@ -24,7 +24,7 @@ using JigLibX.Collision;
 
 namespace rimmprojekt.Razredi
 {
-    class Character : IDraw, IContentOwner, IUpdate
+    public class Character : IDraw, IContentOwner, IUpdate
     {
         #region timers
         private float dyingTimer;

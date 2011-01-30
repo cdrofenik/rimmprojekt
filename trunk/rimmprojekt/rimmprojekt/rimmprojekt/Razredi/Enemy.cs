@@ -24,7 +24,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace rimmprojekt.Razredi
 {
-    class Enemy : IDraw, IContentOwner
+    public class Enemy : IDraw, IContentOwner
     {
         public Boolean isInBattle;
 

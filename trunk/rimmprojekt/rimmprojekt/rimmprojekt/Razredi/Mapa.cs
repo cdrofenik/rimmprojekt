@@ -20,7 +20,7 @@ using JigLibX.Collision;
 
 namespace rimmprojekt.Razredi
 {
-    class Mapa : IDraw
+    public class Mapa : IDraw
     {
         public ArrayList zidovi;
         private Tla tla;
