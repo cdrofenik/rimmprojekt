@@ -75,7 +75,17 @@ namespace rimmprojekt.Razredi
 
         public Enemy()
         {
+            matrix = Matrix.CreateTranslation(polozaj);
+            MaterialShader material = new MaterialShader();
+            material.SpecularColour = Color.LightYellow.ToVector3();//with a nice sheen
 
+            Vector3 lightDirection = new Vector3(0.5f, 1, -0.5f); //a less dramatic direction
+
+            MaterialLightCollection lights = new MaterialLightCollection();
+            lights.AmbientLightColour = Color.White.ToVector3() * 0.5f;
+            //lights.CreateDirectionalLight(lightDirection, Color.Red);
+            material.LightCollection = lights;
+            shader = material;
         }
 
         public Enemy(float x, float y, float z, ContentRegister content, String skinChosen)

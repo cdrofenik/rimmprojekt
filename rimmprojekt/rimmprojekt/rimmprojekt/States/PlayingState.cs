@@ -105,7 +105,7 @@ namespace rimmprojekt.States
 
             backgroundPicture.Draw(state);
             gameData.Draw(state);
-            this.debugText.Draw(state);
+            //this.debugText.Draw(state);
 
             if (drawAnimationForBattle)
             {

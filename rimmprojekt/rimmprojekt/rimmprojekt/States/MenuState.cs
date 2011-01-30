@@ -127,7 +127,9 @@ namespace rimmprojekt.States
 
         private void LoadGame()
         {
-            this.stateManager.Application.Shutdown();
+            //Razredi.GameData gd = new Razredi.GameData();
+            //stateManager.SetState(new PlayingState(gd.nalozi()));
+            stateManager.SetState(new LoadGameState());
         }
 
         private void Gallery()
