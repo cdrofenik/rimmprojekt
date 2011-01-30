@@ -256,7 +256,6 @@ namespace rimmprojekt.States
             if (endGame &&  state.KeyboardState.KeyState.Space)
             {
                 stateManager.SetState(new MenuState());
-                MediaPlayer.Stop();
             }
 
 
