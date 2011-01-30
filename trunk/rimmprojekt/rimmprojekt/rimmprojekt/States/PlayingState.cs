@@ -183,10 +183,7 @@ namespace rimmprojekt.States
                 gameData.shrani();
             }
 
-            if (state.KeyboardState.KeyState.F.OnPressed)
-            {
-                endGame = true;
-            }
+            
 
             //debugText.Text.SetText(gameData.Tezej.polozaj.ToString() + " " + gameData.Tezej.collisions.Count.ToString());
         }

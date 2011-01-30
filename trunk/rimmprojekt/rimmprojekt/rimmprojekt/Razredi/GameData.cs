@@ -29,6 +29,7 @@ namespace rimmprojekt.Razredi
 {
     public class GameData
     {
+        private Vector3 minotaverPos;
         private Razredi.Tezej tezej;
         private Razredi.Inventory inventory;
         private Razredi.Enemy minotaver;
@@ -63,7 +64,7 @@ namespace rimmprojekt.Razredi
 
         public GameData()
         {
-
+            
         }
 
         public GameData(States.IGameStateManager stateManager)
@@ -75,7 +76,7 @@ namespace rimmprojekt.Razredi
                 bodies.Add(k.body);
 
             sovrazniki = generateEnemys(stateManager.Application.UpdateManager, stateManager.Application.Content, 7);
-            minotaver = new Razredi.Enemy(71.0f, 0.0f, 80.0f, stateManager.Application.Content, "");
+            
 
             tezej = new Razredi.Tezej(69.0f, 0.0f, 80.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
             inventory = new Razredi.Inventory(stateManager.Application.UpdateManager, stateManager.Application.Content, tezej);
@@ -93,7 +94,8 @@ namespace rimmprojekt.Razredi
             foreach (Enemy e in gameData.Sovrazniki)
                 sovrazniki.Add(new Enemy(e.polozaj.X, e.polozaj.Y, e.polozaj.Z, stateManager.Application.Content, e.skin_value));
 
-            minotaver = new Razredi.Enemy(20.0f, 0.0f, 20.0f, stateManager.Application.Content, "");
+            
+            //minotaver = new Razredi.Enemy(minotaverPos.X, 0.0f, minotaverPos.Y, stateManager.Application.Content, "");
 
             tezej = new Razredi.Tezej(gameData.Tezej.polozaj.X, gameData.Tezej.polozaj.Y, gameData.Tezej.polozaj.Z, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
             tezej.maxHealthPoints = gameData.Tezej.maxHealthPoints;
@@ -109,7 +111,7 @@ namespace rimmprojekt.Razredi
         public void Draw(DrawState state)
         {
             mapa.Draw(state);
-            minotaver.Draw(state);
+            //minotaver.Draw(state);
             foreach (Razredi.Enemy goblin in sovrazniki)
                 goblin.Draw(state);
             tezej.Draw(state);
@@ -119,7 +121,7 @@ namespace rimmprojekt.Razredi
         public void Update(UpdateState state)
         {
             tezej.Update(state);
-            minotaver.Update(state);
+            //minotaver.Update(state);
             foreach (Razredi.Enemy goblin in sovrazniki)
                 goblin.Update(state);
         }
@@ -136,6 +138,11 @@ namespace rimmprojekt.Razredi
                 goblin.skin_value = "goblin";
                 result.Add(goblin);
             }
+
+            Vector3 minPos = getRandomMinotaverPosition();
+            minotaver = new Razredi.Enemy(minPos.X, 0.0f, minPos.Z, contntrg, "");
+
+            result.Add(minotaver);
 
             return result;
         }
