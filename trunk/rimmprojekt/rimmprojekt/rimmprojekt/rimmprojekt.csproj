@@ -137,6 +137,7 @@
     <Compile Include="States\Gallery.cs" />
     <Compile Include="States\GameStateManager.cs" />
     <Compile Include="States\Interfaces.cs" />
+    <Compile Include="States\LoadGameState.cs" />
     <Compile Include="States\MenuState.cs" />
     <Compile Include="States\PlayingState.cs" />
   </ItemGroup>

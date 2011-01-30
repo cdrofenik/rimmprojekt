@@ -89,7 +89,10 @@ namespace rimmprojekt.Razredi
             foreach (Razredi.Kocka k in mapa.zidovi)
                 bodies.Add(k.body);
 
-            sovrazniki = gameData.Sovrazniki;
+            sovrazniki = new List<Enemy>();
+            foreach (Enemy e in gameData.Sovrazniki)
+                sovrazniki.Add(new Enemy(e.polozaj.X, e.polozaj.Y, e.polozaj.Z, stateManager.Application.Content, e.skin_value));
+
             minotaver = new Razredi.Enemy(20.0f, 0.0f, 20.0f, stateManager.Application.Content, "");
 
             tezej = new Razredi.Tezej(gameData.Tezej.polozaj.X, gameData.Tezej.polozaj.Y, gameData.Tezej.polozaj.Z, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
@@ -186,16 +189,19 @@ namespace rimmprojekt.Razredi
 
         public void shrani()
         {
-            string pot = @"Content/SaveGames/save.xml";
+            string datoteka = DateTime.Now.ToString();
+            datoteka = datoteka.Replace(".", "");
+            datoteka = datoteka.Replace(":", "");
+            datoteka = datoteka.Replace(" ", "");
+            string pot = @"Content/SaveGames/" + datoteka + ".xml";
             XmlSerializer ser = new XmlSerializer(typeof(GameData));
             TextWriter writer = new StreamWriter(pot);
             ser.Serialize(writer, this);
             writer.Close();
         }
 
-        public GameData nalozi()
+        public GameData nalozi(string pot)
         {
-            string pot = @"Content/SaveGames/save.xml";
             XmlSerializer ser = new XmlSerializer(typeof(GameData));
             TextReader reader= new StreamReader(pot);
             return (GameData)ser.Deserialize(reader);
