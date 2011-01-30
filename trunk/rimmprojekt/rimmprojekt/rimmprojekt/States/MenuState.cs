@@ -11,16 +11,17 @@ using Xen.Ex.Graphics2D;
 using Xen.Ex.Geometry;
 using Xen.Ex.Graphics.Content;
 using Xen.Ex.Material;
+using Xen.Input.State;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace rimmprojekt.States
 {
     class MenuState : IGameState, IContentOwner
     {
-        private List<TextElementRect> menuText = new List<TextElementRect>();
         private IGameStateManager stateManager;
 
         #region loading and background pic.
@@ -34,28 +35,145 @@ namespace rimmprojekt.States
         private TexturedElement background;
         #endregion
 
+        #region menu entries, keyboard input
+        SpriteFont selectedFont;
+        SpriteFont nonSelectedFont;
+        int selectedEntry;
+        Vector2 startPosition;
+        Color selected;
+        Color nonSelected;
+
+        List<string> menuEntries = new List<string>();
+        List<TextElement> menuEntryRect = new List<TextElement>();
+
+        KeyboardState currentKeyboardState = new KeyboardState();
+        KeyboardState previousKeyboardState = new KeyboardState();
+        #endregion
+
+        #region input methods and menu operations
+        private bool MenuUp
+        {
+            get { return IsNewPressedKey(Keys.Up); }
+        }
+
+        private bool MenuDown
+        {
+            get { return IsNewPressedKey(Keys.Down); }
+        }
+
+        private bool MenuSelect
+        {
+            get { return IsNewPressedKey(Keys.Enter); }
+        }
+
+        private bool MenuCancel
+        {
+            get { return IsNewPressedKey(Keys.Escape); }
+        }
+
+        private bool IsNewPressedKey(Keys key)
+        {
+            return previousKeyboardState.IsKeyUp(key) && currentKeyboardState.IsKeyDown(key);
+        }
+
+        private void HandleInput()
+        {
+            if (MenuUp)
+            {
+                selectedEntry--;
+                if (selectedEntry < 0)
+                    selectedEntry = menuEntries.Count - 1;
+            }
+
+            if (MenuDown)
+            {
+                selectedEntry++;
+                if (selectedEntry >= menuEntries.Count)
+                    selectedEntry = 0;
+            }
+
+            if (MenuSelect)
+            {
+                MenuSelectExecute(selectedEntry);
+            }
+
+            if (MenuCancel)
+            {
+                MenuCancelExecute();
+            }
+        }
+
+        private void MenuSelectExecute(int selectedItem)
+        {
+            switch (selectedItem)
+            {
+                case 0: NewGame(); break;
+                case 1: LoadGame(); break;
+                case 2: Gallery(); break;
+                case 3: HelpAbout(); break;
+                case 4: QuitGame(); break;
+            }
+        }
+
+        private void MenuCancelExecute()
+        {
+            QuitGame();
+        }
+
+        private void NewGame()
+        {
+            isLoadingElement = true;
+        }
+
+        private void LoadGame()
+        {
+            this.stateManager.Application.Shutdown();
+        }
+
+        private void Gallery()
+        {
+            Gallery galleryState = new Gallery(this.stateManager.Application);
+            this.stateManager.SetState(galleryState);
+        }
+
+        private void HelpAbout()
+        {
+            this.stateManager.Application.Shutdown();
+        }
+
+        private void QuitGame()
+        {
+            this.stateManager.Application.Shutdown();
+        }
+        #endregion
+
         public void Initalise(IGameStateManager stateManager)
         {
             this.stateManager = stateManager;
 
-            //display an incredibly complex line of text
-            this.menuText.Add(new TextElementRect(new Vector2(400, 250)));
-            this.menuText[0].Text.SetText("Nova igra [ENTER]");
-            this.menuText[0].VerticalAlignment = VerticalAlignment.Bottom;
-            this.menuText[0].HorizontalAlignment = HorizontalAlignment.Left;
-            this.menuText[0].TextHorizontalAlignment = TextHorizontalAlignment.Left;
+            #region menu entries
+            menuEntries.Add("New Game");
+            menuEntries.Add("Load Game");
+            menuEntries.Add("Gallery");
+            menuEntries.Add("Help/About");
+            menuEntries.Add("Quit Game");
 
-            this.menuText.Add(new TextElementRect(new Vector2(400, 100)));
-            this.menuText[1].Text.SetText("Izhod [ESC]");
-            this.menuText[1].VerticalAlignment = VerticalAlignment.Bottom;
-            this.menuText[1].HorizontalAlignment = HorizontalAlignment.Left;
-            this.menuText[1].TextHorizontalAlignment = TextHorizontalAlignment.Left;
+            selectedEntry = 0;
+            selected = Color.Yellow;
+            nonSelected = Color.White;
 
-            this.menuText.Add(new TextElementRect(new Vector2(400, 170)));
-            this.menuText[2].Text.SetText("Galerija [Gs]");
-            this.menuText[2].VerticalAlignment = VerticalAlignment.Bottom;
-            this.menuText[2].HorizontalAlignment = HorizontalAlignment.Left;
-            this.menuText[2].TextHorizontalAlignment = TextHorizontalAlignment.Left;
+            startPosition = new Vector2(-150, 100);
+
+            for (int i = 0; i < menuEntries.Count; i++)
+            {
+                this.menuEntryRect.Add(new TextElement());
+                this.menuEntryRect[i].Text.SetText(menuEntries[i]);
+                this.menuEntryRect[i].Position = startPosition;
+                this.menuEntryRect[i].VerticalAlignment = VerticalAlignment.Centre;
+                this.menuEntryRect[i].HorizontalAlignment = HorizontalAlignment.Centre;
+                startPosition.Y -= 60;
+            }
+            #endregion
 
             #region background and loading
             loadingElement = new TexturedElement(new Vector2(718, 69));
@@ -84,9 +202,16 @@ namespace rimmprojekt.States
             }
             else
             {
-                menuText[0].Draw(state);
-                menuText[1].Draw(state);
-                menuText[2].Draw(state);
+                for (int i = 0; i < menuEntries.Count; i++)
+                {
+                    bool isSelected = (i == selectedEntry);
+                    Color color = isSelected ? selected : nonSelected;
+                    SpriteFont font = isSelected ? selectedFont : nonSelectedFont;
+
+                    this.menuEntryRect[i].Colour = color;
+                    this.menuEntryRect[i].Font = font;
+                    menuEntryRect[i].Draw(state);
+                }
             }
         }
 
@@ -109,36 +234,46 @@ namespace rimmprojekt.States
 
             Xen.Input.State.InputState input = state.PlayerInput[this.stateManager.PlayerIndex].InputState;
 
-            if (state.KeyboardState.KeyState.Enter.OnReleased)
-            {
-                isLoadingElement = true;
-                return;
-            }
+            previousKeyboardState = currentKeyboardState;
+            currentKeyboardState = state.KeyboardState;
 
-            if (state.KeyboardState.KeyState.G.OnReleased)
-            {
-                //start gallery display
-                Gallery galleryState = new Gallery(this.stateManager.Application);
+            HandleInput();
 
-                //go to the loading state.
-                this.stateManager.SetState(galleryState);
-                return;
-            }
+            //if (state.KeyboardState.KeyState.Enter.OnReleased)
+            //{
+            //    isLoadingElement = true;
+            //    return;
+            //}
 
-            if (input.Buttons.Back.OnPressed)
-            {
-                //quit when back is pressed in the menu
-                this.stateManager.Application.Shutdown();
-                return;
-            }
+            //if (state.KeyboardState.KeyState.G.OnReleased)
+            //{
+            //    //start gallery display
+            //    Gallery galleryState = new Gallery(this.stateManager.Application);
+
+            //    //go to the loading state.
+            //    this.stateManager.SetState(galleryState);
+            //    return;
+            //}
+
+            //if (input.Buttons.Back.OnPressed)
+            //{
+            //    //quit when back is pressed in the menu
+            //    this.stateManager.Application.Shutdown();
+            //    return;
+            //}
         }
 
         void IContentOwner.LoadContent(ContentState state)
         {
-            //load the text font.
-            this.menuText[0].Font = state.Load<SpriteFont>("MenuFont");
-            this.menuText[1].Font = state.Load<SpriteFont>("MenuFont");
-            this.menuText[2].Font = state.Load<SpriteFont>("MenuFont");
+            nonSelectedFont = state.Load<SpriteFont>("MenuFont");
+            selectedFont = state.Load<SpriteFont>("MenuFont1");
+
+            for (int i = 0; i < menuEntries.Count; i++)
+            {
+                //load the text font.
+                this.menuEntryRect[i].Font = nonSelectedFont;
+            }
+
             alistarLol = state.Load<Texture2D>("Textures/Lol_Alistar");
             loadingTex = state.Load<Texture2D>("Textures/Loading");
             background.Texture = alistarLol;
