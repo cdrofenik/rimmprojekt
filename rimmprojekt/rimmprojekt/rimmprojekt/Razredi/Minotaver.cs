@@ -51,6 +51,11 @@ namespace rimmprojekt.Razredi
         private Boolean isIdle;
         #endregion
 
+        public Minotaver()
+        {
+
+        }
+
         public Minotaver(float x, float y, float z, ContentRegister content, List<Body> bodies)
         {
             isRunning = false;

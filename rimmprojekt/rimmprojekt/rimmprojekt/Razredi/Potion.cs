@@ -5,7 +5,7 @@ using System.Text;
 
 namespace rimmprojekt.Razredi
 {
-    class Potion
+    public class Potion
     {
         public String type;
         public Int32 value;

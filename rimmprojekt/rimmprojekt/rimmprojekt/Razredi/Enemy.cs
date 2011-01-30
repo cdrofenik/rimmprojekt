@@ -43,14 +43,6 @@ namespace rimmprojekt.Razredi
         public Int32 vitality;
         #endregion
 
-        #region collision
-        List<Body> bodies;
-        private CollisionSystem collisionSystem;
-        private Body body;
-        private CollisionSkin skin;
-        public List<CollisionInfo> collisions;
-        private BasicCollisionFunctor collisionFunctor;
-        #endregion
 
         #region AI
         private String orientiranModel = "down";
@@ -78,12 +70,13 @@ namespace rimmprojekt.Razredi
         #endregion
 
         #region get/set metode
-        public Body Body
-        {
-            get { return body; }
-            set { body = value; }
-        }
+
         #endregion
+
+        public Enemy()
+        {
+
+        }
 
         public Enemy(float x, float y, float z, ContentRegister content, String skinChosen)
         {
