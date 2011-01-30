@@ -25,7 +25,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace rimmprojekt.Razredi
 {
-    class Tezej : IDraw, IContentOwner
+    public class Tezej : IDraw, IContentOwner
     {
         #region animacije za sablo
         //private Quaternion itemRotateAnim;
@@ -109,6 +109,11 @@ namespace rimmprojekt.Razredi
             set { collisionSystem = value; }
         }
         #endregion
+
+        public Tezej()
+        {
+
+        }
 
         public Tezej(float x, float y, float z, UpdateManager manager, ContentRegister content, List<Body> bodies)
         {

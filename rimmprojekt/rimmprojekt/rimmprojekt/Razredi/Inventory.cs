@@ -16,7 +16,7 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace rimmprojekt.Razredi
 {
-    class Inventory : IDraw, IContentOwner, IUpdate
+    public class Inventory : IDraw, IContentOwner, IUpdate
     {
         #region parameters
         //parameters

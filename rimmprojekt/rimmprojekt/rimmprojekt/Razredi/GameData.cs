@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using System.IO;
 
 using Xen;
 using Xen.Camera;
@@ -24,7 +27,7 @@ using JigLibX.Collision;
 
 namespace rimmprojekt.Razredi
 {
-    class GameData
+    public class GameData
     {
         private Razredi.Tezej tezej;
         private Razredi.Inventory inventory;
@@ -63,6 +66,11 @@ namespace rimmprojekt.Razredi
             set { mapa = value; }
         }
         #endregion
+
+        public GameData()
+        {
+
+        }
 
         public GameData(States.IGameStateManager stateManager)
         {
@@ -181,5 +189,14 @@ namespace rimmprojekt.Razredi
             return new Vector3(x[tableIndex], 0.0f, z[tableIndex]);
         }
         #endregion
+
+        public void shrani()
+        {
+            string pot = @"Content/SaveGames/save.xml";
+            XmlSerializer ser = new XmlSerializer(typeof(GameData));
+            TextWriter writer = new StreamWriter(pot);
+            ser.Serialize(writer, this);
+            writer.Close();
+        }
     }
 }

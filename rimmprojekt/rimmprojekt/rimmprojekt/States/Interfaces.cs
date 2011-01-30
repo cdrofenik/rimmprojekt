@@ -18,7 +18,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace rimmprojekt.States
 {
-    interface IGameStateManager
+    public interface IGameStateManager
     {
         Application Application { get; }
         PlayerIndex PlayerIndex { get; set; }
@@ -27,7 +27,7 @@ namespace rimmprojekt.States
         void SetState(IGameState state);
     }
 
-    interface IGameState
+    public interface IGameState
     {
         void Initalise(IGameStateManager stateManager);
 

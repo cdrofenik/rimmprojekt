@@ -178,6 +178,11 @@ namespace rimmprojekt.States
                 }
             }
 
+            if (state.KeyboardState.KeyState.LeftControl.IsDown && state.KeyboardState.KeyState.S.OnReleased)
+            {
+                gameData.shrani();
+            }
+
             if (state.KeyboardState.KeyState.F.OnPressed)
             {
                 endGame = true;

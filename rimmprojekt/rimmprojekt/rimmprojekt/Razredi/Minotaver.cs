@@ -24,7 +24,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace rimmprojekt.Razredi
 {
-    class Minotaver : IDraw, IContentOwner
+    public class Minotaver : IDraw, IContentOwner
     {
         public Int32 healthPoints;
         public Int32 damage;
