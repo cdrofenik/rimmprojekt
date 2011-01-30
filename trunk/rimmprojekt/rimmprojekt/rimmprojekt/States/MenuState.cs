@@ -45,6 +45,7 @@ namespace rimmprojekt.States
 
         List<string> menuEntries = new List<string>();
         List<TextElement> menuEntryRect = new List<TextElement>();
+        TextElement menuTitle;
 
         KeyboardState currentKeyboardState = new KeyboardState();
         KeyboardState previousKeyboardState = new KeyboardState();
@@ -153,6 +154,13 @@ namespace rimmprojekt.States
         {
             this.stateManager = stateManager;
 
+            this.menuTitle = new TextElement();
+            this.menuTitle.Text.SetText("Main Menu");
+            this.menuTitle.Position = new Vector2(-150, 200);
+            this.menuTitle.VerticalAlignment = VerticalAlignment.Centre;
+            this.menuTitle.HorizontalAlignment = HorizontalAlignment.Centre;
+            this.menuTitle.Colour = Color.Yellow;
+
             #region menu entries
             menuEntries.Add("New Game");
             menuEntries.Add("Load Game");
@@ -204,6 +212,8 @@ namespace rimmprojekt.States
             }
             else
             {
+                menuTitle.Draw(state);
+
                 for (int i = 0; i < menuEntries.Count; i++)
                 {
                     bool isSelected = (i == selectedEntry);
@@ -269,6 +279,8 @@ namespace rimmprojekt.States
         {
             nonSelectedFont = state.Load<SpriteFont>("MenuFont");
             selectedFont = state.Load<SpriteFont>("MenuFont1");
+
+            this.menuTitle.Font = selectedFont;
 
             for (int i = 0; i < menuEntries.Count; i++)
             {
