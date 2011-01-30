@@ -188,7 +188,7 @@ namespace rimmprojekt.States
                 endGame = true;
             }
 
-            debugText.Text.SetText(gameData.Tezej.polozaj.ToString() + " " + gameData.Tezej.collisions.Count.ToString());
+            //debugText.Text.SetText(gameData.Tezej.polozaj.ToString() + " " + gameData.Tezej.collisions.Count.ToString());
         }
 
         void IContentOwner.LoadContent(ContentState state)

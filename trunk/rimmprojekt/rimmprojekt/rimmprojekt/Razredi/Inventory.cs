@@ -52,6 +52,25 @@ namespace rimmprojekt.Razredi
         private List<Potion> mpPotionList;
         #endregion
 
+        #region get/set metode
+        public List<Potion> HpPotionList
+        {
+            get { return hpPotionList; }
+            set { hpPotionList = value; }
+        }
+
+        public List<Potion> MpPotionList
+        {
+            get { return mpPotionList; }
+            set { mpPotionList = value; }
+        }
+        #endregion
+
+        public Inventory()
+        {
+
+        }
+
         public Inventory(UpdateManager manager, ContentRegister content, Tezej theseus)
 		{
             isInBattle = false;

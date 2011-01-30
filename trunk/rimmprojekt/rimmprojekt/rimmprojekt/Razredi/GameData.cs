@@ -59,12 +59,6 @@ namespace rimmprojekt.Razredi
             get { return sovrazniki; }
             set { sovrazniki = value; }
         }
-
-        public Razredi.Mapa Mapa
-        {
-            get { return mapa; }
-            set { mapa = value; }
-        }
         #endregion
 
         public GameData()
@@ -197,6 +191,14 @@ namespace rimmprojekt.Razredi
             TextWriter writer = new StreamWriter(pot);
             ser.Serialize(writer, this);
             writer.Close();
+        }
+
+        public GameData nalozi()
+        {
+            string pot = @"Content/SaveGames/save.xml";
+            XmlSerializer ser = new XmlSerializer(typeof(GameData));
+            TextReader reader= new StreamReader(pot);
+            return (GameData)ser.Deserialize(reader);
         }
     }
 }

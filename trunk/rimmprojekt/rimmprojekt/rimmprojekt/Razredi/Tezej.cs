@@ -58,12 +58,12 @@ namespace rimmprojekt.Razredi
         public Int32 vitality;
         private Boolean hasLeveledUp = false;
         #endregion
-
+        [NonSerialized]
         List<Body> bodies;
         private CollisionSystem collisionSystem;
         private Body body;
         private CollisionSkin skin;
-        public List<CollisionInfo> collisions;
+        private List<CollisionInfo> collisions;
         private BasicCollisionFunctor collisionFunctor;
 
         #region drawing elements
@@ -103,11 +103,11 @@ namespace rimmprojekt.Razredi
         #endregion
 
         #region get/set metode
-        public CollisionSystem CollisionSystem
-        {
-            get { return collisionSystem; }
-            set { collisionSystem = value; }
-        }
+        //public CollisionSystem CollisionSystem
+        //{
+        //    get { return collisionSystem; }
+        //    set { collisionSystem = value; }
+        //}
         #endregion
 
         public Tezej()
