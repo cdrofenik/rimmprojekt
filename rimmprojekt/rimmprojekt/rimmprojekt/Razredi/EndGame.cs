@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Media;
 using System.IO;
 
 using Xen;
@@ -20,10 +21,12 @@ namespace rimmprojekt.Razredi
 {
     class EndGame : IDraw, IContentOwner, IUpdate
     {
+        
         private SpriteFont bigFont;
         private TextElementRect textBox;
         private Texture2D backPic;
         private TexturedElement background;
+        private SolidColourElement back = new SolidColourElement(Color.Black,new Vector2(1280, 720));
         private Int32 counter;
 
         public EndGame(UpdateManager manager, ContentRegister content) 
@@ -34,7 +37,7 @@ namespace rimmprojekt.Razredi
 
         public void Draw(DrawState state)
         {
-            //background.Draw(state);
+            back.Draw(state);
             textBox.Draw(state);
         }
 
@@ -60,19 +63,19 @@ namespace rimmprojekt.Razredi
             background = new TexturedElement(new Vector2(1280, 720));
             //background.Texture = backPic;
 
-            textBox = new TextElementRect(new Vector2(400, 400));
+            textBox = new TextElementRect(new Vector2(500, 400));
             textBox.Font = bigFont;
             textBox.Colour = Color.White;
             textBox.AlphaBlendState = AlphaBlendState.Additive;
             textBox.HorizontalAlignment = HorizontalAlignment.Right;
             textBox.VerticalAlignment = VerticalAlignment.Centre;
-            textBox.TextHorizontalAlignment = TextHorizontalAlignment.Right;
-            textBox.Position = new Vector2(-350, 100);
+            textBox.TextHorizontalAlignment = TextHorizontalAlignment.Left;
+            textBox.Position = new Vector2(-150, 100);
 
             String pot = "../../../../rimmprojektContent/credits.txt";
             using (StreamReader sr = new StreamReader(pot))
             {
-                textBox.Text.AppendLine(sr.ReadLine());
+                textBox.Text.AppendLine(sr.ReadToEnd());
             }
             
         }
