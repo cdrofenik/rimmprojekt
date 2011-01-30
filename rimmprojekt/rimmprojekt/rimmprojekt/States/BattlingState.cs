@@ -39,6 +39,8 @@ namespace rimmprojekt.States
 
         private int TestDamage;
 
+        private Razredi.EndGame endGameClass;
+        private Boolean endGame;
         private TextElementRect awardText;
         private Int32 expGained;
         private Int32 hpPotionsGained;
@@ -112,6 +114,7 @@ namespace rimmprojekt.States
 
         public BattlingState(Razredi.GameData gameData)
         {
+            
             this.gameData = gameData;
             //this.inventory = gameData.Inventory;
             foreach (Razredi.Enemy e in this.gameData.Sovrazniki)
@@ -129,6 +132,7 @@ namespace rimmprojekt.States
             this.stateManager = stateManager;
 
             #region parameter inicialization
+            this.endGameClass = new Razredi.EndGame(stateManager.Application.UpdateManager, stateManager.Application.Content);
             intro = true;
             gameFinished = false;
             gameOver = false;
@@ -211,7 +215,12 @@ namespace rimmprojekt.States
             }
 
             gameData.Inventory.Draw(state);
-            debug.Draw(state);
+            //debug.Draw(state);
+
+            if (endGame)
+            {
+                endGameClass.Draw(state);
+            }
         }
 
         void IContentOwner.LoadContent(ContentState state)
@@ -244,6 +253,13 @@ namespace rimmprojekt.States
             }
 
 
+            if (endGame &&  state.KeyboardState.KeyState.Space)
+            {
+                stateManager.SetState(new MenuState());
+                MediaPlayer.Stop();
+            }
+
+
             if (intro)
             {
                 StartBattleTimer += state.DeltaTimeSeconds;
@@ -273,13 +289,19 @@ namespace rimmprojekt.States
                 #region enemy dies
                 if (enemyChar.isDead)
                 {
-                    awardGenerator();
-                    gameFinished = true;
-                    if (state.KeyboardState.KeyState.Space.OnPressed)
+                    if(enemy.skin_value.Equals(""))
                     {
-                        MediaPlayer.Stop();
-                        gameData.Sovrazniki.Remove(enemy);
-                        stateManager.SetState(new PlayingState(gameData));
+                        endGame = true;
+                    } else
+                    {
+                        awardGenerator();
+                        gameFinished = true;
+                        if (state.KeyboardState.KeyState.Space.OnPressed)
+                        {
+                            MediaPlayer.Stop();
+                            gameData.Sovrazniki.Remove(enemy);
+                            stateManager.SetState(new PlayingState(gameData));
+                        }
                     }
                 }
                 #endregion
@@ -541,7 +563,7 @@ namespace rimmprojekt.States
             //gameData.Tezej.isInBattle = true;
             gameData.Tezej.isInBattle = true;
             tezejChar.changeCharacterOrientation("down", "right");
-            tezejChar.Strength = gameData.Tezej.strength;
+            tezejChar.Strength = gameData.Tezej.strength+11111;
             tezejChar.Agility = gameData.Tezej.agility;
             tezejChar.Intelligence = gameData.Tezej.intelligence;
             tezejChar.Vitality = gameData.Tezej.vitality;
