@@ -156,9 +156,9 @@ namespace rimmprojekt.States
 
             this.menuTitle = new TextElement();
             this.menuTitle.Text.SetText("Main Menu");
-            this.menuTitle.Position = new Vector2(-150, 200);
+            this.menuTitle.Position = new Vector2(10, 200);
             this.menuTitle.VerticalAlignment = VerticalAlignment.Centre;
-            this.menuTitle.HorizontalAlignment = HorizontalAlignment.Centre;
+            this.menuTitle.HorizontalAlignment = HorizontalAlignment.Left;
             this.menuTitle.Colour = Color.Yellow;
 
             #region menu entries
@@ -172,7 +172,7 @@ namespace rimmprojekt.States
             selected = Color.Yellow;
             nonSelected = Color.White;
 
-            startPosition = new Vector2(-150, 100);
+            startPosition = new Vector2(10, 100);
 
             for (int i = 0; i < menuEntries.Count; i++)
             {
@@ -180,7 +180,7 @@ namespace rimmprojekt.States
                 this.menuEntryRect[i].Text.SetText(menuEntries[i]);
                 this.menuEntryRect[i].Position = startPosition;
                 this.menuEntryRect[i].VerticalAlignment = VerticalAlignment.Centre;
-                this.menuEntryRect[i].HorizontalAlignment = HorizontalAlignment.Centre;
+                this.menuEntryRect[i].HorizontalAlignment = HorizontalAlignment.Left;
                 startPosition.Y -= 60;
             }
             #endregion
