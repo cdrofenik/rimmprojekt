@@ -95,6 +95,7 @@ namespace rimmprojekt
                 datoteka = datoteka.Replace(".", "");
                 datoteka = datoteka.Replace(":", "");
                 datoteka = datoteka.Replace(" ", "");
+                datoteka = datoteka.Replace("/", "");
                 string pot = this.Content.RootDirectory + @"/Screenshots/" + datoteka + ".png";
                 FileStream fs = new System.IO.FileStream(pot, System.IO.FileMode.OpenOrCreate);
                 slika.SaveAsPng(fs, drawToTexture.Width, drawToTexture.Height);
