@@ -154,8 +154,8 @@ namespace rimmprojekt.States
 
             if (state.KeyboardState.KeyState.Escape.OnReleased)
             {
-                stateManager.SetState(new MenuState());
                 MediaPlayer.Stop();
+                this.stateManager.SetState(new PauseMenuState(gameData));
             }
 
             gameData.Update(state);
@@ -178,10 +178,10 @@ namespace rimmprojekt.States
                 }
             }
 
-            if (state.KeyboardState.KeyState.LeftControl.IsDown && state.KeyboardState.KeyState.S.OnReleased)
-            {
-                gameData.shrani();
-            }
+            //if (state.KeyboardState.KeyState.LeftControl.IsDown && state.KeyboardState.KeyState.S.OnReleased)
+            //{
+            //    gameData.shrani();
+            //}
 
             
 
