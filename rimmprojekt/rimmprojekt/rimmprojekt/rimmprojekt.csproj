@@ -144,7 +144,6 @@
   <ItemGroup>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
-    <Content Include="States\the_end.jpg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\rimmprojektContent\rimmprojektContent.contentproj">
