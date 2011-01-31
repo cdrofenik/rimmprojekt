@@ -28,6 +28,8 @@ namespace rimmprojekt.States
     class Gallery : IGameState, IContentOwner
     {
         #region parameters
+        private Texture2D alistarLol;
+        private TexturedElement background;
         private SpriteFont trueFont;
         private Int32 counter;
         private DrawTargetScreen drawToScreen;
@@ -67,7 +69,7 @@ namespace rimmprojekt.States
             {
                 if (CullTest(state))
                 {
-                    
+                    background.Draw(state);
                     seznamElementov.ElementAt(counter).Draw(state);
                     frame.Draw(state);
 
@@ -79,6 +81,7 @@ namespace rimmprojekt.States
 
         void IContentOwner.LoadContent(ContentState state)
         {
+            alistarLol = state.Load<Texture2D>(@"Textures/Lol_Alistar");
             frameTexture = state.Load<Texture2D>(@"Textures/galleryFrame");
             trueFont = state.Load<SpriteFont>("Arial");
 
@@ -92,6 +95,8 @@ namespace rimmprojekt.States
                 fs.Dispose();
             }
             setFrames();
+
+            background = new TexturedElement(alistarLol, new Vector2(1280, 720));
         }
 
         public void Update(UpdateState state)

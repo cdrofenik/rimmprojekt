@@ -36,6 +36,9 @@ namespace rimmprojekt.States
         #endregion
 
         #region menu entries, keyboard input
+        private Boolean isHelp;
+        private Texture2D help;
+        private TexturedElement helpAbout;
         SpriteFont selectedFont;
         SpriteFont nonSelectedFont;
         int selectedEntry;
@@ -100,7 +103,7 @@ namespace rimmprojekt.States
 
             if (MenuCancel)
             {
-                MenuCancelExecute();
+                this.stateManager.SetState(new MenuState());
             }
         }
 
@@ -141,7 +144,7 @@ namespace rimmprojekt.States
 
         private void HelpAbout()
         {
-            this.stateManager.Application.Shutdown();
+            isHelp = true;
         }
 
         private void QuitGame()
@@ -154,6 +157,7 @@ namespace rimmprojekt.States
         {
             this.stateManager = stateManager;
 
+            isHelp = false;
             this.menuTitle = new TextElement();
             this.menuTitle.Text.SetText("Main Menu");
             this.menuTitle.Position = new Vector2(10, 200);
@@ -205,24 +209,31 @@ namespace rimmprojekt.States
         {
             background.Draw(state);
             //display the 'menu' :-)
-            if (isLoadingElement)
+            if (isHelp)
             {
-                loadingElement.Draw(state);
-                solidColElement.Draw(state);
+                helpAbout.Draw(state);
             }
             else
             {
-                menuTitle.Draw(state);
-
-                for (int i = 0; i < menuEntries.Count; i++)
+                if (isLoadingElement)
                 {
-                    bool isSelected = (i == selectedEntry);
-                    Color color = isSelected ? selected : nonSelected;
-                    SpriteFont font = isSelected ? selectedFont : nonSelectedFont;
+                    loadingElement.Draw(state);
+                    solidColElement.Draw(state);
+                }
+                else
+                {
+                    menuTitle.Draw(state);
 
-                    this.menuEntryRect[i].Colour = color;
-                    this.menuEntryRect[i].Font = font;
-                    menuEntryRect[i].Draw(state);
+                    for (int i = 0; i < menuEntries.Count; i++)
+                    {
+                        bool isSelected = (i == selectedEntry);
+                        Color color = isSelected ? selected : nonSelected;
+                        SpriteFont font = isSelected ? selectedFont : nonSelectedFont;
+
+                        this.menuEntryRect[i].Colour = color;
+                        this.menuEntryRect[i].Font = font;
+                        menuEntryRect[i].Draw(state);
+                    }
                 }
             }
         }
@@ -277,6 +288,7 @@ namespace rimmprojekt.States
 
         void IContentOwner.LoadContent(ContentState state)
         {
+            help = state.Load<Texture2D>("helpPic");
             nonSelectedFont = state.Load<SpriteFont>("MenuFont");
             selectedFont = state.Load<SpriteFont>("MenuFont1");
 
@@ -292,6 +304,7 @@ namespace rimmprojekt.States
             loadingTex = state.Load<Texture2D>("Textures/Loading");
             background.Texture = alistarLol;
             loadingElement.Texture = loadingTex;
+            helpAbout = new TexturedElement(help, new Vector2(1280, 720));
         }
 
         private void drawLoadingBar()
