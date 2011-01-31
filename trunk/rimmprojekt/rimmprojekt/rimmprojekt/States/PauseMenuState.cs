@@ -169,7 +169,7 @@ namespace rimmprojekt.States
             menuEntries.Add("Resume Game");
             menuEntries.Add("New Game");
             menuEntries.Add("Save Game");
-            menuEntries.Add("Go To Main Menu");
+            //menuEntries.Add("Go To Main Menu");
             menuEntries.Add("Quit Game");
 
             selectedEntry = 0;
