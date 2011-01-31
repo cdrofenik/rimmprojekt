@@ -29,6 +29,11 @@ namespace rimmprojekt
         private DrawTargetScreen drawToScreen;
         private DrawTargetTexture2D drawToTexture;
 
+        private bool introPlayed;
+        private Video myVideo;
+        private VideoPlayer videoPlayer;
+        private SpriteBatch spriteBatch;
+
         //graphicManager that is used for fullscreen mode
         private GraphicsDeviceManager graphicsManager;
 
@@ -37,6 +42,9 @@ namespace rimmprojekt
         //This method gets called just before the window is shown, and the device is created
         protected override void Initialise()
         {
+            videoPlayer = new VideoPlayer();
+            introPlayed = false;
+
             //create the draw target.
             drawToScreen = new DrawTargetScreen(new Camera3D());
 
@@ -69,6 +77,17 @@ namespace rimmprojekt
         //Note: Player input and Updating is explained in more detail in Tutorial 13
         protected override void Update(UpdateState state)
         {
+            if (!introPlayed)
+            {
+                videoPlayer.Play(myVideo);
+                introPlayed = true;
+            }
+
+            if (state.KeyboardState.KeyState.Q.OnReleased)
+            {
+                videoPlayer.Stop();
+            }
+
             if (state.KeyboardState.KeyState.F5.OnReleased)
             {
                 Texture2D slika = drawToTexture.GetTexture();
@@ -96,9 +115,21 @@ namespace rimmprojekt
         //The vast majority of applications shouldn't need to directly access the graphics device.
         protected override void Frame(FrameState state)
         {
-            //perform the draw to the screen.
-            drawToTexture.Draw(state);
-            drawToScreen.Draw(state);
+            if (videoPlayer.State == MediaState.Playing)
+            {                
+                spriteBatch.Begin();
+
+                    spriteBatch.Draw(videoPlayer.GetTexture(), new Rectangle(0, 0, 1280, 720), Color.White);
+
+                spriteBatch.End();
+            }
+
+            else
+            {
+                //perform the draw to the screen.
+                drawToTexture.Draw(state);
+                drawToScreen.Draw(state);
+            }
 
             //at this point the screen has been drawn...
         }
@@ -131,6 +162,9 @@ namespace rimmprojekt
 
             //the statistics overlay requires the font is set
             this.statisticsOverlay.Font = xnaSpriteFont;
+
+            spriteBatch = new SpriteBatch(graphicsManager.GraphicsDevice);
+            myVideo = state.Load<Video>("intro");
         }
     }
 }
