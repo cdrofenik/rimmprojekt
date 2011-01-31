@@ -178,9 +178,9 @@ namespace rimmprojekt.Razredi
             Random rndm = new Random();
 
             float[] x = new float[3];
-            x[0] = float.Parse(rndm.Next(502, 577).ToString());
-            x[1] = float.Parse(rndm.Next(501, 580).ToString());
-            x[2] = float.Parse(rndm.Next(384, 581).ToString());
+            x[0] = float.Parse(rndm.Next(502, 560).ToString());
+            x[1] = float.Parse(rndm.Next(501, 570).ToString());
+            x[2] = float.Parse(rndm.Next(384, 565).ToString());
 
             float[] z = new float[3];
             z[0] = float.Parse("575");
