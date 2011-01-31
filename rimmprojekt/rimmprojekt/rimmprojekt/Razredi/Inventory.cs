@@ -86,7 +86,7 @@ namespace rimmprojekt.Razredi
 
             sizeOfElement = new Vector2(380.0f, 210.0f);
             element = new TexturedElement(inventoryTexture,sizeOfElement);
-            element.AlphaBlendState = Xen.Graphics.AlphaBlendState.Modulate;
+            element.AlphaBlendState = Xen.Graphics.AlphaBlendState.Additive;
             inicializeInventoryItems();
 		}
 
@@ -98,7 +98,9 @@ namespace rimmprojekt.Razredi
                 {
                     if (isInBattle)
                     {
-                        element.Position = new Vector2(state.Application.WindowWidth - 1000, state.Application.WindowHeight - 700);
+
+
+                        element.Position = new Vector2(300, 20);
                         element.Draw(state);
 
                         #region razlicne situacije stevila hp in mp potionov
