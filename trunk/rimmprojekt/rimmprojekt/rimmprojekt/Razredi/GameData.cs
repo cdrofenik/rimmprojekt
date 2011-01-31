@@ -80,6 +80,8 @@ namespace rimmprojekt.Razredi
 
             tezej = new Razredi.Tezej(69.0f, 0.0f, 80.0f, stateManager.Application.UpdateManager, stateManager.Application.Content, bodies);
             inventory = new Razredi.Inventory(stateManager.Application.UpdateManager, stateManager.Application.Content, tezej);
+            inventory.addPotion("hp", 20);
+            inventory.addPotion("mp", 20);
         }
 
         public GameData(States.IGameStateManager stateManager, GameData gameData)
