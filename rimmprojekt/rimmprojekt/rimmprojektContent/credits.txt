@@ -1,5 +1,7 @@
 ﻿Tose Dimkov:
 - izdelava menijev
+- uvodni film
+- fullscreen mode
 
 Crtomir Drofenik:
 - sistem bojevanja
