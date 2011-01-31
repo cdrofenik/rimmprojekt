@@ -179,16 +179,16 @@ namespace rimmprojekt.Razredi
 
             float[] x = new float[3];
             x[0] = float.Parse(rndm.Next(502, 560).ToString());
-            x[1] = float.Parse(rndm.Next(501, 570).ToString());
-            x[2] = float.Parse(rndm.Next(384, 565).ToString());
+            x[1] = 500.0f;
+            x[2] = float.Parse(rndm.Next(384, 560).ToString());
 
             float[] z = new float[3];
-            z[0] = float.Parse("575");
-            z[1] = float.Parse("504");
+            z[0] = float.Parse("577");
+            z[1] = float.Parse(rndm.Next(420, 570).ToString());
             z[2] = float.Parse("338");
 
 
-            int tableIndex = rndm.Next(1, 3);
+            int tableIndex = rndm.Next(0, 2);
 
             return new Vector3(x[tableIndex], 0.0f, z[tableIndex]);
         }

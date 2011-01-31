@@ -38,12 +38,13 @@ namespace rimmprojekt.Razredi
         public void Draw(DrawState state)
         {
             back.Draw(state);
+            background.Draw(state);
             textBox.Draw(state);
         }
 
         public void LoadContent(ContentState state)
         {
-            //backPic = state.Load<Texture2D>(@"backgroundEnd");
+            backPic = state.Load<Texture2D>(@"the_end");
             bigFont = state.Load<SpriteFont>(@"ArialBattle");
             setVisuals();
         }
@@ -60,8 +61,11 @@ namespace rimmprojekt.Razredi
 
         private void setVisuals()
         {
-            background = new TexturedElement(new Vector2(1280, 720));
-            //background.Texture = backPic;
+            background = new TexturedElement(new Vector2(400, 299));
+            background.AlphaBlendState = AlphaBlendState.Alpha;
+            background.HorizontalAlignment = HorizontalAlignment.Left;
+            background.VerticalAlignment = VerticalAlignment.Centre;
+            background.Texture = backPic;
 
             textBox = new TextElementRect(new Vector2(500, 400));
             textBox.Font = bigFont;
