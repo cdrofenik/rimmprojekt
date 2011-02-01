@@ -666,7 +666,7 @@ namespace rimmprojekt.States
                 Random rndm = new Random();
                 String addText = "";
 
-                expGained = rndm.Next(250, 450);
+                expGained = 500;
                 gameData.Tezej.expPoints += expGained;
 
                 hpPotionsGained = rndm.Next(0, 2);
