@@ -1,0 +1,1 @@
+SVN za projekt minotavrovo mascevanje
